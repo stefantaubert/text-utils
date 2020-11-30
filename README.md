@@ -38,3 +38,14 @@ cd textgrid-ipa
 python3.8 -m pip install pipenv
 python3.8 -m pipenv install --dev
 ```
+
+### Add to another project
+
+In the destination project run:
+
+```sh
+# if not already done:
+pip install --user pipenv --python 3.7
+# add reference
+pipenv install -e git+https://github.com/stefantaubert/text-utils.git@master#egg=text_utils
+```
