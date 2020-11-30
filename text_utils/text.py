@@ -30,6 +30,24 @@ class EngToIpaMode(IntEnum):
   BOTH = 2
 
 
+CHN_MAPPINGS = [
+  (r"。", "."),
+  (r"？", "?"),
+  (r"！", "!"),
+  (r"，", ","),
+  (r"：", ":"),
+  (r"；", ";"),
+  (r"「", "\""),
+  (r"」", "\""),
+  (r"『", "\""),
+  (r"』", "\""),
+  (r"、", ",")
+]
+
+CHN_SUBS = [(re.compile(regex_pattern), replace_with)
+            for regex_pattern, replace_with in CHN_MAPPINGS]
+
+
 def en_to_ipa(text: str, mode: EngToIpaMode) -> str:
   if mode is None:
     raise Exception("Assert")
@@ -135,7 +153,7 @@ def text_normalize(text: str, lang: Language) -> str:
   if lang == Language.IPA:
     return normalize_ipa(text)
 
-  assert False
+  raise Exception()
 
 
 def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode]) -> str:
@@ -151,7 +169,7 @@ def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode]) -> str:
   if lang == Language.IPA:
     return text
 
-  assert False
+  raise Exception()
 
 
 def text_to_sentences(text: str, lang: Language) -> List[str]:
@@ -167,27 +185,21 @@ def text_to_sentences(text: str, lang: Language) -> List[str]:
   if lang == Language.GER:
     return split_ger_text(text)
 
-  assert False
+  raise Exception()
 
 
 def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None, padding_symbol: Optional[str] = None) -> List[str]:
-  if lang == Language.ENG:
-    symbols = list(text)
-  elif lang == Language.GER:
-    symbols = list(text)
-  elif lang == Language.CHN:
-    symbols = list(text)
-  elif lang == Language.IPA:
-    symbols = extract_from_sentence(
+  if lang == Language.ENG or lang == Language.GER or lang == Language.CHN:
+    return list(text)
+  if lang == Language.IPA:
+    return extract_from_sentence(
       text,
       ignore_tones=ignore_tones,
       ignore_arcs=ignore_arcs,
       padding_symbol=padding_symbol,
     )
-  else:
-    assert False
 
-  return symbols
+  raise Exception()
 
 
 def split_text(text: str, separators: List[str]) -> List[str]:
@@ -226,23 +238,6 @@ def split_chn_text(text: str) -> List[str]:
   return split_text(text, separators)
 
 
-CHN_MAPPINGS = [
-  (r"。", "."),
-  (r"？", "?"),
-  (r"！", "!"),
-  (r"，", ","),
-  (r"：", ":"),
-  (r"；", ";"),
-  (r"「", "\""),
-  (r"」", "\""),
-  (r"『", "\""),
-  (r"』", "\""),
-  (r"、", ",")
-]
-
-_subs = [(re.compile(regex_pattern), replace_with) for regex_pattern, replace_with in CHN_MAPPINGS]
-
-
 def split_chn_sentence(sentence: str) -> List[str]:
   chn_words = sentence.split(' ')
   return chn_words
@@ -257,13 +252,7 @@ def chn_to_ipa(chn: str):
     res.append(chn_ipa)
   res_str = ' '.join(res)
 
-  for regex, replacement in _subs:
+  for regex, replacement in CHN_SUBS:
     res_str = re.sub(regex, replacement, res_str)
 
   return res_str
-
-
-if __name__ == "__main__":
-  w = "东北军 的 一些 爱？」"
-  a = chn_to_ipa(w)
-  print(a)
