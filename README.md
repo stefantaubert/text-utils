@@ -9,7 +9,7 @@ def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode]) -> str:
   ...
 def text_to_sentences(text: str, lang: Language) -> List[str]:
   ...
-def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None) -> List[str]:
+def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None, padding_symbol: Optional[str] = None) -> List[str]:
   ...
 ```
 
@@ -53,3 +53,4 @@ pipenv install -e git+https://github.com/stefantaubert/text-utils.git@master#egg
 ## Dev
 
 update setup.py with `pipenv-setup sync`
+see [details](https://pypi.org/project/pipenv-setup/)

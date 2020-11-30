@@ -3,20 +3,19 @@ from typing import List
 
 from ipapy.ipastring import IPAString
 
-DEFAULT_PADDING_SYMBOL = "_"
 # _rx = '[{}]'.format(re.escape(string.punctuation))
 
 ARC = '͡'
 
 
-def extract_from_sentence(ipa_sentence: str, ignore_tones: bool, ignore_arcs: bool):
+def extract_from_sentence(ipa_sentence: str, ignore_tones: bool, ignore_arcs: bool, padding_symbol: str):
   res = []
   tmp: List[str] = []
 
   for c in ipa_sentence:
     if c in string.punctuation or c in string.whitespace:
       if len(tmp) > 0:
-        raw_word_symbols = _extract_symbols(tmp, ignore_tones, ignore_arcs)
+        raw_word_symbols = _extract_symbols(tmp, ignore_tones, ignore_arcs, padding_symbol)
         res.extend(raw_word_symbols)
         tmp.clear()
       res.append(c)
@@ -24,13 +23,13 @@ def extract_from_sentence(ipa_sentence: str, ignore_tones: bool, ignore_arcs: bo
       tmp.append(c)
 
   if len(tmp) > 0:
-    raw_word_symbols = _extract_symbols(tmp, ignore_tones, ignore_arcs)
+    raw_word_symbols = _extract_symbols(tmp, ignore_tones, ignore_arcs, padding_symbol)
     res.extend(raw_word_symbols)
     tmp.clear()
   return res
 
 
-def _extract_symbols(input_symbols: List[str], ignore_tones: bool, ignore_arcs: bool, replace_unknown_ipa_by: str = DEFAULT_PADDING_SYMBOL) -> List[str]:
+def _extract_symbols(input_symbols: List[str], ignore_tones: bool, ignore_arcs: bool, replace_unknown_ipa_by: str) -> List[str]:
   symbols: List[str] = []
   input_word = ''.join(input_symbols)
   try:

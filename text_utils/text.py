@@ -170,7 +170,7 @@ def text_to_sentences(text: str, lang: Language) -> List[str]:
   assert False
 
 
-def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None) -> List[str]:
+def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None, padding_symbol: Optional[str] = None) -> List[str]:
   if lang == Language.ENG:
     symbols = list(text)
   elif lang == Language.GER:
@@ -181,7 +181,8 @@ def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = No
     symbols = extract_from_sentence(
       text,
       ignore_tones=ignore_tones,
-      ignore_arcs=ignore_arcs
+      ignore_arcs=ignore_arcs,
+      padding_symbol=padding_symbol,
     )
   else:
     assert False
