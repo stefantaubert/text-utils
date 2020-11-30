@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+autopep8 = "*"
+pylint = "*"
+pycodestyle = "*"
+isort = "*"
+
+[packages]
+epitran = "*"
+nltk = "*"
+dragonmapper = "*"
+ipapy = "*"
+inflect = "*"
+cmudict-parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
+unidecode = "*"
+
+[requires]
+python_version = "3.8"
