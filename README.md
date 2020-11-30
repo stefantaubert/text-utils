@@ -49,3 +49,7 @@ pip install --user pipenv --python 3.7
 # add reference
 pipenv install -e git+https://github.com/stefantaubert/text-utils.git@master#egg=text_utils
 ```
+
+## Dev
+
+update setup.py with `pipenv-setup sync`
