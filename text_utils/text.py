@@ -48,13 +48,13 @@ CHN_SUBS = [(re.compile(regex_pattern), replace_with)
             for regex_pattern, replace_with in CHN_MAPPINGS]
 
 
-def en_to_ipa(text: str, mode: EngToIpaMode) -> str:
+def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: str) -> str:
   if mode is None:
     raise Exception("Assert")
   if mode == EngToIpaMode.EPITRAN:
     return en_to_ipa_epitran(text)
   if mode == EngToIpaMode.CMUDICT:
-    return en_to_ipa_cmu(text)
+    return en_to_ipa_cmu(text, replace_unknown_with)
   if mode == EngToIpaMode.BOTH:
     return en_to_ipa_cmu_epitran(text)
   raise Exception()
@@ -90,13 +90,13 @@ def en_to_ipa_epi_verbose(word: str) -> str:
   return res
 
 
-def en_to_ipa_cmu(text: str) -> str:
+def en_to_ipa_cmu(text: str, replace_unknown_with: str) -> str:
   global CMU_CACHE
   if CMU_CACHE is None:
     CMU_CACHE = get_dict(silent=True)
   result = CMU_CACHE.sentence_to_ipa(
     sentence=text,
-    replace_unknown_with="_"
+    replace_unknown_with=replace_unknown_with
   )
   return result
 
@@ -156,9 +156,9 @@ def text_normalize(text: str, lang: Language) -> str:
   raise Exception()
 
 
-def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode]) -> str:
+def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str]) -> str:
   if lang == Language.ENG:
-    return en_to_ipa(text, mode)
+    return en_to_ipa(text, mode, replace_unknown_with)
 
   if lang == Language.GER:
     return ger_to_ipa(text)
