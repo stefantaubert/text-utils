@@ -59,7 +59,7 @@ def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str]
       ex = ValueError(f"Parameter replace_unknown_with is required for {mode!r}!")
       logger.error("", exc_info=ex)
       raise ex
-    return en_to_ipa_cmu(text, replace_unknown_with)
+    return en_to_ipa_cmu(text, replace_unknown_with, logger)
   if mode == EngToIpaMode.BOTH:
     return en_to_ipa_cmu_epitran(text, logger)
 
@@ -82,12 +82,17 @@ def en_to_ipa_cmu_epitran(text: str, logger: Logger) -> str:
     CMU_CACHE = get_dict(silent=True)
   if Language.ENG not in EPITRAN_CACHE.keys():
     EPITRAN_CACHE[Language.ENG] = Epitran('eng-Latn')
-  result = CMU_CACHE.sentence_to_ipa(
-    sentence=text,
-    # replace_unknown_with=EPITRAN_CACHE[Language.ENG].transliterate
-    replace_unknown_with=partial(en_to_ipa_epi_verbose, logger=logger)
-  )
-  return result
+  try:
+    result = CMU_CACHE.sentence_to_ipa(
+      sentence=text,
+      # replace_unknown_with=EPITRAN_CACHE[Language.ENG].transliterate
+      replace_unknown_with=partial(en_to_ipa_epi_verbose, logger=logger)
+    )
+    return result
+  except Exception as orig_exception:
+    ex = ValueError(f"Conversion of '{text}' was not successfull!")
+    logger.error("", exc_info=ex)
+    raise ex from orig_exception
 
 
 def en_to_ipa_epi_verbose(word: str, logger: Logger) -> str:
@@ -97,16 +102,22 @@ def en_to_ipa_epi_verbose(word: str, logger: Logger) -> str:
   return res
 
 
-def en_to_ipa_cmu(text: str, replace_unknown_with: str) -> str:
+def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
   assert replace_unknown_with is not None
   global CMU_CACHE
   if CMU_CACHE is None:
     CMU_CACHE = get_dict(silent=True)
-  result = CMU_CACHE.sentence_to_ipa(
-    sentence=text,
-    replace_unknown_with=replace_unknown_with
-  )
-  return result
+
+  try:
+    result = CMU_CACHE.sentence_to_ipa(
+      sentence=text,
+      replace_unknown_with=replace_unknown_with
+    )
+    return result
+  except Exception as orig_exception:
+    ex = ValueError(f"Conversion of '{text}' was not successfull!")
+    logger.error("", exc_info=ex)
+    raise ex from orig_exception
 
 
 def ger_to_ipa(text: str) -> str:

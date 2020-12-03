@@ -3,13 +3,13 @@
 methods:
 
 ```py
-def text_normalize(text: str, lang: Language) -> str:
+def text_normalize(text: str, lang: Language, logger: Logger) -> str:
   ...
-def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode]) -> str:
+def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger) -> str:
   ...
-def text_to_sentences(text: str, lang: Language) -> List[str]:
+def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
   ...
-def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None, padding_symbol: Optional[str] = None) -> List[str]:
+def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
   ...
 ```
 
