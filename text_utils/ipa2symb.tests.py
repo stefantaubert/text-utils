@@ -1,16 +1,16 @@
-from text_utils.language import Language
-from text_utils.text import EngToIpaMode, text_normalize, text_to_ipa
 import unittest
 
 import epitran
 
 from text_utils.ipa2symb import extract_from_sentence
+from text_utils.language import Language
+from text_utils.text import EngToIpaMode, text_normalize, text_to_ipa
 
 
 class UnitTests(unittest.TestCase):
   def test_all(self):
     sent = "At Müller's execution there was great competition for front seats."
-    res = text_to_ipa(sent, Language.ENG, EngToIpaMode.EPITRAN)
+    res = text_to_ipa(sent, Language.ENG, EngToIpaMode.BOTH, replace_unknown_with="_")
     self.assertEqual("", res)
 
   def test_quick(self):
