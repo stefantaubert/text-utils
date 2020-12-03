@@ -27,7 +27,7 @@
         "cmudict-parser": {
             "editable": true,
             "git": "https://github.com/stefantaubert/cmudict-parser.git",
-            "ref": "4ac82315e4641de7227f44b0e6abbe27acc60500"
+            "ref": "a304228d45f217653c9a9b597fb61b76d5f2b44b"
         },
         "dragonmapper": {
             "hashes": [
@@ -636,7 +636,7 @@
                 "sha256:19188f96923873c92ccb987120ec4acaa12f0461fa9ce5d3d0772bc965a39e08",
                 "sha256:d8ff90d979214d7b4f8ce956e80f4028fc6860e4431f731ea4a8c08f23f99473"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4.0'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'",
             "version": "==1.26.2"
         },
         "vistir": {

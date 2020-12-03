@@ -1,9 +1,9 @@
 from setuptools import find_packages, setup
 
 setup(
-    # dependency_links=[
-    #     "git+https://github.com/stefantaubert/cmudict-parser.git@4ac82315e4641de7227f44b0e6abbe27acc60500#egg=cmudict-parser"
-    # ],
+    dependency_links=[
+        "git+https://github.com/stefantaubert/cmudict-parser.git@a304228d45f217653c9a9b597fb61b76d5f2b44b#egg=cmudict-parser"
+    ],
     name="text_utils",
     version="1.0.0",
     url="https://github.com/stefantaubert/text-utils.git",
@@ -13,7 +13,6 @@ setup(
     packages=["text_utils"],
     install_requires=[
         "click==7.1.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
-        "cmudict-parser @ git+https://github.com/stefantaubert/cmudict-parser.git@4ac82315e4641de7227f44b0e6abbe27acc60500#egg=cmudict-parser",
         "dragonmapper==0.2.6",
         "editdistance==0.5.3",
         "epitran==1.8",
