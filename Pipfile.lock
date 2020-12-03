@@ -27,7 +27,7 @@
         "cmudict-parser": {
             "editable": true,
             "git": "https://github.com/stefantaubert/cmudict-parser.git",
-            "ref": "e8767cfdd2e1405890afc5a3566f33b4c6e75a2d"
+            "ref": "b2bd08efb7f18bfca393b79c0f3c3899fdcfd6df"
         },
         "dragonmapper": {
             "hashes": [
