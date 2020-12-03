@@ -1,5 +1,7 @@
 import re
 from enum import IntEnum
+from functools import partial
+from logging import Logger
 from typing import Dict, List, Optional
 
 from cmudict_parser import CMUDict, get_dict
@@ -16,7 +18,7 @@ from text_utils.adjustments.emails import (replace_at_symbols,
                                            replace_mail_addresses)
 from text_utils.adjustments.numbers import normalize_numbers
 from text_utils.adjustments.whitespace import collapse_whitespace
-from text_utils.ipa2symb import extract_from_sentence
+from text_utils.ipa2symb import IPAExtractionSettings, extract_from_sentence
 from text_utils.language import Language
 
 EPITRAN_CACHE: Dict[Language, Epitran] = {}
@@ -48,16 +50,20 @@ CHN_SUBS = [(re.compile(regex_pattern), replace_with)
             for regex_pattern, replace_with in CHN_MAPPINGS]
 
 
-def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: str) -> str:
-  if mode is None:
-    raise Exception("Assert")
+def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], logger: Logger) -> str:
+  assert mode is not None
   if mode == EngToIpaMode.EPITRAN:
     return en_to_ipa_epitran(text)
   if mode == EngToIpaMode.CMUDICT:
+    if replace_unknown_with is None:
+      ex = ValueError(f"Parameter replace_unknown_with is required for {mode!r}!")
+      logger.error("", exc_info=ex)
+      raise ex
     return en_to_ipa_cmu(text, replace_unknown_with)
   if mode == EngToIpaMode.BOTH:
-    return en_to_ipa_cmu_epitran(text)
-  raise Exception()
+    return en_to_ipa_cmu_epitran(text, logger)
+
+  assert False
 
 
 def en_to_ipa_epitran(text: str) -> str:
@@ -68,29 +74,31 @@ def en_to_ipa_epitran(text: str) -> str:
   return result
 
 
-def en_to_ipa_cmu_epitran(text: str) -> str:
+def en_to_ipa_cmu_epitran(text: str, logger: Logger) -> str:
   global CMU_CACHE
   global EPITRAN_CACHE
   if CMU_CACHE is None:
+    logger.info("Loading CMU dictionary...")
     CMU_CACHE = get_dict(silent=True)
   if Language.ENG not in EPITRAN_CACHE.keys():
     EPITRAN_CACHE[Language.ENG] = Epitran('eng-Latn')
   result = CMU_CACHE.sentence_to_ipa(
     sentence=text,
     # replace_unknown_with=EPITRAN_CACHE[Language.ENG].transliterate
-    replace_unknown_with=en_to_ipa_epi_verbose
+    replace_unknown_with=partial(en_to_ipa_epi_verbose, logger=logger)
   )
   return result
 
 
-def en_to_ipa_epi_verbose(word: str) -> str:
+def en_to_ipa_epi_verbose(word: str, logger: Logger) -> str:
   global EPITRAN_CACHE
   res = EPITRAN_CACHE[Language.ENG].transliterate(word)
-  print(f"used Epitran for: {word} => {res}")
+  logger.info(f"used Epitran for: {word} => {res}")
   return res
 
 
 def en_to_ipa_cmu(text: str, replace_unknown_with: str) -> str:
+  assert replace_unknown_with is not None
   global CMU_CACHE
   if CMU_CACHE is None:
     CMU_CACHE = get_dict(silent=True)
@@ -140,7 +148,7 @@ def normalize_chn(text: str) -> str:
   return text
 
 
-def text_normalize(text: str, lang: Language) -> str:
+def text_normalize(text: str, lang: Language, logger: Logger) -> str:
   if lang == Language.ENG:
     return normalize_en(text)
 
@@ -153,12 +161,17 @@ def text_normalize(text: str, lang: Language) -> str:
   if lang == Language.IPA:
     return normalize_ipa(text)
 
-  raise Exception()
+  assert False
 
 
-def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str]) -> str:
+def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger) -> str:
   if lang == Language.ENG:
-    return en_to_ipa(text, mode, replace_unknown_with)
+    if mode is None:
+      ex = ValueError(f"Parameter mode is required for {lang!r}!")
+      logger.error("", exc_info=ex)
+      raise ex
+
+    return en_to_ipa(text, mode, replace_unknown_with, logger)
 
   if lang == Language.GER:
     return ger_to_ipa(text)
@@ -169,10 +182,10 @@ def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace
   if lang == Language.IPA:
     return text
 
-  raise Exception()
+  assert False
 
 
-def text_to_sentences(text: str, lang: Language) -> List[str]:
+def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
   if lang == Language.CHN:
     return split_chn_text(text)
 
@@ -185,21 +198,25 @@ def text_to_sentences(text: str, lang: Language) -> List[str]:
   if lang == Language.GER:
     return split_ger_text(text)
 
-  raise Exception()
+  assert False
 
 
-def text_to_symbols(text: str, lang: Language, ignore_tones: Optional[bool] = None, ignore_arcs: Optional[bool] = None, padding_symbol: Optional[str] = None) -> List[str]:
-  if lang == Language.ENG or lang == Language.GER or lang == Language.CHN:
+def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
+  if lang in (Language.ENG, Language.GER, Language.CHN):
     return list(text)
   if lang == Language.IPA:
+    if ipa_settings is None:
+      ex = ValueError(f"You have to pass ipa_settings for {lang!r}!")
+      logger.error("", exc_info=ex)
+      raise ex
+
     return extract_from_sentence(
       text,
-      ignore_tones=ignore_tones,
-      ignore_arcs=ignore_arcs,
-      padding_symbol=padding_symbol,
+      ipa_settings,
+      logger,
     )
 
-  raise Exception()
+  assert False
 
 
 def split_text(text: str, separators: List[str]) -> List[str]:
@@ -243,7 +260,7 @@ def split_chn_sentence(sentence: str) -> List[str]:
   return chn_words
 
 
-def chn_to_ipa(chn: str):
+def chn_to_ipa(chn: str) -> str:
   chn_words = split_chn_sentence(chn)
   res = []
   for word in chn_words:

@@ -1,10 +1,39 @@
 import time
 import unittest
+from logging import getLogger
 
 from text_utils.text import *
 
 
 class UnitTests(unittest.TestCase):
+
+  def test_text_to_symbols__no_settings_for_ipa__raise_exception(self):
+    with self.assertRaises(ValueError):
+      text_to_symbols(
+        text="test",
+        lang=Language.IPA,
+        ipa_settings=None,
+        logger=getLogger()
+      )
+
+  def test_text_to_ipa__no_mode_for_eng__raise_exception(self):
+    with self.assertRaises(ValueError):
+      text_to_ipa(
+        text="test",
+        lang=Language.ENG,
+        mode=None,
+        replace_unknown_with="_",
+        logger=getLogger(),
+      )
+
+  def test_en_to_ipa__no_replace_on_cmu__raise_exception(self):
+    with self.assertRaises(ValueError):
+      en_to_ipa(
+        text="test",
+        mode=EngToIpaMode.CMUDICT,
+        replace_unknown_with=None,
+        logger=getLogger(),
+      )
 
   def test_normalize_en(self):
     inp = "ü Hello my name is mr. test and    1 + 3 is $4. g 5e12  "
@@ -17,7 +46,8 @@ class UnitTests(unittest.TestCase):
     start = time.time()
     res = []
     for _ in range(25):
-      res.append(en_to_ipa(text, EngToIpaMode.EPITRAN))
+      res.append(en_to_ipa(text, EngToIpaMode.EPITRAN,
+                           replace_unknown_with=None, logger=getLogger()))
     duration_s = time.time() - start
     # 21s with no caching
     self.assertTrue(duration_s < 6)
@@ -75,11 +105,11 @@ class UnitTests(unittest.TestCase):
     self.assertEqual("This is a error!", res[6])
 
   def test_split_en_north(self):
+    # Maybe include splitting on \n
     example_text = "his cloak around him;\nand at last."
     res = split_en_text(example_text)
-    self.assertEqual(2, len(res))
-    self.assertEqual("his cloak around him;", res[0])
-    self.assertEqual("and at last.", res[1])
+    self.assertEqual(1, len(res))
+    self.assertEqual("his cloak around him;\nand at last.", res[0])
 
   def test_split_ger(self):
     example_text = "Das ist ein Test 4.000. Und ein weiterer.\nUnd eine neue Zeile.\r\nUnd eine Zeile mit \r.\n\nUnd eine Zeile mit \n drin. Das ist eine Frage? Das ist ein Fehler!"
