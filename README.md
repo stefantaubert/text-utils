@@ -52,5 +52,5 @@ pipenv install -e git+https://github.com/stefantaubert/text-utils.git@master#egg
 
 ## Dev
 
-update setup.py with `pipenv-setup sync`
+update setup.py with shell and `pipenv-setup sync`
 see [details](https://pypi.org/project/pipenv-setup/)

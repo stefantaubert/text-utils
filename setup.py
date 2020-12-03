@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     dependency_links=[
-        "git+https://github.com/stefantaubert/cmudict-parser.git@master#egg=cmudict-parser"
+        "git+https://github.com/stefantaubert/cmudict-parser.git@4ac82315e4641de7227f44b0e6abbe27acc60500#egg=cmudict-parser"
     ],
     name="text_utils",
     version="1.0.0",
