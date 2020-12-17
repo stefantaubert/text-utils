@@ -2,6 +2,8 @@ import time
 import unittest
 from logging import getLogger
 
+from cmudict_parser import clear_cache
+
 from text_utils.text import *
 
 
@@ -10,7 +12,7 @@ class UnitTests(unittest.TestCase):
   def test_en_to_ipa_with_phones(self):
     text = "This is /ð/ a test."
     res = en_to_ipa(text, EngToIpaMode.EPITRAN,
-                    replace_unknown_with=None, logger=getLogger())
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
     self.assertEqual("ðɪs ɪz ð ə tɛst.", res)
 
   def test_text_to_symbols__no_settings_for_ipa__raise_exception(self):
@@ -29,6 +31,7 @@ class UnitTests(unittest.TestCase):
         lang=Language.ENG,
         mode=None,
         replace_unknown_with="_",
+        use_cache=False,
         logger=getLogger(),
       )
 
@@ -38,6 +41,7 @@ class UnitTests(unittest.TestCase):
         text="test",
         mode=EngToIpaMode.CMUDICT,
         replace_unknown_with=None,
+        use_cache=False,
         logger=getLogger(),
       )
 
@@ -47,14 +51,52 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(
       "u Hello my name is mister test and one + three is four dollars. grams five times ten to the power of twelve", res)
 
+  def test_en_to_ipa__both_without_cache__takes_longer_time(self):
+    # xyzxyz doesn't exist in CMUDict
+    text = "xyzxyz"
+
+    ensure_cmudict_is_loaded(getLogger())
+    ensure_eng_epitran_is_loaded(getLogger())
+    clear_cache()
+
+    start = time.time()
+    # , to prevent caching in cmudict, i could also clear the cache on every iteration
+    res = [en_to_ipa(text + ("," * i), EngToIpaMode.BOTH,
+                     replace_unknown_with="_", use_cache=False, logger=getLogger()) for i in range(100)]
+    duration_s = time.time() - start
+
+    self.assertTrue(duration_s < 9)
+    self.assertEqual(100, len(res))
+    self.assertEqual("zɪzksajz", res[0])
+
+  def test_en_to_ipa__both_without_cache__takes_shorter_time(self):
+    # xyzxyz doesn't exist in CMUDict
+    text = "xyzxyz"
+
+    ensure_cmudict_is_loaded(getLogger())
+    ensure_eng_epitran_is_loaded(getLogger())
+    clear_cache()
+    clear_en_word_cache()
+
+    start = time.time()
+    # , to prevent caching in cmudict, i could also clear the cache on every iteration
+    res = [en_to_ipa(text + ("," * i), EngToIpaMode.BOTH,
+                     replace_unknown_with="_", use_cache=True, logger=getLogger()) for i in range(100)]
+    duration_s = time.time() - start
+
+    self.assertTrue(duration_s < 5)
+    self.assertEqual(100, len(res))
+    self.assertEqual("zɪzksajz", res[0])
+
   def test_en_to_ipa(self):
     text = "This is a test. And an other one."
+    ensure_eng_epitran_is_loaded(getLogger())
+
     start = time.time()
-    res = []
-    for _ in range(25):
-      res.append(en_to_ipa(text, EngToIpaMode.EPITRAN,
-                           replace_unknown_with=None, logger=getLogger()))
+    res = [en_to_ipa(text, EngToIpaMode.EPITRAN,
+                     replace_unknown_with=None, use_cache=False, logger=getLogger()) for _ in range(25)]
     duration_s = time.time() - start
+
     # 21s with no caching
     # don't run training in parallel!
     self.assertTrue(duration_s < 6)
@@ -63,10 +105,10 @@ class UnitTests(unittest.TestCase):
 
   def test_ger_to_ipa(self):
     text = "Das ist ein Test. Und ein weiterer."
+    ensure_ger_epitran_is_loaded(getLogger())
+
     start = time.time()
-    res = []
-    for _ in range(25):
-      res.append(ger_to_ipa(text))
+    res = [ger_to_ipa(text, getLogger()) for _ in range(25)]
     duration_s = time.time() - start
     # 16.39s with no caching
     self.assertTrue(duration_s < 2)

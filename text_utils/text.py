@@ -22,6 +22,7 @@ from text_utils.ipa2symb import IPAExtractionSettings, extract_from_sentence
 from text_utils.language import Language
 
 EPITRAN_CACHE: Dict[Language, Epitran] = {}
+EPITRAN_EN_WORD_CACHE: Dict[str, str] = {}
 
 CMU_CACHE: Optional[CMUDict] = None
 
@@ -50,10 +51,10 @@ CHN_SUBS = [(re.compile(regex_pattern), replace_with)
             for regex_pattern, replace_with in CHN_MAPPINGS]
 
 
-def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], logger: Logger) -> str:
+def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, logger: Logger) -> str:
   assert mode is not None
   if mode == EngToIpaMode.EPITRAN:
-    return en_to_ipa_epitran(text)
+    return en_to_ipa_epitran(text, logger)
   if mode == EngToIpaMode.CMUDICT:
     if replace_unknown_with is None:
       ex = ValueError(f"Parameter replace_unknown_with is required for {mode!r}!")
@@ -61,32 +62,55 @@ def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str]
       raise ex
     return en_to_ipa_cmu(text, replace_unknown_with, logger)
   if mode == EngToIpaMode.BOTH:
-    return en_to_ipa_cmu_epitran(text, logger)
+    return en_to_ipa_cmu_epitran(text, use_cache, logger)
 
   assert False
 
 
-def en_to_ipa_epitran(text: str) -> str:
+def en_to_ipa_epitran(text: str, logger: Logger) -> str:
   global EPITRAN_CACHE
-  if Language.ENG not in EPITRAN_CACHE.keys():
-    EPITRAN_CACHE[Language.ENG] = Epitran('eng-Latn')
+
+  ensure_eng_epitran_is_loaded(logger)
+
   result = EPITRAN_CACHE[Language.ENG].transliterate(text)
   return result
 
 
-def en_to_ipa_cmu_epitran(text: str, logger: Logger) -> str:
-  global CMU_CACHE
+def ensure_eng_epitran_is_loaded(logger: Logger) -> None:
   global EPITRAN_CACHE
+  if Language.ENG not in EPITRAN_CACHE.keys():
+    logger.info("Loading English Epitran...")
+    EPITRAN_CACHE[Language.ENG] = Epitran('eng-Latn')
+
+
+def ensure_ger_epitran_is_loaded(logger: Logger) -> None:
+  global EPITRAN_CACHE
+  if Language.GER not in EPITRAN_CACHE.keys():
+    logger.info("Loading German Epitran...")
+    EPITRAN_CACHE[Language.GER] = Epitran('deu-Latn')
+
+
+def ensure_cmudict_is_loaded(logger: Logger) -> None:
+  global CMU_CACHE
   if CMU_CACHE is None:
     logger.info("Loading CMU dictionary...")
     CMU_CACHE = get_dict(silent=True)
-  if Language.ENG not in EPITRAN_CACHE.keys():
-    EPITRAN_CACHE[Language.ENG] = Epitran('eng-Latn')
+
+
+def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
+  global CMU_CACHE
+
+  ensure_cmudict_is_loaded(logger)
+  ensure_eng_epitran_is_loaded(logger)
+
   try:
+    replacing_func = partial(epi_transliterate_word_cached, logger=logger) if use_cache else partial(
+        epi_transliterate_word_verbose, logger=logger)
+
     result = CMU_CACHE.sentence_to_ipa(
       sentence=text,
       # replace_unknown_with=EPITRAN_CACHE[Language.ENG].transliterate
-      replace_unknown_with=partial(en_to_ipa_epi_verbose, logger=logger)
+      replace_unknown_with=replacing_func
     )
     return result
   except Exception as orig_exception:
@@ -95,8 +119,24 @@ def en_to_ipa_cmu_epitran(text: str, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def en_to_ipa_epi_verbose(word: str, logger: Logger) -> str:
+def epi_transliterate_word_cached(word: str, logger: Logger) -> str:
+  # I am assuming there is no IPA difference in EPITRAN.
+  word = word.lower()
+
+  if word in EPITRAN_EN_WORD_CACHE:
+    return EPITRAN_EN_WORD_CACHE[word]
+
+  res = epi_transliterate_word_verbose(word, logger)
+
+  EPITRAN_EN_WORD_CACHE[word] = res
+
+  return res
+
+
+def epi_transliterate_word_verbose(word: str, logger: Logger) -> str:
   global EPITRAN_CACHE
+  assert Language.ENG in EPITRAN_CACHE
+
   res = EPITRAN_CACHE[Language.ENG].transliterate(word)
   logger.info(f"used Epitran for: {word} => {res}")
   return res
@@ -105,8 +145,8 @@ def en_to_ipa_epi_verbose(word: str, logger: Logger) -> str:
 def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
   assert replace_unknown_with is not None
   global CMU_CACHE
-  if CMU_CACHE is None:
-    CMU_CACHE = get_dict(silent=True)
+
+  ensure_cmudict_is_loaded(logger)
 
   try:
     result = CMU_CACHE.sentence_to_ipa(
@@ -120,10 +160,9 @@ def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def ger_to_ipa(text: str) -> str:
+def ger_to_ipa(text: str, logger: Logger) -> str:
   global EPITRAN_CACHE
-  if Language.GER not in EPITRAN_CACHE.keys():
-    EPITRAN_CACHE[Language.GER] = Epitran('deu-Latn')
+  ensure_ger_epitran_is_loaded(logger)
   result = EPITRAN_CACHE[Language.GER].transliterate(text)
   return result
 
@@ -175,17 +214,27 @@ def text_normalize(text: str, lang: Language, logger: Logger) -> str:
   assert False
 
 
-def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger) -> str:
+def clear_en_word_cache() -> None:
+  EPITRAN_EN_WORD_CACHE.clear()
+
+
+def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger, use_cache: bool = True) -> str:
   if lang == Language.ENG:
     if mode is None:
       ex = ValueError(f"Parameter mode is required for {lang!r}!")
       logger.error("", exc_info=ex)
       raise ex
 
-    return en_to_ipa(text, mode, replace_unknown_with, logger)
+    return en_to_ipa(
+      text=text,
+      mode=mode,
+      replace_unknown_with=replace_unknown_with,
+      use_cache=use_cache,
+      logger=logger,
+    )
 
   if lang == Language.GER:
-    return ger_to_ipa(text)
+    return ger_to_ipa(text, logger)
 
   if lang == Language.CHN:
     return chn_to_ipa(text)
