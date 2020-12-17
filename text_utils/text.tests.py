@@ -7,6 +7,12 @@ from text_utils.text import *
 
 class UnitTests(unittest.TestCase):
 
+  def test_en_to_ipa_with_phones(self):
+    text = "This is /ð/ a test."
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, logger=getLogger())
+    self.assertEqual("ðɪs ɪz ð ə tɛst.", res)
+
   def test_text_to_symbols__no_settings_for_ipa__raise_exception(self):
     with self.assertRaises(ValueError):
       text_to_symbols(
@@ -50,6 +56,7 @@ class UnitTests(unittest.TestCase):
                            replace_unknown_with=None, logger=getLogger()))
     duration_s = time.time() - start
     # 21s with no caching
+    # don't run training in parallel!
     self.assertTrue(duration_s < 6)
     self.assertEqual(25, len(res))
     self.assertEqual("ðɪs ɪz ə tɛst. ænd æn ʌðɹ̩ wʌn.", res[0])
