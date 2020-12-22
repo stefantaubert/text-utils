@@ -27,8 +27,8 @@ EPITRAN_EN_WORD_CACHE: Dict[str, str] = {}
 CMU_CACHE: Optional[CMUDict] = None
 
 PH_TRANS_NO_WHITESPACE = re.compile(r'/\S*/')
-IPA = re.compile('[^/]+')
-PH_TRANS = re.compile(r'/(.*)/')
+SLASH = re.compile(r'/')
+PH_TRANS = re.compile(r'([^ ]*)/(\S*)/([^ ]*)')
 
 
 class EngToIpaMode(IntEnum):
@@ -106,8 +106,7 @@ def is_phonetic_transcription_in_text(text: str) -> bool:
 
 def ipa_of_phonetic_transcription(ph_trans: str) -> str:
   assert is_phonetic_transcription(ph_trans)
-  ipa_of_ph_trans = IPA.search(ph_trans)
-  return ipa_of_ph_trans.group()
+  return re.sub(SLASH, '', ph_trans)
 
 
 def is_phonetic_transcription(text: str) -> bool:
@@ -209,6 +208,12 @@ def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
 
 
 def ger_to_ipa(text: str, logger: Logger) -> str:
+  if is_phonetic_transcription_in_text(text):
+    words = text.split(" ")
+    return " ".join([ipa_of_phonetic_transcription(word)
+                     if is_phonetic_transcription(word)
+                     else ger_to_ipa(text=word, logger=logger)
+                     for word in words])
   global EPITRAN_CACHE
   ensure_ger_epitran_is_loaded(logger)
   result = EPITRAN_CACHE[Language.GER].transliterate(text)
