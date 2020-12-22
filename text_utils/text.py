@@ -26,6 +26,10 @@ EPITRAN_EN_WORD_CACHE: Dict[str, str] = {}
 
 CMU_CACHE: Optional[CMUDict] = None
 
+PH_TRANS_NO_WHITESPACE = re.compile(r'/\S*/')
+IPA = re.compile('[^/]+')
+PH_TRANS = re.compile(r'/(.*)/')
+
 
 class EngToIpaMode(IntEnum):
   EPITRAN = 0
@@ -53,6 +57,34 @@ CHN_SUBS = [(re.compile(regex_pattern), replace_with)
 
 def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, logger: Logger) -> str:
   assert mode is not None
+  if is_phonetic_transcription_in_text(text):
+    words = text.split(" ")
+    return " ".join([ipa_of_phonetic_transcription(word)
+                     if is_phonetic_transcription(word)
+                     else ipa_of_text_not_containing_phonetic_transcription(
+        text=word,
+        mode=mode,
+        replace_unknown_with=replace_unknown_with,
+        use_cache=use_cache,
+        logger=logger
+      )
+        for word in words])
+  return ipa_of_text_not_containing_phonetic_transcription(
+     text=text,
+     mode=mode,
+     replace_unknown_with=replace_unknown_with,
+     use_cache=use_cache,
+     logger=logger
+    )
+
+
+def ipa_of_text_not_containing_phonetic_transcription(
+    text: str,
+    mode: EngToIpaMode,
+    replace_unknown_with: Optional[str],
+    use_cache: bool,
+    logger: Logger
+  ) -> str:
   if mode == EngToIpaMode.EPITRAN:
     return en_to_ipa_epitran(text, logger)
   if mode == EngToIpaMode.CMUDICT:
@@ -65,6 +97,22 @@ def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str]
     return en_to_ipa_cmu_epitran(text, use_cache, logger)
 
   assert False
+
+
+def is_phonetic_transcription_in_text(text: str) -> bool:
+  ph_trans_in_text = PH_TRANS_NO_WHITESPACE.search(text)
+  return ph_trans_in_text is not None
+
+
+def ipa_of_phonetic_transcription(ph_trans: str) -> str:
+  assert is_phonetic_transcription(ph_trans)
+  ipa_of_ph_trans = IPA.search(ph_trans)
+  return ipa_of_ph_trans.group()
+
+
+def is_phonetic_transcription(text: str) -> bool:
+  ipa_of_ph_trans = PH_TRANS.match(text)
+  return ipa_of_ph_trans is not None
 
 
 def en_to_ipa_epitran(text: str, logger: Logger) -> str:

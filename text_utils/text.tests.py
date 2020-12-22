@@ -15,6 +15,30 @@ class UnitTests(unittest.TestCase):
                     replace_unknown_with=None, use_cache=False, logger=getLogger())
     self.assertEqual("ðɪs ɪz ð ə tɛst.", res)
 
+  def test_en_to_ipa_with_phones_at_beginning(self):
+    text = "/ð/ a test."
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ð ə tɛst.", res)
+
+  def test_en_to_ipa_with_phones_at_end(self):
+    text = "This is /ð/"
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ðɪs ɪz ð", res)
+
+  def test_en_to_ipa_with_only_phones(self):
+    text = "/ð/"
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ð", res)
+
+  def test_en_to_ipa_with_only_phones_and_dot(self):
+    text = "/ð./"
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ð.", res)
+
   def test_text_to_symbols__no_settings_for_ipa__raise_exception(self):
     with self.assertRaises(ValueError):
       text_to_symbols(
