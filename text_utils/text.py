@@ -377,8 +377,11 @@ def chn_to_ipa(chn: str) -> str:
   chn_words = split_chn_sentence(chn)
   res = []
   for word in chn_words:
-    chn_ipa = hanzi.to_ipa(word)
-    chn_ipa = chn_ipa.replace(' ', '')
+    if is_phonetic_transcription(word):
+      chn_ipa = ipa_of_phonetic_transcription(word)
+    else:
+      chn_ipa = hanzi.to_ipa(word)
+      chn_ipa = chn_ipa.replace(' ', '')
     res.append(chn_ipa)
   res_str = ' '.join(res)
 
