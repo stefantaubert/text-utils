@@ -9,11 +9,97 @@ from text_utils.text import *
 
 class UnitTests(unittest.TestCase):
 
+  # region en_to_ipa
+
   def test_en_to_ipa_with_phones(self):
     text = "This is /ð/ a test."
     res = en_to_ipa(text, EngToIpaMode.EPITRAN,
                     replace_unknown_with=None, use_cache=False, logger=getLogger())
     self.assertEqual("ðɪs ɪz ð ə tɛst.", res)
+
+  def test_en_to_ipa_with_phones_at_beginning(self):
+    text = "/ð/ a test."
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ð ə tɛst.", res)
+
+  def test_en_to_ipa_with_phones_at_end(self):
+    text = "This is /ð/"
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ðɪs ɪz ð", res)
+
+  def test_en_to_ipa_with_only_phones(self):
+    text = "/ð/"
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("ð", res)
+
+  def test_en_to_ipa_with_only_phones_and_dot(self):
+    text = "-/ð/."
+    res = en_to_ipa(text, EngToIpaMode.EPITRAN,
+                    replace_unknown_with=None, use_cache=False, logger=getLogger())
+    self.assertEqual("-ð.", res)
+
+  # endregion
+
+  # region ger_to_ipa
+
+  def test_ger_to_ipa_with_phones(self):
+    text = "Das ist /ð/ ein Test."
+    res = ger_to_ipa(text, logger=getLogger())
+    self.assertEqual("das ist ð ain test.", res)
+
+  def test_ger_to_ipa_with_phones_at_beginning(self):
+    text = "/ð/ ein Test."
+    res = ger_to_ipa(text, logger=getLogger())
+    self.assertEqual("ð ain test.", res)
+
+  def test_ger_to_ipa_with_phones_at_end(self):
+    text = "Das ist /ð/"
+    res = ger_to_ipa(text, logger=getLogger())
+    self.assertEqual("das ist ð", res)
+
+  def test_ger_to_ipa_with_only_phones(self):
+    text = "/ð/"
+    res = ger_to_ipa(text, logger=getLogger())
+    self.assertEqual("ð", res)
+
+  def test_ger_to_ipa_with_only_phones_and_dot(self):
+    text = "-/ð/."
+    res = ger_to_ipa(text, logger=getLogger())
+    self.assertEqual("-ð.", res)
+
+  # endregion
+
+  # region chn_to_ipa
+
+  def test_chn_to_ipa_with_phones(self):
+    text = "东北军 的 一些 爱 /ð/ 东北军 的 一些 爱"
+    res = chn_to_ipa(text)
+    self.assertEqual("tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩ ð tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩", res)
+
+  def test_chn_to_ipa_with_phones_at_beginning(self):
+    text = "/ð/ 东北军 的 一些 爱"
+    res = chn_to_ipa(text)
+    self.assertEqual("ð tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩", res)
+
+  def test_chn_to_ipa_with_phones_at_end(self):
+    text = "东北军 的 一些 爱 /ð/"
+    res = chn_to_ipa(text)
+    self.assertEqual("tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩ ð", res)
+
+  def test_chn_to_ipa_with_only_phones(self):
+    text = "/ð/"
+    res = chn_to_ipa(text)
+    self.assertEqual("ð", res)
+
+  def test_chn_to_ipa_with_only_phones_and_dot(self):
+    text = "-/ð/."
+    res = chn_to_ipa(text)
+    self.assertEqual("-ð.", res)
+
+  # endregion
 
   def test_text_to_symbols__no_settings_for_ipa__raise_exception(self):
     with self.assertRaises(ValueError):
