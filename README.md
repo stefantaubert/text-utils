@@ -54,3 +54,27 @@ pipenv install -e git+https://github.com/stefantaubert/text-utils.git@master#egg
 
 update setup.py with shell and `pipenv-setup sync`
 see [details](https://pypi.org/project/pipenv-setup/)
+
+## Example Map
+
+```json
+{
+  "ɨ": "ʊ",
+  "ɯ": "ʊ",
+  "ʌ": "ʌ",
+  "ʒ": "ʒ",
+  "ʐ": "ʒ",
+  "θ": "θ"
+}
+```
+
+## Example Map Symbols
+
+```txt
+" "
+"ʃ"
+"ʊ"
+"ʌ"
+"ʒ"
+"θ"
+```

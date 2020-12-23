@@ -8,7 +8,6 @@ from text_utils.utils import get_sorted_list_from_set, parse_json, save_json
 
 
 class SymbolsMap(OrderedDict):
-
   @classmethod
   def from_intersection(cls, map_from: set, map_to: set):
     #only_a = list(sorted(list(symbolsA)))
