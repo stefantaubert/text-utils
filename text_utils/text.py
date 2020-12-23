@@ -393,18 +393,19 @@ def chn_to_ipa(chn: str) -> str:
 
 def chn_word_to_ipa(word: str) -> str:
   if is_phonetic_transcription(word):
-    chn_ipa = ipa_of_phonetic_transcription(word)
-  else:
-    chn_ipa = hanzi.to_ipa(word)
-    chn_ipa = chn_ipa.replace(' ', '')
-  return chn_ipa
+    return ipa_of_phonetic_transcription(word)
+  return chn_ipa_of_word_not_containing_phonetic_transcription(word)
 
 
 def chn_sentence_to_ipa(sentence: str) -> str:
   chn_words = split_chn_sentence(sentence)
-  res = []
-  for word in chn_words:
-    chn_ipa = chn_word_to_ipa(word)
-    res.append(chn_ipa)
+  res = [chn_word_to_ipa(word) for word in chn_words]
   res_str = ' '.join(res)
   return res_str
+
+
+def chn_ipa_of_word_not_containing_phonetic_transcription(word: str) -> str:
+  assert not is_phonetic_transcription(word)
+  chn_ipa = hanzi.to_ipa(word)
+  chn_ipa = chn_ipa.replace(' ', '')
+  return chn_ipa
