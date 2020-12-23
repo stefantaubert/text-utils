@@ -59,17 +59,21 @@ def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str]
   assert mode is not None
   if is_phonetic_transcription_in_text(text):
     words = text.split(" ")
-    return " ".join([ipa_of_phonetic_transcription(word)
-                     if is_phonetic_transcription(word)
-                     else ipa_of_text_not_containing_phonetic_transcription(
+    ipa_list = [
+      ipa_of_phonetic_transcription(word)
+        if is_phonetic_transcription(word)
+        else en_ipa_of_text_not_containing_phonetic_transcription(
         text=word,
         mode=mode,
         replace_unknown_with=replace_unknown_with,
         use_cache=use_cache,
         logger=logger
-      )
-        for word in words])
-  return ipa_of_text_not_containing_phonetic_transcription(
+          )
+        for word in words
+    ]
+    res = " ".join(ipa_list)
+    return res
+  return en_ipa_of_text_not_containing_phonetic_transcription(
      text=text,
      mode=mode,
      replace_unknown_with=replace_unknown_with,
@@ -78,7 +82,7 @@ def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str]
     )
 
 
-def ipa_of_text_not_containing_phonetic_transcription(
+def en_ipa_of_text_not_containing_phonetic_transcription(
     text: str,
     mode: EngToIpaMode,
     replace_unknown_with: Optional[str],
@@ -210,10 +214,16 @@ def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
 def ger_to_ipa(text: str, logger: Logger) -> str:
   if is_phonetic_transcription_in_text(text):
     words = text.split(" ")
-    return " ".join([ipa_of_phonetic_transcription(word)
-                     if is_phonetic_transcription(word)
-                     else ger_to_ipa(text=word, logger=logger)
-                     for word in words])
+    ipa_list = [ipa_of_phonetic_transcription(word)
+                if is_phonetic_transcription(word)
+                else ger_ipa_of_text_not_containing_phonetic_transcription(text=word, logger=logger)
+                for word in words]
+    res = " ".join(ipa_list)
+    return res
+  return ger_ipa_of_text_not_containing_phonetic_transcription(text, logger)
+
+
+def ger_ipa_of_text_not_containing_phonetic_transcription(text: str, logger: Logger) -> str:
   global EPITRAN_CACHE
   ensure_ger_epitran_is_loaded(logger)
   result = EPITRAN_CACHE[Language.GER].transliterate(text)
@@ -374,18 +384,27 @@ def split_chn_sentence(sentence: str) -> List[str]:
 
 
 def chn_to_ipa(chn: str) -> str:
-  chn_words = split_chn_sentence(chn)
-  res = []
-  for word in chn_words:
-    if is_phonetic_transcription(word):
-      chn_ipa = ipa_of_phonetic_transcription(word)
-    else:
-      chn_ipa = hanzi.to_ipa(word)
-      chn_ipa = chn_ipa.replace(' ', '')
-    res.append(chn_ipa)
-  res_str = ' '.join(res)
-
+  res_str = chn_sentence_to_ipa(chn)
   for regex, replacement in CHN_SUBS:
     res_str = re.sub(regex, replacement, res_str)
 
+  return res_str
+
+
+def chn_word_to_ipa(word: str) -> str:
+  if is_phonetic_transcription(word):
+    chn_ipa = ipa_of_phonetic_transcription(word)
+  else:
+    chn_ipa = hanzi.to_ipa(word)
+    chn_ipa = chn_ipa.replace(' ', '')
+  return chn_ipa
+
+
+def chn_sentence_to_ipa(sentence: str) -> str:
+  chn_words = split_chn_sentence(sentence)
+  res = []
+  for word in chn_words:
+    chn_ipa = chn_word_to_ipa(word)
+    res.append(chn_ipa)
+  res_str = ' '.join(res)
   return res_str
