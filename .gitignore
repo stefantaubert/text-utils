@@ -130,3 +130,6 @@ dmypy.json
 .pyre/
 
 playground.py
+
+# Example files
+example*
