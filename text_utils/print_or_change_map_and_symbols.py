@@ -81,7 +81,6 @@ def change_symbols_in_map(map_path: str, symbol_path: str):
     chosen_key_pos = int(input("Your input: ")) - 1
     while chosen_key_pos < 0 or chosen_key_pos >= len(input_map):
       chosen_key_pos = int(input(f"Please input a number between 1 and {len(input_map)}: ")) - 1
-      #raise ValueError(f"Please input a number between 1 and {len(input_map)}.")
     for pos, (key, _) in enumerate(input_map.items()):
       if pos == chosen_key_pos:
         chosen_key = key
