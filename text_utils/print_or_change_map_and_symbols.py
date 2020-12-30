@@ -42,69 +42,59 @@ def init_change_parser(parser: ArgumentParser):
   return change_symbols_in_map
 
 
-# def change_symbols_in_map(map_path: str, symbol_path: str):
-#   input_map = SymbolsMap.load(map_path)
-#   print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
-#   for pos, (key, _) in enumerate(input_map.items()):
-#     print(f"{pos+1}: {key}")
-#   chosen_key_pos = int(input("Your input: ")) - 1
-#   for pos, (key, _) in enumerate(input_map.items()):
-#     if pos == chosen_key_pos:
-#       chosen_key = key
-#   assert chosen_key
-#   print("Which symbol shoud be assigned to the chosen key? Please input the corresponding number.")
-#   with open(symbol_path) as symbol_file:
-#     lines = symbol_file.readlines()
-#     for pos, line in enumerate(lines):
-#       line = line.strip()
-#       if len(line) > 0:
-#         line = line[1:-1]
-#         print(f"{pos+1}: {line}")
-#   chosen_symbol_pos = int(input("Your input: ")) - 1
-#   with open(symbol_path) as symbol_file:
-#     lines = symbol_file.readlines()
-#     for pos, line in enumerate(lines):
-#       if pos == chosen_symbol_pos:
-#         chosen_symbol = line.strip()[1:-1]
-#   input_map[chosen_key] = chosen_symbol
-#   input_map.save(map_path)
-#   print("Updated Map:")
-#   print_map(map_path)
-
 def change_symbols_in_map(map_path: str, symbol_path: str):
-  input_map = SymbolsMap.load(map_path)
   update = True
+  input_map = SymbolsMap.load(map_path)
   while update:
-    print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
-    for pos, (key, _) in enumerate(input_map.items()):
-      print(f"{pos+1}: {key}")
-    chosen_key_pos = int(input("Your input: ")) - 1
-    while chosen_key_pos < 0 or chosen_key_pos >= len(input_map):
-      chosen_key_pos = int(input(f"Please input a number between 1 and {len(input_map)}: ")) - 1
-    for pos, (key, _) in enumerate(input_map.items()):
-      if pos == chosen_key_pos:
-        chosen_key = key
-    assert chosen_key
-    print("Which symbol shoud be assigned to the chosen key? Please input the corresponding number.")
-    with open(symbol_path) as symbol_file:
-      lines = symbol_file.readlines()
-      for pos, line in enumerate(lines):
-        line = line.strip()
-        if len(line) > 0:
-          line = line[1:-1]
-          print(f"{pos+1}: {line}")
-        number_of_lines = pos - 1
-    chosen_symbol_pos = int(input("Your input: ")) - 1
-    while chosen_symbol_pos < 0 or chosen_symbol_pos >= number_of_lines:
-      chosen_symbol_pos = int(input(f"Please input a number between 1 and {number_of_lines}: ")) - 1
-    with open(symbol_path) as symbol_file:
-      lines = symbol_file.readlines()
-      for pos, line in enumerate(lines):
-        if pos == chosen_symbol_pos:
-          chosen_symbol = line.strip()[1:-1]
-    input_map[chosen_key] = chosen_symbol
-    input_map.save(map_path)
-    print("Updated Map:")
-    print_map(map_path)
-    continue_updating = input("Do you want to adjust another symbol? y/n: ")
-    update = continue_updating == "y"
+    change_one_symbol_in_map(input_map, map_path, symbol_path)
+    continue_updating = input("Do you want to adjust another symbol? [y]/n: ")
+    update = continue_updating in ["y", ""]
+
+
+def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str):
+  chosen_key = choose_key(input_map)
+  chosen_symbol = choose_symbol(symbol_path)
+  input_map[chosen_key] = chosen_symbol
+  input_map.save(map_path)
+  print("Updated Map:")
+  print_map(map_path)
+
+
+def choose_key(input_map: SymbolsMap) -> str:
+  print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
+  chosen_key = ""
+  for pos, (key, _) in enumerate(input_map.items()):
+    print(f"{pos+1}: {key}")
+  chosen_key_pos = get_correct_input(len(input_map))
+  for pos, (key, _) in enumerate(input_map.items()):
+    if pos == chosen_key_pos:
+      chosen_key = key
+  return chosen_key
+
+
+def choose_symbol(symbol_path) -> str:
+  print("Which symbol shoud be assigned to the chosen key? Please input the corresponding number.")
+  with open(symbol_path) as symbol_file:
+    lines = symbol_file.readlines()
+  number_of_lines = open_file_and_print_symbols(lines)
+  chosen_symbol_pos = get_correct_input(number_of_lines)
+  chosen_symbol = lines[chosen_symbol_pos].strip()[1:-1]
+  return chosen_symbol
+
+
+def open_file_and_print_symbols(lines) -> int:
+  number_of_lines = 0
+  for pos, line in enumerate(lines):
+    line = line.strip()
+    if len(line) > 0:
+      line = line[1:-1]
+      print(f"{pos+1}: {line}")
+      number_of_lines = pos + 1
+  return number_of_lines
+
+
+def get_correct_input(upper_bound: int) -> int:
+  pos = int(input("Your input: ")) - 1
+  while pos < 0 or pos >= upper_bound:
+    pos = int(input(f"Please input a number between 1 and {upper_bound}: ")) - 1
+  return pos
