@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 
-from text_utils.print_maps_and_symbols import (init_map_parser,
-                                               init_symbol_parser)
+from text_utils.print_or_change_map_and_symbols import (init_change_parser,
+                                                        init_map_parser,
+                                                        init_symbol_parser)
 
 
 def _add_parser_to(subparsers, name: str, init_method):
@@ -17,6 +18,7 @@ def _init_parser():
 
   _add_parser_to(subparsers, "print_map", init_map_parser)
   _add_parser_to(subparsers, "print_symbols", init_symbol_parser)
+  _add_parser_to(subparsers, "change_symbols", init_change_parser)
   return result
 
 
