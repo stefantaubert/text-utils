@@ -63,10 +63,10 @@ def init_change_parser(parser: ArgumentParser):
                       help="Path to .json-file containing the map")
   parser.add_argument("-s", "--symbol_path", type=str, required=True,
                       help="Path to file containing the allowed symbols")
-  return change_symbols_in_map
+  return change_symbols
 
 
-def change_symbols_in_map(map_path: str, symbol_path: str):
+def change_symbols(map_path: str, symbol_path: str):
   update = True
   input_map = SymbolsMap.load(map_path)
   while update:
@@ -118,7 +118,7 @@ def open_file_and_print_symbols(lines) -> int:
 
 
 def get_correct_input(upper_bound: int) -> int:
-  pos = int(input("Your input: ")) - 1
-  while pos < 0 or pos >= upper_bound:
-    pos = int(input(f"Please input a number between 1 and {upper_bound}: ")) - 1
-  return pos
+  user_input = input("Your input: ")
+  while (not user_input.isnumeric()) or (int(user_input) < 1 or int(user_input) > upper_bound + 1):
+    user_input = input(f"Please input a number between 1 and {upper_bound}: ")
+  return int(user_input) - 1
