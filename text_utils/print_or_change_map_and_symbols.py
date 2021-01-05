@@ -6,7 +6,7 @@ from text_utils.symbols_map import SymbolsMap
 def init_map_parser(parser: ArgumentParser):
   parser.add_argument("-p", "--path", type=str, required=True,
                       help="Path to .json-file containing the map")
-  parser.add_argument("-a", "--arrow_type", type=str, required=False,
+  parser.add_argument("-a", "--arrow_type", type=str, required=True,
                       help="Sets the direction of the arrow")
   return print_map
 
@@ -16,14 +16,15 @@ def print_map(path: str, arrow_type: str):
   arrow = get_correct_type_input(arrow_type)
   for map_output, map_input in symbols_map.items():
     string_to_print = f"{space_or_nothing_as_word(map_input)} {arrow} {space_or_nothing_as_word(map_output)}"
-    if map_input == map_output:
-      print(string_to_print)
-    else:
-      print('\033[1m' + string_to_print + '\033[0m')
+    print_bold_if_true(string_to_print, map_input != map_output)
 
-def print_bold(string_to_print: str, bold: bool):
+
+def print_bold_if_true(string_to_print: str, bold: bool):
   if bold:
-    print()
+    print('\033[1m' + string_to_print + '\033[0m')
+  else:
+    print(string_to_print)
+
 
 def space_or_nothing_as_word(symbol: str) -> str:
   if symbol == "":
@@ -34,10 +35,10 @@ def space_or_nothing_as_word(symbol: str) -> str:
 
 
 def get_correct_type_input(arrow_type: str) -> str:
-  while arrow_type not in ["weights", "interference"]:
+  while arrow_type not in ["weights", "inference"]:
     arrow_type = input(
-      "Type must be either \"weights\" or \"interference\". Please define the type again: ")
-  arrow = "\u2190" if arrow_type == "interference" else "\u2192"
+      "Type must be either \"weights\" or \"inference\". Please define the type again: ")
+  arrow = "\u2190" if arrow_type == "inference" else "\u2192"
   return arrow
 
 
@@ -64,41 +65,44 @@ def init_change_parser(parser: ArgumentParser):
                       help="Path to .json-file containing the map")
   parser.add_argument("-s", "--symbol_path", type=str, required=True,
                       help="Path to file containing the allowed symbols")
+  parser.add_argument("-a", "--arrow_type", type=str, required=True,
+                      help="Sets the direction of the arrow", choices=["weights", "inference"])
   return change_symbols_in_map
 
 
-def change_symbols_in_map(map_path: str, symbol_path: str):
+def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: str):
   update = True
   input_map = SymbolsMap.load(map_path)
   while update:
-    change_one_symbol_in_map(input_map, map_path, symbol_path)
+    change_one_symbol_in_map(input_map, map_path, symbol_path, arrow_type)
     continue_updating = input("Do you want to adjust another symbol? [y]/n: ")
     update = continue_updating in ["y", ""]
 
 
-def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str):
-  chosen_key = choose_key(input_map)
+def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str, arrow_type: str):
+  chosen_key = choose_key(input_map, arrow_type)
   chosen_symbol = choose_symbol(symbol_path)
   input_map[chosen_key] = chosen_symbol
   input_map.save(map_path)
   print("Updated Map:")
-  print_map(map_path, "weights")  # !!!!!!!!
+  print_map(map_path, arrow_type)
 
 
-def choose_key(input_map: SymbolsMap) -> str:
+def choose_key(input_map: SymbolsMap, arrow_type: str) -> str:
   print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
   chosen_key = ""
   for pos, (key, value) in enumerate(input_map.items()):
-    string_to_print = f"{pos+1}: {key} (\u2190 {space_or_nothing_as_word(value)})"
-    if key == value:
-      print(string_to_print)
-    else:
-      print('\033[1m' + string_to_print + '\033[0m')
+    string_to_print = f"{pos+1}: {key} ({reverse_arrow(arrow_type)} {space_or_nothing_as_word(value)})"
+    print_bold_if_true(string_to_print, key != value)
   chosen_key_pos = get_correct_input(len(input_map))
   for pos, (key, _) in enumerate(input_map.items()):
     if pos == chosen_key_pos:
       chosen_key = key
   return chosen_key
+
+
+def reverse_arrow(arrow_type: str) -> str:
+  return "\u2190" if arrow_type == "weights" else "\u2192"
 
 
 def choose_symbol(symbol_path) -> str:
