@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
-from typing import Mapping, Tuple
 
 from text_utils.symbols_map import SymbolsMap
+
+#from typing import Mapping, Tuple
 
 
 def init_map_parser(parser: ArgumentParser):
@@ -16,11 +17,19 @@ def print_map(path: str, arrow_type: str):
   symbols_map = SymbolsMap.load(path)
   arrow = get_correct_type_input(arrow_type)
   for map_output, map_input in symbols_map.items():
-    string_to_print = f"{map_input} {arrow} {map_output}"
+    string_to_print = f"{space_or_nothing_as_word(map_input)} {arrow} {space_or_nothing_as_word(map_output)}"
     if map_input == map_output:
       print(string_to_print)
     else:
       print('\033[1m' + string_to_print + '\033[0m')
+
+
+def space_or_nothing_as_word(symbol: str) -> str:
+  if symbol == "":
+    return "NOTHING"
+  if symbol == " ":
+    return "SPACE"
+  return symbol
 
 
 def get_correct_type_input(arrow_type: str) -> str:
@@ -45,7 +54,7 @@ def print_symbols(path: str):
       line = line.strip()
       if len(line) > 0:
         line = line[1:-1]
-        print_list.append(line)
+        print_list.append(space_or_nothing_as_word(line))
   print(", ".join(print_list))
 
 
@@ -72,7 +81,7 @@ def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: 
   input_map[chosen_key] = chosen_symbol
   input_map.save(map_path)
   print("Updated Map:")
-  print_map(map_path)
+  print_map(map_path, "weights")  # !!!!!!!!
 
 
 def choose_key(input_map: SymbolsMap) -> str:
