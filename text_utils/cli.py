@@ -22,8 +22,11 @@ def _init_parser():
 
 def _process_args(args):
   params = vars(args)
-  invoke_handler = params.pop("invoke_handler")
-  invoke_handler(**params)
+  if "invoke_handler" in params:
+    invoke_handler = params.pop("invoke_handler")
+    invoke_handler(**params)
+  else:
+    print("Please specifiy which method you want to invoke.")
 
 
 if __name__ == "__main__":
