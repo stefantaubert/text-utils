@@ -3,8 +3,11 @@ from typing import List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Union
 
-from text_utils.utils import (deserialize_list, get_entries_ids_dict_order,
-                              parse_json, save_json, serialize_list)
+from utils import (deserialize_list, get_entries_ids_dict_order, parse_json,
+                   save_json, serialize_list)
+
+# from text_utils.utils import (deserialize_list, get_entries_ids_dict_order,
+# parse_json, save_json, serialize_list)
 
 
 class AccentsDict():
