@@ -25,21 +25,25 @@ def print_map(path: str, arrow_type: str) -> None:
   arrow = LEFT_ARROW if arrow_type == INFERENCE else RIGHT_ARROW
   for map_output, map_input in symbols_map.items():
     string_to_print = f"{get_symbol_representation(map_input)} {arrow} {get_symbol_representation(map_output)}"
-    print_bold_if_true(string_to_print, map_input != map_output)
+    print_bold_or_normal(string_to_print, map_input != map_output)
 
 
-def print_bold_if_true(string_to_print: str, bold: bool) -> None:
+def print_bold_or_normal(string_to_print: str, bold: bool) -> None:
   if bold:
-    print('\033[1m' + string_to_print + '\033[0m')
+    print_bold(string_to_print)
   else:
     print(string_to_print)
 
 
+def print_bold(string_to_print: str) -> None:
+  print('\033[1m' + string_to_print + '\033[0m')
+
+
 def get_symbol_representation(symbol: str) -> str:
   if symbol == "":
-    return "NOTHING"
+    return NOTHING
   if symbol == " ":
-    return "SPACE"
+    return SPACE
   return symbol
 
 

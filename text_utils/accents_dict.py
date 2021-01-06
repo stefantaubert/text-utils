@@ -6,9 +6,6 @@ from typing import Set, Union
 from text_utils.utils import (deserialize_list, get_entries_ids_dict_order,
                               parse_json, save_json, serialize_list)
 
-# from text_utils.utils import (deserialize_list, get_entries_ids_dict_order,
-# parse_json, save_json, serialize_list)
-
 
 class AccentsDict():
   def __init__(self, ids_to_accents: OrderedDictType[str, int]):
