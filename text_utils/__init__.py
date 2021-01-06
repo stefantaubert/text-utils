@@ -6,4 +6,4 @@ from text_utils.symbol_id_dict import SymbolIdDict
 from text_utils.symbols_map import SymbolsMap
 from text_utils.text import (EngToIpaMode, text_normalize, text_to_ipa,
                              text_to_sentences, text_to_symbols)
-from utils import deserialize_list, serialize_list
+from text_utils.utils import deserialize_list, serialize_list

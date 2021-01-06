@@ -5,9 +5,9 @@ from typing import List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Union
 
-from utils import (deserialize_list, get_basename, get_entries_ids_dict_order,
-                   parse_json, save_json, serialize_list,
-                   switch_keys_with_values)
+from text_utils.utils import (deserialize_list, get_basename, get_entries_ids_dict_order,
+                              parse_json, save_json, serialize_list,
+                              switch_keys_with_values)
 
 
 class SymbolIdDict():

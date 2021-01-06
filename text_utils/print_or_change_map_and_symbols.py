@@ -28,7 +28,7 @@ def print_map(path: str, arrow_type: str) -> None:
     print_bold_if_true(string_to_print, map_input != map_output)
 
 
-def print_bold_if_true(string_to_print: str, bold: bool):
+def print_bold_if_true(string_to_print: str, bold: bool) -> None:
   if bold:
     print('\033[1m' + string_to_print + '\033[0m')
   else:

@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 
-from text_utils.print_or_change_map_and_symbols import (init_change_parser,
-                                                        init_map_parser,
+from text_utils.print_or_change_map_and_symbols import (init_map_parser,
                                                         init_symbol_parser)
 
 
