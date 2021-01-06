@@ -18,7 +18,6 @@ def _init_parser():
 
   _add_parser_to(subparsers, "print_map", init_map_parser)
   _add_parser_to(subparsers, "print_symbols", init_symbol_parser)
-  _add_parser_to(subparsers, "change_symbols", init_change_parser)
   return result
 
 
