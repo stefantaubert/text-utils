@@ -67,16 +67,42 @@ def init_change_parser(parser: ArgumentParser):
                       help="Path to file containing the allowed symbols")
   parser.add_argument("-a", "--arrow_type", type=str, required=True,
                       help="Sets the direction of the arrow", choices=["weights", "inference"])
+  parser.add_argument("--map", type=str, required=False,
+                      help="Key to which new symbol should be assigned")
+  parser.add_argument("--to", type=str, required=False,
+                      help="Symbol that should be assigned to chosen key")
   return change_symbols_in_map
 
 
-def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: str):
-  update = True
+def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: str, map: str = None, to: str = None):
   input_map = SymbolsMap.load(map_path)
-  while update:
-    change_one_symbol_in_map(input_map, map_path, symbol_path, arrow_type)
-    continue_updating = input("Do you want to adjust another symbol? [y]/n: ")
-    update = continue_updating in ["y", ""]
+  if map is None and to is None:
+    update = True
+    while update:
+      change_one_symbol_in_map(input_map, map_path, symbol_path, arrow_type)
+      continue_updating = input("Do you want to adjust another symbol? [y]/n: ")
+      update = continue_updating in ["y", ""]
+  elif map is None and to is not None or map is not None and to is None:
+    print("You have to either specify both the key and the symbol or none of them.")
+  elif not is_given_symbol_in_symbolfile(map, symbol_path):
+    print("The symbol you've chosen is not one of the allowed symbols.")
+  elif to not in input_map.values():
+    print("The key you've specified is not in the map.")
+  else:
+    input_map[to] = map
+    input_map.save(map_path)
+
+
+def is_given_symbol_in_symbolfile(symbol: str, symbol_path: str) -> bool:
+  with open(symbol_path) as symbol_file:
+    lines = symbol_file.readlines()
+    for line in lines:
+      line = line.strip()
+      if len(line) > 0:
+        line = line[1:-1]
+        if symbol == line:
+          return True
+  return False
 
 
 def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str, arrow_type: str):
