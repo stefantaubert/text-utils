@@ -129,4 +129,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-playground.py
+playground*
+
+# Example files
+example*
