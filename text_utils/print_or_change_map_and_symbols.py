@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from typing import Callable
+from typing import Callable, List, Optional
 
 from text_utils.symbols_map import SymbolsMap
 
@@ -65,36 +65,36 @@ def print_symbols(path: str) -> None:
   print(", ".join(print_list))
 
 
-def init_change_parser(parser: ArgumentParser):
+def init_change_parser(parser: ArgumentParser) -> Callable[[str, str, str, Optional[str], Optional[str]], None]:
   parser.add_argument("-p", "--map_path", type=str, required=True,
                       help="Path to .json-file containing the map")
   parser.add_argument("-s", "--symbol_path", type=str, required=True,
                       help="Path to file containing the allowed symbols")
   parser.add_argument("-a", "--arrow_type", type=str, required=True,
                       help="Sets the direction of the arrow", choices=["weights", "inference"])
-  parser.add_argument("--map", type=str, required=False,
+  parser.add_argument("--map_symbol", type=str, required=False,
                       help="Key to which new symbol should be assigned")
   parser.add_argument("--to", type=str, required=False,
                       help="Symbol that should be assigned to chosen key")
   return change_symbols_in_map
 
 
-def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: str, map: str = None, to: str = None):
+def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: str, map_symbol: str = None, to: str = None) -> None:
   input_map = SymbolsMap.load(map_path)
-  if map is None and to is None:
+  if map_symbol is None and to is None:
     update = True
     while update:
       change_one_symbol_in_map(input_map, map_path, symbol_path, arrow_type)
       continue_updating = input("Do you want to adjust another symbol? [y]/n: ")
       update = continue_updating in ["y", ""]
-  elif map is None and to is not None or map is not None and to is None:
+  elif (map_symbol is None and to is not None) or (map_symbol is not None and to is None):
     print("You have to either specify both the key and the symbol or none of them.")
-  elif not is_given_symbol_in_symbolfile(map, symbol_path):
+  elif not is_given_symbol_in_symbolfile(map_symbol, symbol_path):
     print("The symbol you've chosen is not one of the allowed symbols.")
   elif to not in input_map.values():
     print("The key you've specified is not in the map.")
   else:
-    input_map[to] = map
+    input_map[to] = map_symbol
     input_map.save(map_path)
 
 
@@ -110,7 +110,7 @@ def is_given_symbol_in_symbolfile(symbol: str, symbol_path: str) -> bool:
   return False
 
 
-def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str, arrow_type: str):
+def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str, arrow_type: str) -> None:
   chosen_key = choose_key(input_map, arrow_type)
   chosen_symbol = choose_symbol(symbol_path)
   input_map[chosen_key] = chosen_symbol
@@ -136,7 +136,7 @@ def reverse_arrow(arrow_type: str) -> str:
   return "\u2190" if arrow_type == "weights" else "\u2192"
 
 
-def choose_symbol(symbol_path) -> str:
+def choose_symbol(symbol_path: str) -> str:
   print("Which symbol shoud be assigned to the chosen key? Please input the corresponding number.")
   with open(symbol_path) as symbol_file:
     lines = symbol_file.readlines()
@@ -145,14 +145,14 @@ def choose_symbol(symbol_path) -> str:
   if chosen_symbol_pos < number_of_lines - 1:
     chosen_symbol = lines[chosen_symbol_pos].strip()[1:-1]
   else:
-    chosen_symbol = "NOTHING"
+    chosen_symbol = NOTHING
   return chosen_symbol
 
 
-def open_file_and_print_symbols(lines) -> int:
+def open_file_and_print_symbols(file_lines: List[str]) -> int:
   number_of_lines = 0
   contains_nothing = False
-  for pos, line in enumerate(lines):
+  for pos, line in enumerate(file_lines):
     line = line.strip()
     if len(line) > 0:
       line = line[1:-1]
@@ -162,7 +162,7 @@ def open_file_and_print_symbols(lines) -> int:
       number_of_lines = pos + 1
   if not contains_nothing:
     number_of_lines += 1
-    print(f"{number_of_lines}: NOTHING")
+    print(f"{number_of_lines}: {NOTHING}")
   return number_of_lines
 
 
