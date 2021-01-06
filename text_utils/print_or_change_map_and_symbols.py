@@ -15,7 +15,7 @@ RIGHT_ARROW = "\u2192"
 def init_map_parser(parser: ArgumentParser) -> Callable[[str, str], None]:
   parser.add_argument("-p", "--path", type=str, required=True,
                       help="Path to .json-file containing the map")
-  parser.add_argument("-a", "--arrow_type", type=str, required=False,
+  parser.add_argument("-a", "--arrow_type", type=str, required=True,
                       help="Sets the direction of the arrow", choices=ARROW_TYPES)
   return print_map
 
