@@ -18,7 +18,7 @@ class UnitTests(unittest.TestCase):
     self.assertEqual("c", res.get_accent(2))
 
   def test_init_from_accents_with_pad_uses_pad_const(self):
-    res = AccentsDict.init_from_accents_with_pad({"b", "a"})
+    res = AccentsDict.init_from_accents_with_pad({"b", "a"}, pad_accent="_")
 
     self.assertEqual("_", res.get_accent(0))
     self.assertEqual("a", res.get_accent(1))
