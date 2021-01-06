@@ -1,4 +1,5 @@
 from text_utils.accents_dict import AccentsDict
+from text_utils.gender import Gender
 from text_utils.ipa2symb import IPAExtractionSettings
 from text_utils.language import Language
 from text_utils.speakers_dict import SpeakersDict, SpeakersLogDict
