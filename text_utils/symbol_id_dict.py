@@ -5,9 +5,9 @@ from typing import List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Union
 
-from utils import (deserialize_list, get_basename, get_entries_ids_dict_order,
-                   parse_json, save_json, serialize_list,
-                   switch_keys_with_values)
+from text_utils.utils import (deserialize_list, get_basename, get_entries_ids_dict_order,
+                              parse_json, save_json, serialize_list,
+                              switch_keys_with_values)
 
 
 class SymbolIdDict():
@@ -66,7 +66,7 @@ class SymbolIdDict():
   def save(self, file_path: str):
     save_json(file_path, self._ids_to_symbols)
 
-  def replace_unknown_symbols_with_pad(self, symbols: List[str], pad_symbol: Optional[str] = "_") -> List[str]:
+  def replace_unknown_symbols_with_pad(self, symbols: List[str], pad_symbol: str) -> List[str]:
     assert pad_symbol in self._ids_to_symbols.keys()
     result = []
     for symbol in symbols:
@@ -132,7 +132,7 @@ class SymbolIdDict():
     return cls(ids_to_symbols)
 
   @classmethod
-  def init_from_symbols_with_pad(cls, symbols: Set[str], pad_symbol: str = "_"):
+  def init_from_symbols_with_pad(cls, symbols: Set[str], pad_symbol: str):
     unique_entries = list(sorted(symbols - {pad_symbol}))
     final_symbols = [pad_symbol] + unique_entries
     ids_to_symbols = get_entries_ids_dict_order(final_symbols)

@@ -1,54 +1,59 @@
 from argparse import ArgumentParser
+from typing import Callable
 
 from text_utils.symbols_map import SymbolsMap
 
+NOTHING = "NOTHING"
+SPACE = "SPACE"
+WEIGHTS = "weights"
+INFERENCE = "inference"
+ARROW_TYPES = [WEIGHTS, INFERENCE]
+LEFT_ARROW = "\u2190"
+RIGHT_ARROW = "\u2192"
 
-def init_map_parser(parser: ArgumentParser):
+
+def init_map_parser(parser: ArgumentParser) -> Callable[[str, str], None]:
   parser.add_argument("-p", "--path", type=str, required=True,
                       help="Path to .json-file containing the map")
   parser.add_argument("-a", "--arrow_type", type=str, required=True,
-                      help="Sets the direction of the arrow")
+                      help="Sets the direction of the arrow", choices=ARROW_TYPES)
   return print_map
 
 
-def print_map(path: str, arrow_type: str):
+def print_map(path: str, arrow_type: str) -> None:
   symbols_map = SymbolsMap.load(path)
-  arrow = get_correct_type_input(arrow_type)
+  arrow = LEFT_ARROW if arrow_type == INFERENCE else RIGHT_ARROW
   for map_output, map_input in symbols_map.items():
-    string_to_print = f"{space_or_nothing_as_word(map_input)} {arrow} {space_or_nothing_as_word(map_output)}"
-    print_bold_if_true(string_to_print, map_input != map_output)
+    string_to_print = f"{get_symbol_representation(map_input)} {arrow} {get_symbol_representation(map_output)}"
+    print_bold_or_normal(string_to_print, map_input != map_output)
 
 
-def print_bold_if_true(string_to_print: str, bold: bool):
+def print_bold_or_normal(string_to_print: str, bold: bool) -> None:
   if bold:
-    print('\033[1m' + string_to_print + '\033[0m')
+    print_bold(string_to_print)
   else:
     print(string_to_print)
 
 
-def space_or_nothing_as_word(symbol: str) -> str:
+def print_bold(string_to_print: str) -> None:
+  print('\033[1m' + string_to_print + '\033[0m')
+
+
+def get_symbol_representation(symbol: str) -> str:
   if symbol == "":
-    return "NOTHING"
+    return NOTHING
   if symbol == " ":
-    return "SPACE"
+    return SPACE
   return symbol
 
 
-def get_correct_type_input(arrow_type: str) -> str:
-  while arrow_type not in ["weights", "inference"]:
-    arrow_type = input(
-      "Type must be either \"weights\" or \"inference\". Please define the type again: ")
-  arrow = "\u2190" if arrow_type == "inference" else "\u2192"
-  return arrow
-
-
-def init_symbol_parser(parser: ArgumentParser):
+def init_symbol_parser(parser: ArgumentParser) -> Callable[[str], None]:
   parser.add_argument("-p", "--path", type=str, required=True,
                       help="Path to file containing the symbols")
   return print_symbols
 
 
-def print_symbols(path: str):
+def print_symbols(path: str) -> None:
   with open(path) as symbol_file:
     lines = symbol_file.readlines()
     print_list = []
@@ -56,7 +61,7 @@ def print_symbols(path: str):
       line = line.strip()
       if len(line) > 0:
         line = line[1:-1]
-        print_list.append(space_or_nothing_as_word(line))
+        print_list.append(get_symbol_representation(line))
   print(", ".join(print_list))
 
 
@@ -118,8 +123,8 @@ def choose_key(input_map: SymbolsMap, arrow_type: str) -> str:
   print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
   chosen_key = ""
   for pos, (key, value) in enumerate(input_map.items()):
-    string_to_print = f"{pos+1}: {key} ({reverse_arrow(arrow_type)} {space_or_nothing_as_word(value)})"
-    print_bold_if_true(string_to_print, key != value)
+    string_to_print = f"{pos+1}: {key} ({reverse_arrow(arrow_type)} {get_symbol_representation(value)})"
+    print_bold_or_normal(string_to_print, key != value)
   chosen_key_pos = get_correct_input(len(input_map))
   for pos, (key, _) in enumerate(input_map.items()):
     if pos == chosen_key_pos:
@@ -153,7 +158,7 @@ def open_file_and_print_symbols(lines) -> int:
       line = line[1:-1]
       if line == "":
         contains_nothing = True
-      print(f"{pos+1}: {space_or_nothing_as_word(line)}")
+      print(f"{pos+1}: {get_symbol_representation(line)}")
       number_of_lines = pos + 1
   if not contains_nothing:
     number_of_lines += 1

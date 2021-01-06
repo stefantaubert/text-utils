@@ -3,11 +3,8 @@ from typing import List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Union
 
-from utils import (deserialize_list, get_entries_ids_dict_order, parse_json,
-                   save_json, serialize_list)
-
-# from text_utils.utils import (deserialize_list, get_entries_ids_dict_order,
-# parse_json, save_json, serialize_list)
+from text_utils.utils import (deserialize_list, get_entries_ids_dict_order,
+                              parse_json, save_json, serialize_list)
 
 
 class AccentsDict():
@@ -82,7 +79,7 @@ class AccentsDict():
     return cls.from_raw(ids_to_accents)
 
   @classmethod
-  def init_from_accents_with_pad(cls, accents: Set[str], pad_accent: str = "_"):
+  def init_from_accents_with_pad(cls, accents: Set[str], pad_accent: str):
     unique_entries = list(sorted(accents - {pad_accent}))
     final_accents = [pad_accent] + unique_entries
     ids_to_accents = get_entries_ids_dict_order(final_accents)

@@ -4,7 +4,7 @@ from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple
 
 from text_utils.symbol_id_dict import SymbolIdDict
-from utils import get_sorted_list_from_set, parse_json, save_json
+from text_utils.utils import get_sorted_list_from_set, parse_json, save_json
 
 
 class SymbolsMap(OrderedDict):

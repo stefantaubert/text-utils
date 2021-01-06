@@ -3,7 +3,7 @@ from typing import List
 from typing import OrderedDict as OrderedDictType
 from typing import Set
 
-from utils import parse_json, save_json, switch_keys_with_values
+from text_utils.utils import parse_json, save_json, switch_keys_with_values
 
 #from text_utils.utils import parse_json, save_json, switch_keys_with_values
 
