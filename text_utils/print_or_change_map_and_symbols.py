@@ -22,7 +22,7 @@ def init_map_parser(parser: ArgumentParser) -> Callable[[str, str], None]:
 
 def print_map(path: str, arrow_type: str) -> None:
   symbols_map = SymbolsMap.load(path)
-  for map_output, map_input in symbols_map.items():
+  for map_input, map_output in symbols_map.items():
     string_to_print = f"{get_symbol_representation(map_input)} {arrow(arrow_type)} {get_symbol_representation(map_output)}"
     print_bold_or_normal(string_to_print, map_input != map_output)
 
@@ -75,16 +75,16 @@ def init_change_parser(parser: ArgumentParser) -> Callable[[str, str, Optional[s
                       help="Path to file containing the allowed symbols")
   parser.add_argument("-a", "--arrow_type", type=str, required=False,
                       help="Sets the direction of the arrow", choices=ARROW_TYPES)
-  parser.add_argument("-m", "--map_symbol", type=str, required=False,
+  parser.add_argument("-t", "--to_key", type=str, required=False,
                       help="Key to which new symbol should be assigned")
-  parser.add_argument("-t", "--to", type=str, required=False,
+  parser.add_argument("-m", "--map_symbol", type=str, required=False,
                       help="Symbol that should be assigned to chosen key")
   return change_symbols_in_map
 
 
-def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[str] = None, map_symbol: Optional[str] = None, to: Optional[str] = None) -> None:
+def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[str] = None, to_key: Optional[str] = None, map_symbol: Optional[str] = None) -> None:
   input_map = SymbolsMap.load(map_path)
-  if map_symbol is None and to is None:
+  if to_key is None and map_symbol is None:
     if arrow_type is None:
       print("You have to specify the arrow type.")
       return
@@ -93,14 +93,14 @@ def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[
       change_one_symbol_in_map(input_map, map_path, symbol_path, arrow_type)
       continue_updating = input("Do you want to adjust another symbol? [y]/n: ")
       update = continue_updating in ["y", ""]
-  elif (map_symbol is None and to is not None) or (map_symbol is not None and to is None):
+  elif (to_key is None and map_symbol is not None) or (to_key is not None and map_symbol is None):
     print("You have to either specify both the key and the symbol or none of them.")
   elif not is_given_symbol_in_symbolfile(map_symbol, symbol_path):
     print("The symbol you've chosen is not one of the allowed symbols.")
-  elif to not in input_map.values():
+  elif to_key not in input_map.keys():
     print("The key you've specified is not in the map.")
   else:
-    input_map[to] = map_symbol
+    input_map[to_key] = map_symbol
     input_map.save(map_path)
 
 
@@ -118,7 +118,8 @@ def is_given_symbol_in_symbolfile(symbol: str, symbol_path: str) -> bool:
 
 def change_one_symbol_in_map(input_map: SymbolsMap, map_path: str, symbol_path: str, arrow_type: str) -> None:
   chosen_key = choose_key(input_map, arrow_type)
-  chosen_symbol = choose_symbol(symbol_path)
+  old_symbol = input_map[chosen_key]
+  chosen_symbol = choose_symbol(symbol_path, old_symbol, chosen_key)
   input_map[chosen_key] = chosen_symbol
   input_map.save(map_path)
   print("Updated Map:")
@@ -129,7 +130,7 @@ def choose_key(input_map: SymbolsMap, arrow_type: str) -> str:
   print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
   chosen_key = ""
   for pos, (key, value) in enumerate(input_map.items()):
-    string_to_print = f"{pos+1}: {key} ({reverse_arrow(arrow_type)} {get_symbol_representation(value)})"
+    string_to_print = f"{pos+1}: ({get_symbol_representation(value)} {arrow(arrow_type)}) {get_symbol_representation(key)}"
     print_bold_or_normal(string_to_print, key != value)
   chosen_key_pos = get_correct_input(len(input_map))
   for pos, (key, _) in enumerate(input_map.items()):
@@ -142,8 +143,9 @@ def reverse_arrow(arrow_type: str) -> str:
   return LEFT_ARROW if arrow_type == WEIGHTS else RIGHT_ARROW
 
 
-def choose_symbol(symbol_path: str) -> str:
-  print("Which symbol should be assigned to the chosen key? Please input the corresponding number.")
+def choose_symbol(symbol_path: str, old_symbol: str, chosen_key: str) -> str:
+  print(
+    f"Which new symbol instead of {get_symbol_representation(old_symbol)} should be assigned to {get_symbol_representation(chosen_key)}? Please input the corresponding number.")
   with open(symbol_path) as symbol_file:
     lines = symbol_file.readlines()
   number_of_lines = open_file_and_print_symbols(lines)
