@@ -49,7 +49,7 @@ class UnitTests(unittest.TestCase):
   def test_ger_to_ipa_with_phones_logging_is_disabled(self):
     text = "Das ist /ð/ ein Test."
     getLogger().setLevel(0)
-    res = ger_to_ipa(text, logger=getLogger())
+    ger_to_ipa(text, logger=getLogger())
     level = getLogger().level
     self.assertEqual(0, level)
 
