@@ -1,7 +1,7 @@
 import re
 from enum import IntEnum
 from functools import partial
-from logging import WARNING, Logger, getLogger
+from logging import Logger
 from typing import Dict, List, Optional
 
 from cmudict_parser import CMUDict, get_dict
@@ -123,8 +123,7 @@ def en_to_ipa_epitran(text: str, logger: Logger) -> str:
 
   ensure_eng_epitran_is_loaded(logger)
 
-  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
-  # result = EPITRAN_CACHE[Language.ENG].transliterate(text)
+  result = EPITRAN_CACHE[Language.ENG].transliterate(text)
   return result
 
 
@@ -161,6 +160,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
 
     result = CMU_CACHE.sentence_to_ipa(
       sentence=text,
+      # replace_unknown_with=EPITRAN_CACHE[Language.ENG].transliterate
       replace_unknown_with=replacing_func
     )
     return result
@@ -188,23 +188,9 @@ def epi_transliterate_word_verbose(word: str, logger: Logger) -> str:
   global EPITRAN_CACHE
   assert Language.ENG in EPITRAN_CACHE
 
-  res = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], word)
-  # res = EPITRAN_CACHE[Language.ENG].transliterate(word)
-
+  res = EPITRAN_CACHE[Language.ENG].transliterate(word)
   logger.info(f"used Epitran for: {word} => {res}")
   return res
-
-
-def epi_transliterate_without_logging(epi_instance: Epitran, word: str) -> str:
-  main_logger = getLogger()
-  old_level = main_logger.level
-  main_logger.setLevel(WARNING)
-
-  result = epi_instance.transliterate(word)
-
-  main_logger.setLevel(old_level)
-
-  return result
 
 
 def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
@@ -240,8 +226,7 @@ def ger_to_ipa(text: str, logger: Logger) -> str:
 def ger_ipa_of_text_not_containing_phonetic_transcription(text: str, logger: Logger) -> str:
   global EPITRAN_CACHE
   ensure_ger_epitran_is_loaded(logger)
-  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.GER], text)
-  # result = EPITRAN_CACHE[Language.GER].transliterate(text)
+  result = EPITRAN_CACHE[Language.GER].transliterate(text)
   return result
 
 
