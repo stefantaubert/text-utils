@@ -130,17 +130,13 @@ def choose_key(input_map: SymbolsMap, arrow_type: str) -> str:
   print("The symbol corresponding to which key should be adjusted? Please input the corresponding number.")
   chosen_key = ""
   for pos, (key, value) in enumerate(input_map.items()):
-    string_to_print = f"{pos+1}: ({get_symbol_representation(value)} {arrow(arrow_type)}) {get_symbol_representation(key)}"
+    string_to_print = f"{pos+1}: {get_symbol_representation(key)} ({arrow(arrow_type)} {get_symbol_representation(value)})"
     print_bold_or_normal(string_to_print, key != value)
   chosen_key_pos = get_correct_input(len(input_map))
   for pos, (key, _) in enumerate(input_map.items()):
     if pos == chosen_key_pos:
       chosen_key = key
   return chosen_key
-
-
-def reverse_arrow(arrow_type: str) -> str:
-  return LEFT_ARROW if arrow_type == WEIGHTS else RIGHT_ARROW
 
 
 def choose_symbol(symbol_path: str, old_symbol: str, chosen_key: str) -> str:
