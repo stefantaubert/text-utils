@@ -95,7 +95,7 @@ def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[
       update = continue_updating in ["y", ""]
   elif (to_key is None and map_symbol is not None) or (to_key is not None and map_symbol is None):
     print("You have to either specify both the key and the symbol or none of them.")
-  elif not is_given_symbol_in_symbolfile(map_symbol, symbol_path):
+  elif not (is_given_symbol_in_symbolfile(map_symbol, symbol_path) or map_symbol == ""):
     print("The symbol you've chosen is not one of the allowed symbols.")
   elif to_key not in input_map.keys():
     print("The key you've specified is not in the map.")
