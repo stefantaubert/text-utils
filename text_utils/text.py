@@ -156,7 +156,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
   ensure_eng_epitran_is_loaded(logger)
 
   try:
-    replacing_func = partial(epi_transliterate_word_cached, logger=logger) if use_cache else partial(
+    replacing_func = partial(epi_transliterate_word_cached_verbose, logger=logger) if use_cache else partial(
         epi_transliterate_word_verbose, logger=logger)
 
     result = CMU_CACHE.sentence_to_ipa(
@@ -170,7 +170,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def epi_transliterate_word_cached(word: str, logger: Logger) -> str:
+def epi_transliterate_word_cached_verbose(word: str, logger: Logger) -> str:
   # I am assuming there is no IPA difference in EPITRAN.
   word = word.lower()
 
