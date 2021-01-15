@@ -46,7 +46,9 @@ def _extract_symbols(input_symbols: List[str], settings: IPAExtractionSettings, 
   except ValueError:
     ipa = IPAString(unicode_string=input_word, ignore=True)
     result = [settings.replace_unknown_ipa_by] * len(input_symbols)
-    logger.info(f"Conversion of '{input_word}' to IPA failed. Result would be: '{ipa}'. Replaced with '{''.join(result)}' instead.")
+    logger.info(
+      f"Conversion of '{input_word}' to IPA failed. Result would be: '{ipa}'. Replaced with '{''.join(result)}' instead.")
+    # TODO: Conversion of 'ðӕ' to IPA failed. Result would be: 'ð'. Replaced with '__' instead.
     return result
 
   for char in ipa.ipa_chars:
