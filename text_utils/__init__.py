@@ -4,6 +4,7 @@ from text_utils.ipa2symb import IPAExtractionSettings
 from text_utils.language import Language
 from text_utils.speakers_dict import SpeakersDict, SpeakersLogDict
 from text_utils.symbol_id_dict import SymbolIdDict
+from text_utils.symbols import symbols_normalize, symbols_to_ipa
 from text_utils.symbols_dict import SymbolsDict
 from text_utils.symbols_map import (SymbolsMap, create_or_update_inference_map,
                                     create_or_update_weights_map)
