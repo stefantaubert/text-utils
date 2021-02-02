@@ -27,10 +27,8 @@ EPITRAN_EN_WORD_CACHE: Dict[str, str] = {}
 CMU_CACHE: Optional[CMUDict] = None
 
 WHOLE_STRING_IS_PHONETIC_TRANS = re.compile(r'\A/\S*/\Z')
-#WHOLE_STRING_IS_PHONETIC_TRANS = re.compile(r'/\S*/')
 SLASH = re.compile(r'/')
 PH_TRANS = re.compile(r'/(\S*)/')
-#PH_TRANS = re.compile(r'([^ ]*)/(\S*)/([^ ]*)')
 
 
 class EngToIpaMode(IntEnum):
