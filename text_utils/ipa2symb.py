@@ -1,7 +1,7 @@
 import string
 from dataclasses import dataclass
 from logging import Logger
-from typing import List
+from typing import List, Tuple
 
 from ipapy.ipastring import IPAString
 
@@ -15,6 +15,15 @@ class IPAExtractionSettings():
   ignore_tones: bool
   ignore_arcs: bool
   replace_unknown_ipa_by: str
+
+
+def check_is_ipa_and_return_closest_ipa(word_ipa: str) -> Tuple[bool, str]:
+  try:
+    ipa = IPAString(unicode_string=word_ipa, ignore=False)
+    return True, ipa
+  except ValueError:
+    ipa = IPAString(unicode_string=word_ipa, ignore=True)
+    return False, ipa
 
 
 def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, logger: Logger):
@@ -41,10 +50,8 @@ def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, lo
 def _extract_symbols(input_symbols: List[str], settings: IPAExtractionSettings, logger: Logger) -> List[str]:
   symbols: List[str] = []
   input_word = ''.join(input_symbols)
-  try:
-    ipa = IPAString(unicode_string=input_word, ignore=False)
-  except ValueError:
-    ipa = IPAString(unicode_string=input_word, ignore=True)
+  is_valid_ipa, ipa = check_is_ipa_and_return_closest_ipa(input_word)
+  if not is_valid_ipa:
     result = [settings.replace_unknown_ipa_by] * len(input_symbols)
     logger.info(
       f"Conversion of '{input_word}' to IPA failed. Result would be: '{ipa}'. Replaced with '{''.join(result)}' instead.")
