@@ -2,7 +2,7 @@ import re
 from enum import IntEnum
 from functools import partial
 from logging import WARNING, Logger, getLogger
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set, Tuple
 
 from cmudict_parser import CMUDict, get_dict
 from dragonmapper import hanzi
@@ -55,6 +55,14 @@ CHN_MAPPINGS = [
 
 CHN_SUBS = [(re.compile(regex_pattern), replace_with)
             for regex_pattern, replace_with in CHN_MAPPINGS]
+
+
+def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
+  res: List[Tuple[str]] = []
+  for i in range(len(sentence_symbols) - n + 1):
+    tmp = tuple(sentence_symbols[i:i + n])
+    res.append(tmp)
+  return res
 
 
 def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, logger: Logger) -> str:
@@ -159,7 +167,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
   ensure_eng_epitran_is_loaded(logger)
 
   try:
-    replacing_func = partial(epi_transliterate_word_cached, logger=logger) if use_cache else partial(
+    replacing_func = partial(epi_transliterate_word_cached_verbose, logger=logger) if use_cache else partial(
         epi_transliterate_word_verbose, logger=logger)
 
     result = CMU_CACHE.sentence_to_ipa(
@@ -173,7 +181,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def epi_transliterate_word_cached(word: str, logger: Logger) -> str:
+def epi_transliterate_word_cached_verbose(word: str, logger: Logger) -> str:
   # I am assuming there is no IPA difference in EPITRAN.
   word = word.lower()
 
