@@ -9,6 +9,7 @@ pylint = "*"
 pycodestyle = "*"
 isort = "*"
 pipenv-setup = "*"
+rope = "*"
 
 [packages]
 epitran = "*"

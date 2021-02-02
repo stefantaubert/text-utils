@@ -2,7 +2,8 @@ import re
 from enum import IntEnum
 from functools import partial
 from logging import WARNING, Logger, getLogger
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+
 
 from cmudict_parser import CMUDict, get_dict
 from dragonmapper import hanzi
@@ -18,7 +19,9 @@ from text_utils.adjustments.emails import (replace_at_symbols,
                                            replace_mail_addresses)
 from text_utils.adjustments.numbers import normalize_numbers
 from text_utils.adjustments.whitespace import collapse_whitespace
-from text_utils.ipa2symb import IPAExtractionSettings, extract_from_sentence
+from text_utils.ipa2symb import (IPAExtractionSettings,
+                                 check_is_ipa_and_return_closest_ipa,
+                                 extract_from_sentence)
 from text_utils.language import Language
 
 EPITRAN_CACHE: Dict[Language, Epitran] = {}
@@ -55,12 +58,20 @@ CHN_SUBS = [(re.compile(regex_pattern), replace_with)
             for regex_pattern, replace_with in CHN_MAPPINGS]
 
 
+def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
+  res: List[Tuple[str]] = []
+  for i in range(len(sentence_symbols) - n + 1):
+    tmp = tuple(sentence_symbols[i:i + n])
+    res.append(tmp)
+  return res
+
+
 def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, logger: Logger) -> str:
   assert mode is not None
   if is_phonetic_transcription_in_text(text):
     words = text.split(" ")
     ipa_list = [
-      ipa_of_phonetic_transcription(word)
+      ipa_of_phonetic_transcription(word, logger)
         if is_phonetic_transcription(word)
         else en_ipa_of_text_not_containing_phonetic_transcription(
         text=word,
@@ -109,9 +120,15 @@ def is_phonetic_transcription_in_text(text: str) -> bool:
   return ph_trans_in_text is not None
 
 
-def ipa_of_phonetic_transcription(ph_trans: str) -> str:
+def ipa_of_phonetic_transcription(ph_trans: str, logger: Logger) -> str:
   assert is_phonetic_transcription(ph_trans)
-  return re.sub(SLASH, '', ph_trans)
+  resulting_ipa = re.sub(SLASH, '', ph_trans)
+  is_ipa, _ = check_is_ipa_and_return_closest_ipa(resulting_ipa)
+  if not is_ipa:
+    ex = ValueError(f"'{ph_trans}': '{resulting_ipa}' is no valid IPA!")
+    logger.error("", exc_info=ex)
+    raise ex
+  return
 
 
 def is_phonetic_transcription(text: str) -> bool:
@@ -157,7 +174,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
   ensure_eng_epitran_is_loaded(logger)
 
   try:
-    replacing_func = partial(epi_transliterate_word_cached, logger=logger) if use_cache else partial(
+    replacing_func = partial(epi_transliterate_word_cached_verbose, logger=logger) if use_cache else partial(
         epi_transliterate_word_verbose, logger=logger)
 
     result = CMU_CACHE.sentence_to_ipa(
@@ -171,7 +188,7 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def epi_transliterate_word_cached(word: str, logger: Logger) -> str:
+def epi_transliterate_word_cached_verbose(word: str, logger: Logger) -> str:
   # I am assuming there is no IPA difference in EPITRAN.
   word = word.lower()
 
@@ -229,7 +246,7 @@ def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
 def ger_to_ipa(text: str, logger: Logger) -> str:
   if is_phonetic_transcription_in_text(text):
     words = text.split(" ")
-    ipa_list = [ipa_of_phonetic_transcription(word)
+    ipa_list = [ipa_of_phonetic_transcription(word, logger)
                 if is_phonetic_transcription(word)
                 else ger_ipa_of_text_not_containing_phonetic_transcription(text=word, logger=logger)
                 for word in words]
@@ -316,9 +333,10 @@ def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace
     return ger_to_ipa(text, logger)
 
   if lang == Language.CHN:
-    return chn_to_ipa(text)
+    return chn_to_ipa(text, logger)
 
   if lang == Language.IPA:
+    # maybe check is valid IPA
     return text
 
   assert False
@@ -399,23 +417,23 @@ def split_chn_sentence(sentence: str) -> List[str]:
   return chn_words
 
 
-def chn_to_ipa(chn: str) -> str:
-  res_str = chn_sentence_to_ipa(chn)
+def chn_to_ipa(chn: str, logger: Logger) -> str:
+  res_str = chn_sentence_to_ipa(chn, logger)
   for regex, replacement in CHN_SUBS:
     res_str = re.sub(regex, replacement, res_str)
 
   return res_str
 
 
-def chn_word_to_ipa(word: str) -> str:
+def chn_word_to_ipa(word: str, logger: Logger) -> str:
   if is_phonetic_transcription(word):
-    return ipa_of_phonetic_transcription(word)
+    return ipa_of_phonetic_transcription(word, logger)
   return chn_ipa_of_word_not_containing_phonetic_transcription(word)
 
 
-def chn_sentence_to_ipa(sentence: str) -> str:
+def chn_sentence_to_ipa(sentence: str, logger: Logger) -> str:
   chn_words = split_chn_sentence(sentence)
-  res = [chn_word_to_ipa(word) for word in chn_words]
+  res = [chn_word_to_ipa(word, logger) for word in chn_words]
   res_str = ' '.join(res)
   return res_str
 
