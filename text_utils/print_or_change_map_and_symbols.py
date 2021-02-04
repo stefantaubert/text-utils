@@ -30,9 +30,10 @@ def print_map(path: str, arrow_type: str) -> None:
 
 def print_headline(arrow_type: str) -> None:
   if arrow_type == "weights":
-    print(f"Trained symbol {RIGHT_ARROW} symbol to be trained")
+    headline = f"Trained symbol {RIGHT_ARROW} symbol to be trained"
   else:
-    print(f"Occuring symbol in input {LEFT_ARROW} synthesizable symbol")
+    headline = f"Occuring symbol in input {LEFT_ARROW} synthesizable symbol"
+  print('\033[1m' + '\033[4m' + headline + '\033[0m')
 
 
 def arrow(arrow_type: str) -> str:
