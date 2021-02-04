@@ -55,26 +55,32 @@ pipenv install -e git+https://github.com/stefantaubert/text-utils.git@master#egg
 update setup.py with shell and `pipenv-setup sync`
 see [details](https://pypi.org/project/pipenv-setup/)
 
-## Example Map
+## Examples
 
-```json
-{
-  "ɨ": "ʊ",
-  "ɯ": "ʊ",
-  "ʌ": "ʌ",
-  "ʒ": "ʒ",
-  "ʐ": "ʒ",
-  "θ": "θ"
-}
-```
+There are files containing an example map and example symbols in the folder examples. You can use them to test the client. The commands are the following:
 
-## Example Map Symbols
+### For printing the map
 
-```txt
-" "
-"ʃ"
-"ʊ"
-"ʌ"
-"ʒ"
-"θ"
-```
+If you want to print the pretrained weights mapping, use
+pipenv run python -m text_utils.cli print_map -p "examples/examplemap.json" -a "weights"
+
+If you want to print the map showing all occuring symbols and the corresponding synthesizable symbols that are assigned to them, use
+pipenv run python -m text_utils.cli print_map -p "examples/examplemap.json" -a "inference"
+
+### For printing the symbols
+
+If you want to print all allowed symbols, use
+pipenv run python -m text_utils.cli print_symbols -p "examples/examplesymbols.symb"
+
+### For changing
+
+If you want to change the symbol for a specific key, use
+pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -a="weights"
+or
+pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -a="inference"
+(depending on the use case)
+and follow the instructions.
+
+It is also possible to change one symbol without the interactive mode via for example
+pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -t="ʒ" -m="ʌ"
+where "ʒ" is the key to which "ʌ" is newly assigned
