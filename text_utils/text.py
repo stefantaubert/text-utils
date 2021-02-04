@@ -70,7 +70,7 @@ def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str]
   if is_phonetic_transcription_in_text(text):
     words = text.split(" ")
     ipa_list = [
-      ipa_of_phonetic_transcription(word, logger)
+      str(ipa_of_phonetic_transcription(word, logger))
         if is_phonetic_transcription(word)
         else en_ipa_of_text_not_containing_phonetic_transcription(
         text=word,
@@ -126,7 +126,7 @@ def ipa_of_phonetic_transcription(ph_trans: str, logger: Logger) -> str:
     ex = ValueError(f"'{ph_trans}': '{resulting_ipa}' is no valid IPA!")
     logger.error("", exc_info=ex)
     raise ex
-  return
+  return resulting_ipa
 
 
 def is_phonetic_transcription(text: str) -> bool:
@@ -139,7 +139,10 @@ def en_to_ipa_epitran(text: str, logger: Logger) -> str:
 
   ensure_eng_epitran_is_loaded(logger)
 
-  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
+  splitted_text = text.split(" ")
+  splitted_result = [epi_transliterate_word_verbose(
+    word, logger, verbose=False) for word in splitted_text]
+  result = " ".join(splitted_result)
   # result = EPITRAN_CACHE[Language.ENG].transliterate(text)
   return result
 
@@ -200,14 +203,16 @@ def epi_transliterate_word_cached_verbose(word: str, logger: Logger) -> str:
   return res
 
 
-def epi_transliterate_word_verbose(word: str, logger: Logger) -> str:
+def epi_transliterate_word_verbose(word: str, logger: Logger, verbose: bool = True) -> str:
   global EPITRAN_CACHE
   assert Language.ENG in EPITRAN_CACHE
 
   res = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], word)
   # res = EPITRAN_CACHE[Language.ENG].transliterate(word)
 
-  logger.info(f"used Epitran for: {word} => {res}")
+  if verbose:
+    logger.info(f"used Epitran for: {word} => {res}")
+
   return res
 
 
