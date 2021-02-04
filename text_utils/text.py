@@ -4,7 +4,6 @@ from functools import partial
 from logging import WARNING, Logger, getLogger
 from typing import Dict, List, Optional, Tuple
 
-
 from cmudict_parser import CMUDict, get_dict
 from dragonmapper import hanzi
 from epitran import Epitran
@@ -141,7 +140,9 @@ def en_to_ipa_epitran(text: str, logger: Logger) -> str:
 
   ensure_eng_epitran_is_loaded(logger)
 
-  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
+  splitted_text = text.split(" ")
+  splitted_result = [epi_transliterate_word_verbose(word, logger) for word in splitted_text]
+  result = " ".join(splitted_result)
   # result = EPITRAN_CACHE[Language.ENG].transliterate(text)
   return result
 
