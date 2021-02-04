@@ -84,27 +84,27 @@ class UnitTests(unittest.TestCase):
 
   def test_chn_to_ipa_with_phones(self):
     text = "东北军 的 一些 爱 /ð/ 东北军 的 一些 爱"
-    res = chn_to_ipa(text)
+    res = chn_to_ipa(text, logger=getLogger())
     self.assertEqual("tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩ ð tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩", res)
 
   def test_chn_to_ipa_with_phones_at_beginning(self):
     text = "/ð/ 东北军 的 一些 爱"
-    res = chn_to_ipa(text)
+    res = chn_to_ipa(text, logger=getLogger())
     self.assertEqual("ð tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩", res)
 
   def test_chn_to_ipa_with_phones_at_end(self):
     text = "东北军 的 一些 爱 /ð/"
-    res = chn_to_ipa(text)
+    res = chn_to_ipa(text, logger=getLogger())
     self.assertEqual("tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩ ð", res)
 
   def test_chn_to_ipa_with_only_phones(self):
     text = "/ð/"
-    res = chn_to_ipa(text)
+    res = chn_to_ipa(text, logger=getLogger())
     self.assertEqual("ð", res)
 
   def test_chn_to_ipa_with_only_phones_and_dot(self):
     text = "-/ð/."
-    res = chn_to_ipa(text)
+    res = chn_to_ipa(text, logger=getLogger())
     self.assertEqual("-ð.", res)
 
   # endregion
@@ -269,14 +269,14 @@ class UnitTests(unittest.TestCase):
   def test_normal(self):
     inp = "东北军 的 一些 爱"
 
-    res = chn_to_ipa(inp)
+    res = chn_to_ipa(inp, logger=getLogger())
 
     self.assertEqual('tʊŋ˥peɪ˧˩˧tɕyn˥ tɤ i˥ɕjɛ˥ aɪ˥˩', res)
 
   def test_chn_to_ipa(self):
     text = "。？！，：；「」『』、"
 
-    res = chn_to_ipa(text)
+    res = chn_to_ipa(text, logger=getLogger())
 
     self.assertEqual('.?!,:;"""",', res)
 
