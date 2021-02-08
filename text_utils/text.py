@@ -127,7 +127,7 @@ def ipa_of_phonetic_transcription(ph_trans: str, logger: Logger) -> str:
     ex = ValueError(f"'{ph_trans}': '{resulting_ipa}' is no valid IPA!")
     logger.error("", exc_info=ex)
     raise ex
-  return
+  return resulting_ipa
 
 
 def is_phonetic_transcription(text: str) -> bool:
