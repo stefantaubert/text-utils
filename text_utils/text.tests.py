@@ -10,16 +10,6 @@ from text_utils.text import *
 
 class UnitTests(unittest.TestCase):
 
-  # region is_phonetic_transcription
-
-  def test_is_phonetic_transcription__missing_space__returns_false(self):
-    text = "/I/if"
-    res = is_phonetic_transcription(text)
-
-    self.assertFalse(res)
-
-  # endregion
-
   # region en_to_ipa
 
   def test_en_to_ipa_with_phones(self):
@@ -47,7 +37,7 @@ class UnitTests(unittest.TestCase):
     self.assertEqual("ð", res)
 
   def test_en_to_ipa_with_only_phones_and_dot(self):
-    text = "/-ð./"
+    text = "-/ð/."
     res = en_to_ipa(text, EngToIpaMode.EPITRAN,
                     replace_unknown_with=None, use_cache=False, logger=getLogger())
     self.assertEqual("-ð.", res)
@@ -84,7 +74,7 @@ class UnitTests(unittest.TestCase):
     self.assertEqual("ð", res)
 
   def test_ger_to_ipa_with_only_phones_and_dot(self):
-    text = "/-ð./"
+    text = "-/ð/."
     res = ger_to_ipa(text, logger=getLogger())
     self.assertEqual("-ð.", res)
 
@@ -113,7 +103,7 @@ class UnitTests(unittest.TestCase):
     self.assertEqual("ð", res)
 
   def test_chn_to_ipa_with_only_phones_and_dot(self):
-    text = "/-ð./"
+    text = "-/ð/."
     res = chn_to_ipa(text)
     self.assertEqual("-ð.", res)
 
