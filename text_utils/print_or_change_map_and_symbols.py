@@ -21,18 +21,10 @@ def init_map_parser(parser: ArgumentParser) -> Callable[[str, str], None]:
 
 
 def print_map(path: str, arrow_type: str) -> None:
-  print_headline(arrow_type)
   symbols_map = SymbolsMap.load(path)
   for map_input, map_output in symbols_map.items():
     string_to_print = f"{get_symbol_representation(map_input)} {arrow(arrow_type)} {get_symbol_representation(map_output)}"
     print_bold_or_normal(string_to_print, map_input != map_output)
-
-
-def print_headline(arrow_type: str) -> None:
-  if arrow_type == "weights":
-    print(f"Trained symbol {RIGHT_ARROW} symbol to be trained")
-  else:
-    print(f"Occuring symbol in input {LEFT_ARROW} synthesizable symbol")
 
 
 def arrow(arrow_type: str) -> str:
