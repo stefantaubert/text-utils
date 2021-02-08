@@ -28,9 +28,9 @@ EPITRAN_EN_WORD_CACHE: Dict[str, str] = {}
 
 CMU_CACHE: Optional[CMUDict] = None
 
-PH_TRANS_NO_WHITESPACE = re.compile(r'/\S*/')
+WHOLE_STRING_IS_PHONETIC_TRANS = re.compile(r'\A/\S*/\Z')
 SLASH = re.compile(r'/')
-PH_TRANS = re.compile(r'([^ ]*)/(\S*)/([^ ]*)')
+PH_TRANS = re.compile(r'/(\S*)/')
 
 
 class EngToIpaMode(IntEnum):
@@ -114,7 +114,8 @@ def en_ipa_of_text_not_containing_phonetic_transcription(
 
 
 def is_phonetic_transcription_in_text(text: str) -> bool:
-  ph_trans_in_text = PH_TRANS_NO_WHITESPACE.search(text)
+  #ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
+  ph_trans_in_text = PH_TRANS.search(text)
   return ph_trans_in_text is not None
 
 
@@ -130,7 +131,7 @@ def ipa_of_phonetic_transcription(ph_trans: str, logger: Logger) -> str:
 
 
 def is_phonetic_transcription(text: str) -> bool:
-  ipa_of_ph_trans = PH_TRANS.match(text)
+  ipa_of_ph_trans = WHOLE_STRING_IS_PHONETIC_TRANS.search(text)
   return ipa_of_ph_trans is not None
 
 
