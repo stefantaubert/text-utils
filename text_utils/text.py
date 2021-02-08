@@ -2,7 +2,8 @@ import re
 from enum import IntEnum
 from functools import partial
 from logging import WARNING, Logger, getLogger
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Tuple
+
 
 from cmudict_parser import CMUDict, get_dict
 from dragonmapper import hanzi
@@ -114,6 +115,7 @@ def en_ipa_of_text_not_containing_phonetic_transcription(
 
 
 def is_phonetic_transcription_in_text(text: str) -> bool:
+  #ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
   ph_trans_in_text = PH_TRANS_NO_WHITESPACE.search(text)
   return ph_trans_in_text is not None
 
