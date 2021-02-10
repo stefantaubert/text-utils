@@ -70,25 +70,32 @@ pipenv run python -m text_utils.cli print_map -p "examples/examplemap.json" -a "
 ### For printing the symbols
 
 If you want to print all allowed symbols, use
-```
+
+```sh
 pipenv run python -m text_utils.cli print_symbols -p "examples/examplesymbols.symb"
 ```
 
 ### For changing
 
 If you want to change the symbol for a specific key, use
-```
+
+```sh
 pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -a="weights"
 ```
+
 or
-```
+
+```sh
 pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -a="inference"
 ```
+
 (depending on the use case)
 and follow the instructions.
 
 It is also possible to change one symbol without the interactive mode via for example
-```
+
+```sh
 pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -t="ʒ" -m="ʌ"
 ```
+
 where "ʒ" is the key to which "ʌ" is newly assigned
