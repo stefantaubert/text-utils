@@ -187,7 +187,7 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(100, len(res))
     self.assertEqual("zɪzksajz", res[0])
 
-  def test_en_to_ipa__both_without_cache__takes_shorter_time(self):
+  def test_en_to_ipa__both_with_cache__takes_shorter_time(self):
     # xyzxyz doesn't exist in CMUDict
     text = "xyzxyz"
 
@@ -206,7 +206,7 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(100, len(res))
     self.assertEqual("zɪzksajz", res[0])
 
-  def test_en_to_ipa__epitran_without_cache__takes_shorter_time(self):
+  def test_en_to_ipa__epitran_with_cache__takes_shorter_time(self):
     # xyzxyz doesn't exist in CMUDict
     text = "xyzxyz"
 
@@ -216,12 +216,21 @@ class UnitTests(unittest.TestCase):
 
     start = time.time()
     # , to prevent caching in cmudict, i could also clear the cache on every iteration
-    res = [en_to_ipa_epitran(text + ("," * i), logger=getLogger()) for i in range(100)]
-    duration_s = time.time() - start
+    res_cache = [en_to_ipa_epitran(text, logger=getLogger()) for i in range(100)]
+    duration_cache = time.time() - start
 
-    self.assertTrue(duration_s < 5)
-    self.assertEqual(100, len(res))
-    self.assertEqual("zɪzksajz", res[0])
+    clear_cache()
+    clear_en_word_cache()
+
+    start = time.time()
+    # , to prevent caching in cmudict, i could also clear the cache on every iteration
+    _ = [en_to_ipa_epitran(
+      text, logger=getLogger(), use_cache=False) for i in range(100)]
+    duration_no_cache = time.time() - start
+
+    self.assertTrue(duration_cache < duration_no_cache)
+    self.assertEqual(100, len(res_cache))
+    self.assertEqual("zɪzksajz", res_cache[0])
 
   def test_en_to_ipa(self):
     text = "This is a test. And an other one."

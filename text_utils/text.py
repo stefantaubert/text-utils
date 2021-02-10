@@ -135,17 +135,18 @@ def is_phonetic_transcription(text: str) -> bool:
   return ipa_of_ph_trans is not None
 
 
-def en_to_ipa_epitran(text: str, logger: Logger) -> str:
+def en_to_ipa_epitran(text: str, logger: Logger, use_cache: bool = True) -> str:
   global EPITRAN_CACHE
 
   ensure_eng_epitran_is_loaded(logger)
 
-  splitted_text = text.split(" ")
-  splitted_result = [epi_transliterate_word_cached_verbose(
-    word, logger, verbose=False) for word in splitted_text]
-  result = " ".join(splitted_result)
-  #result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
-  # result = EPITRAN_CACHE[Language.ENG].transliterate(text)
+  if use_cache:
+    splitted_text = text.split(" ")
+    splitted_result = [epi_transliterate_word_cached_verbose(
+      word, logger, verbose=False) for word in splitted_text]
+    result = " ".join(splitted_result)
+    return result
+  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
   return result
 
 
