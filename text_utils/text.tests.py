@@ -206,6 +206,23 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(100, len(res))
     self.assertEqual("zɪzksajz", res[0])
 
+  def test_en_to_ipa__epitran_without_cache__takes_shorter_time(self):
+    # xyzxyz doesn't exist in CMUDict
+    text = "xyzxyz"
+
+    ensure_eng_epitran_is_loaded(getLogger())
+    clear_cache()
+    clear_en_word_cache()
+
+    start = time.time()
+    # , to prevent caching in cmudict, i could also clear the cache on every iteration
+    res = [en_to_ipa_epitran(text + ("," * i), logger=getLogger()) for i in range(100)]
+    duration_s = time.time() - start
+
+    self.assertTrue(duration_s < 5)
+    self.assertEqual(100, len(res))
+    self.assertEqual("zɪzksajz", res[0])
+
   def test_en_to_ipa(self):
     text = "This is a test. And an other one."
     ensure_eng_epitran_is_loaded(getLogger())
