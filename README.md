@@ -62,17 +62,28 @@ There are files containing an example map and example symbols in the folder exam
 ### For printing the map
 
 If you want to print the pretrained weights mapping, use
-pipenv run python -m text_utils.cli print_map -p "examples/examplemap.json" -a "weights"
+
+```sh
+pipenv run python -m text_utils.cli print_map \
+  --path="examples/examplemap.json" \
+  --arrow_type="weights"
+```
 
 If you want to print the map showing all occuring symbols and the corresponding synthesizable symbols that are assigned to them, use
-pipenv run python -m text_utils.cli print_map -p "examples/examplemap.json" -a "inference"
+
+```sh
+pipenv run python -m text_utils.cli print_map \
+  --path="examples/examplemap.json" \
+  --arrow_type="inference"
+```
 
 ### For printing the symbols
 
 If you want to print all allowed symbols, use
 
 ```sh
-pipenv run python -m text_utils.cli print_symbols -p "examples/examplesymbols.symb"
+pipenv run python -m text_utils.cli print_symbols \
+  --path="examples/examplesymbols.symb"
 ```
 
 ### For changing
@@ -80,13 +91,19 @@ pipenv run python -m text_utils.cli print_symbols -p "examples/examplesymbols.sy
 If you want to change the symbol for a specific key, use
 
 ```sh
-pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -a="weights"
+pipenv run python -m text_utils.cli change_symbols \
+  --path="examples/examplemap.json" \
+  --symbol_path="examples/examplesymbols.symb" \
+  --arrow_type="weights"
 ```
 
 or
 
 ```sh
-pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -a="inference"
+pipenv run python -m text_utils.cli change_symbols \
+ --path="examples/examplemap.json" \
+ --symbol_path="examples/examplesymbols.symb" \
+ --arrow_type="inference"
 ```
 
 (depending on the use case)
@@ -95,7 +112,11 @@ and follow the instructions.
 It is also possible to change one symbol without the interactive mode via for example
 
 ```sh
-pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -t="ʒ" -m="ʌ"
+pipenv run python -m text_utils.cli change_symbols \
+  --path="examples/examplemap.json" \
+  --symbol_path="examples/examplesymbols.symb" \
+  --to_key="ʒ" \
+  --map_symbol="ʌ"
 ```
 
-where "ʒ" is the key to which "ʌ" is newly assigned.
+where `"ʒ"` is the key to which `"ʌ"` is newly assigned.
