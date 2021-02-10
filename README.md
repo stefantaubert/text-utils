@@ -98,4 +98,4 @@ It is also possible to change one symbol without the interactive mode via for ex
 pipenv run python -m text_utils.cli change_symbols -p="examples/examplemap.json" -s="examples/examplesymbols.symb" -t="ʒ" -m="ʌ"
 ```
 
-where "ʒ" is the key to which "ʌ" is newly assigned
+where "ʒ" is the key to which "ʌ" is newly assigned.
