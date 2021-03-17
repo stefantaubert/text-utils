@@ -43,7 +43,7 @@ def random_iterations(data: OrderedDictType[int, Any], seed: int, iterations: in
   )
 
 
-def random_ngrams_default_cover(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int) -> OrderedSet[int]:
+def random_ngrams_cover_default(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int) -> OrderedSet[int]:
   data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
   return get_random_cover_default(
     data=data_ngrams,
@@ -51,7 +51,7 @@ def random_ngrams_default_cover(data: OrderedDictType[int, List[str]], n_gram: i
   )
 
 
-def random_ngrams_seconds_cover(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, durations_s: Dict[int, float], seconds: float) -> OrderedSet[int]:
+def random_ngrams_cover_seconds(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, durations_s: Dict[int, float], seconds: float) -> OrderedSet[int]:
   data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
   return get_random_seconds_cover(
     data=data_ngrams,
@@ -61,7 +61,7 @@ def random_ngrams_seconds_cover(data: OrderedDictType[int, List[str]], n_gram: i
   )
 
 
-def random_ngrams_iterations_cover(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, iterations: int) -> OrderedSet[int]:
+def random_ngrams_cover_iterations(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, iterations: int) -> OrderedSet[int]:
   data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
   return get_random_iterations_cover(
     data=data_ngrams,
@@ -70,7 +70,7 @@ def random_ngrams_iterations_cover(data: OrderedDictType[int, List[str]], n_gram
   )
 
 
-def random_ngrams_count_cover(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, chars: Dict[int, int], count: int) -> OrderedSet[int]:
+def random_ngrams_cover_count(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, chars: Dict[int, int], count: int) -> OrderedSet[int]:
   data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
   return get_random_count_cover(
     data=data_ngrams,

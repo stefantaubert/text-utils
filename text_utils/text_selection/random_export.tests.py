@@ -32,7 +32,7 @@ class UnitTests(unittest.TestCase):
     seed_tries = range(500)
 
     for seed in seed_tries:
-      res = random_ngrams_default_cover(
+      res = random_ngrams_cover_default(
         data=data,
         seed=seed,
         ignore_symbols=None,
