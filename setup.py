@@ -32,5 +32,7 @@ setup(
         "unidecode>=1.1.2",
         "wget>=3.2",
         "zhon>=1.1.5",
+        "ordered-set",
+        "scipy",
     ],
 )
