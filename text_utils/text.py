@@ -58,6 +58,9 @@ CHN_SUBS = [(re.compile(regex_pattern), replace_with)
 
 
 def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
+  if n < 1:
+    raise Exception()
+
   res: List[Tuple[str]] = []
   for i in range(len(sentence_symbols) - n + 1):
     tmp = tuple(sentence_symbols[i:i + n])
