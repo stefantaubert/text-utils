@@ -135,13 +135,18 @@ def is_phonetic_transcription(text: str) -> bool:
   return ipa_of_ph_trans is not None
 
 
-def en_to_ipa_epitran(text: str, logger: Logger) -> str:
+def en_to_ipa_epitran(text: str, logger: Logger, use_cache: bool = True) -> str:
   global EPITRAN_CACHE
 
   ensure_eng_epitran_is_loaded(logger)
 
+  if use_cache:
+    splitted_text = text.split(" ")
+    splitted_result = [epi_transliterate_word_cached_verbose(
+      word, logger, verbose=False) for word in splitted_text]
+    result = " ".join(splitted_result)
+    return result
   result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
-  # result = EPITRAN_CACHE[Language.ENG].transliterate(text)
   return result
 
 
@@ -187,28 +192,30 @@ def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def epi_transliterate_word_cached_verbose(word: str, logger: Logger) -> str:
+def epi_transliterate_word_cached_verbose(word: str, logger: Logger, verbose: bool = True) -> str:
   # I am assuming there is no IPA difference in EPITRAN.
   word = word.lower()
 
   if word in EPITRAN_EN_WORD_CACHE:
     return EPITRAN_EN_WORD_CACHE[word]
 
-  res = epi_transliterate_word_verbose(word, logger)
+  res = epi_transliterate_word_verbose(word, logger, verbose)
 
   EPITRAN_EN_WORD_CACHE[word] = res
 
   return res
 
 
-def epi_transliterate_word_verbose(word: str, logger: Logger) -> str:
+def epi_transliterate_word_verbose(word: str, logger: Logger, verbose: bool = True) -> str:
   global EPITRAN_CACHE
   assert Language.ENG in EPITRAN_CACHE
 
   res = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], word)
   # res = EPITRAN_CACHE[Language.ENG].transliterate(word)
 
-  logger.info(f"used Epitran for: {word} => {res}")
+  if verbose:
+    logger.info(f"used Epitran for: {word} => {res}")
+
   return res
 
 
