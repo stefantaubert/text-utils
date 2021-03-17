@@ -4,14 +4,14 @@ from typing import Set
 
 from ordered_set import OrderedSet
 from text_utils.text_selection.greedy_kld_applied import (
-    greedy_kld_uniform, greedy_kld_uniform_count,
+    greedy_kld_uniform_default, greedy_kld_uniform_count,
     greedy_kld_uniform_iterations, greedy_kld_uniform_seconds)
 from text_utils.text_selection.utils import get_filtered_ngrams
 
 
-def greedy_kld_uniform_ngrams(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]]) -> OrderedSet[int]:
+def greedy_kld_uniform_ngrams_default(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]]) -> OrderedSet[int]:
   data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
-  return greedy_kld_uniform(
+  return greedy_kld_uniform_default(
     data=data_ngrams,
   )
 

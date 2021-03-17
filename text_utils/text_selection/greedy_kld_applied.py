@@ -9,7 +9,8 @@ from text_utils.text_selection.greedy_kld_methods import (
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
-def greedy_kld_uniform(data: OrderedDict[_T1, List[_T2]]) -> OrderedSet[_T1]:
+
+def greedy_kld_uniform_default(data: OrderedDict[_T1, List[_T2]]) -> OrderedSet[_T1]:
   uniform_distr = get_uniform_distribution(data)
   greedy_selected = sort_greedy_kld(
     data=data,

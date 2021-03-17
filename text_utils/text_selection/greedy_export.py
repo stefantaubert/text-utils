@@ -4,15 +4,15 @@ from typing import OrderedDict as OrderedDictType
 from typing import Set
 
 from ordered_set import OrderedSet
-from text_utils.text_selection.greedy_applied import (greedy, greedy_count,
+from text_utils.text_selection.greedy_applied import (greedy_default, greedy_count,
                                                       greedy_epochs,
                                                       greedy_iterations,
                                                       greedy_seconds)
 from text_utils.text_selection.utils import get_filtered_ngrams
 
 
-def greedy_ngrams(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]]) -> OrderedSet[int]:
-  return greedy(
+def greedy_ngrams_default(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]]) -> OrderedSet[int]:
+  return greedy_default(
     data=get_filtered_ngrams(data, n_gram, ignore_symbols),
   )
 

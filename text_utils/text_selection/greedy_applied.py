@@ -34,12 +34,12 @@ def greedy_epochs(data: OrderedDictType[_T1, List[_T2]], epochs: int) -> Ordered
 
 def greedy_iterations(data: OrderedDictType[_T1, List[_T2]], iterations: int) -> OrderedSet[_T1]:
   # maybe own method in greedy_methods
-  greedy_selected = greedy(data)
+  greedy_selected = greedy_default(data)
   result = greedy_selected[:iterations]
   return result
 
 
-def greedy(data: OrderedDictType[_T1, List[_T2]]) -> OrderedSet[_T1]:
+def greedy_default(data: OrderedDictType[_T1, List[_T2]]) -> OrderedSet[_T1]:
   # maybe own method in greedy_methods
   available_set = values_to_set(data)
   result = sort_greedy(ngrams=available_set)

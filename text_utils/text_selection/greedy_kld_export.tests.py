@@ -2,7 +2,7 @@ import unittest
 
 from ordered_set import OrderedSet
 from text_utils.text_selection.greedy_kld_export import \
-    greedy_kld_uniform_ngrams
+    greedy_kld_uniform_ngrams_default
 from text_utils.text_selection.utils import *
 
 
@@ -15,7 +15,7 @@ class UnitTests(unittest.TestCase):
       4: ["c", "a"],  # two new
     })
 
-    res = greedy_kld_uniform_ngrams(
+    res = greedy_kld_uniform_ngrams_default(
       data=data,
       n_gram=1,
       ignore_symbols=None,
@@ -30,7 +30,7 @@ class UnitTests(unittest.TestCase):
       3: ["c", "a"],  # one new
     })
 
-    res = greedy_kld_uniform_ngrams(
+    res = greedy_kld_uniform_ngrams_default(
       data=data,
       n_gram=2,
       ignore_symbols=None,

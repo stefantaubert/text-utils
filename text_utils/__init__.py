@@ -10,5 +10,4 @@ from text_utils.symbols_map import (SymbolsMap, create_or_update_inference_map,
                                     create_or_update_weights_map)
 from text_utils.text import (EngToIpaMode, get_ngrams, text_normalize,
                              text_to_ipa, text_to_sentences, text_to_symbols)
-from text_utils.text_selection import *
 from text_utils.utils import deserialize_list, serialize_list
