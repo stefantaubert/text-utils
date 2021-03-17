@@ -45,6 +45,32 @@ class UnitTests(unittest.TestCase):
       self.assertEqual(5, len(res))
 
 
+  def test_random_ngrams_cover_seconds__one_gram_two_seconds__return_correct_sorting(self):
+    data = OrderedDict({
+      1: ["a", "a"],  # one new
+      2: ["c", "a"],  # two new
+      3: ["d", "a"],  # two new
+    })
+
+    durations = {
+      1: 1,
+      2: 1,
+      3: 1,
+    }
+
+    res = random_ngrams_cover_seconds(
+      data=data,
+      n_gram=1,
+      ignore_symbols=None,
+      durations_s=durations,
+      seconds=2,
+      seed=1,
+    )
+
+    assert_res = OrderedSet([1, 2])
+    self.assertEqual(assert_res, res)
+
+
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(UnitTests)
   unittest.TextTestRunner(verbosity=2).run(suite)

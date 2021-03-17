@@ -83,9 +83,9 @@ def filter_entries_from_lists(d: OrderedDictType[_T1, List[_T2]], allowed_entrie
 def get_until_sum_set(d: OrderedSet[_T1], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> OrderedSet[_T1]:
   total = 0
   res: OrderedSet[_T1] = OrderedSet()
-  for k in d.items():
+  for k in d:
     current_val = until_values[k]
-    include = total + current_val < until_value
+    include = total + current_val <= until_value
     if not include:
       break
     res.add(k)
@@ -99,7 +99,7 @@ def get_until_sum(d: OrderedDictType[_T1, _T2], until_values: Dict[_T1, Union[fl
   res: OrderedDictType[_T1, _T2] = OrderedDict()
   for k, v in d.items():
     current_val = until_values[k]
-    include = total + current_val < until_value
+    include = total + current_val <= until_value
     if not include:
       break
     res[k] = v
