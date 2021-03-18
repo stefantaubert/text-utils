@@ -12,12 +12,19 @@ class UnitTests(unittest.TestCase):
 
     self.assertEqual(OrderedSet([1]), res)
 
-  def test_get_first_percent_50percent_rounds_up(self):
+  def test_get_first_percent_50percent__rounds_up(self):
     data = OrderedSet([1, 2, 3, 4, 5, 6, 7])
 
     res = get_first_percent(data, 50)
 
     self.assertEqual(OrderedSet([1, 2, 3, 4]), res)
+
+  def test_get_first_percent_100percent__adds_all(self):
+    data = OrderedSet([1, 2, 3, 4, 5, 6, 7])
+
+    res = get_first_percent(data, 100)
+
+    self.assertEqual(OrderedSet([1, 2, 3, 4, 5, 6, 7]), res)
 
   def test_get_filtered_ngrams__returns_ordered_dict(self):
     data = OrderedDict({
