@@ -6,7 +6,8 @@ from ordered_set import OrderedSet
 from text_utils.text_selection.random_applied import (
     get_random_count, get_random_count_cover, get_random_cover_default,
     get_random_default, get_random_iterations, get_random_iterations_cover,
-    get_random_seconds, get_random_seconds_cover)
+    get_random_percent, get_random_percent_cover, get_random_seconds,
+    get_random_seconds_cover)
 from text_utils.text_selection.utils import get_filtered_ngrams
 
 
@@ -40,6 +41,14 @@ def random_iterations(data: OrderedDictType[int, Any], seed: int, iterations: in
     data=data,
     seed=seed,
     iterations=iterations,
+  )
+
+
+def random_percent(data: OrderedDictType[int, Any], seed: int, percent: float) -> OrderedSet[int]:
+  return get_random_percent(
+    data=data,
+    seed=seed,
+    percent=percent,
   )
 
 
@@ -77,4 +86,13 @@ def random_ngrams_cover_count(data: OrderedDictType[int, List[str]], n_gram: int
     seed=seed,
     chars=chars,
     count=count,
+  )
+
+
+def random_ngrams_cover_percent(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], seed: int, percent: float) -> OrderedSet[int]:
+  data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
+  return get_random_percent_cover(
+    data=data_ngrams,
+    seed=seed,
+    percent=percent,
   )

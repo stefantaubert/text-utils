@@ -5,6 +5,20 @@ from text_utils.text_selection.utils import *
 
 class UnitTests(unittest.TestCase):
 
+  def test_get_first_percent_20percent(self):
+    data = OrderedSet([1, 2, 3, 4, 5])
+
+    res = get_first_percent(data, 20)
+
+    self.assertEqual(OrderedSet([1]), res)
+
+  def test_get_first_percent_50percent_rounds_up(self):
+    data = OrderedSet([1, 2, 3, 4, 5, 6, 7])
+
+    res = get_first_percent(data, 50)
+
+    self.assertEqual(OrderedSet([1, 2, 3, 4]), res)
+
   def test_get_filtered_ngrams__returns_ordered_dict(self):
     data = OrderedDict({
       1: ["a", "b"],

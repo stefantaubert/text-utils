@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar
 
+from ordered_set import OrderedSet
 from text_utils.text import get_ngrams
 from text_utils.utils import filter_ngrams
 
@@ -47,6 +48,13 @@ def get_filtered_ngrams(data: OrderedDictType[int, List[str]], n_gram: int, igno
 
   return available_ngrams
 
+
+def get_first_percent(data: OrderedSet, percent: float) -> OrderedSet:
+  proportion = len(data) / 100 * percent
+  # rounding is strange see: https://docs.python.org/3/library/functions.html#round
+  percent_count = round(proportion)
+  res = data[:percent_count]
+  return res
 
 # def ignore_ngrams(available_ngrams: OrderedDictType[int, List[Tuple]], ignore_symbols: Set[str]):
 #   logger = getLogger(__name__)

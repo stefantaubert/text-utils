@@ -5,6 +5,7 @@ from typing import TypeVar
 from ordered_set import OrderedSet
 from text_utils.text_selection.random_method import (sort_random,
                                                      sort_random_set_cover)
+from text_utils.text_selection.utils import get_first_percent
 from text_utils.utils import get_until_sum_set, values_to_set
 
 _T1 = TypeVar("_T1")
@@ -47,7 +48,6 @@ def get_random_count_cover(data: OrderedDictType[_T1, List[_T2]], seed: int, cha
   result = get_until_sum_set(greedy_selected, until_values=chars, until_value=count)
   return result
 
-
 def get_random_iterations(data: OrderedDictType[_T1, List[_T2]], seed: int, iterations: int) -> OrderedSet[_T1]:
   greedy_selected = sort_random(data=data, seed=seed)
   result = greedy_selected[:iterations]
@@ -58,4 +58,17 @@ def get_random_iterations_cover(data: OrderedDictType[_T1, List[_T2]], seed: int
   available_set = values_to_set(data)
   greedy_selected = sort_random_set_cover(data=available_set, seed=seed)
   result = greedy_selected[:iterations]
+  return result
+
+
+def get_random_percent(data: OrderedDictType[_T1, List[_T2]], seed: int, percent: float) -> OrderedSet[_T1]:
+  greedy_selected = sort_random(data=data, seed=seed)
+  result = get_first_percent(greedy_selected, percent)
+  return result
+
+
+def get_random_percent_cover(data: OrderedDictType[_T1, List[_T2]], seed: int, percent: float) -> OrderedSet[_T1]:
+  available_set = values_to_set(data)
+  greedy_selected = sort_random_set_cover(data=available_set, seed=seed)
+  result = get_first_percent(greedy_selected, percent)
   return result
