@@ -15,20 +15,20 @@ _T2 = TypeVar("_T2")
 def greedy_seconds(data: OrderedDictType[_T1, List[_T2]], durations_s: Dict[int, float], seconds: float) -> OrderedSet[_T1]:
   available_set = values_to_set(data)
   result = sort_greedy_until(
-    ngrams=available_set, until_values=durations_s, until_value=seconds)
+    data=available_set, until_values=durations_s, until_value=seconds)
   return result
 
 
 def greedy_count(data: OrderedDictType[_T1, List[_T2]], chars: Dict[int, int], total_count: int) -> OrderedSet[_T1]:
   available_set = values_to_set(data)
   result = sort_greedy_until(
-    ngrams=available_set, until_values=chars, until_value=total_count)
+    data=available_set, until_values=chars, until_value=total_count)
   return result
 
 
 def greedy_epochs(data: OrderedDictType[_T1, List[_T2]], epochs: int) -> OrderedSet[_T1]:
   available_set = values_to_set(data)
-  result = sort_greedy_epochs(ngrams=available_set, epochs=epochs)
+  result = sort_greedy_epochs(data=available_set, epochs=epochs)
   return result
 
 
@@ -42,5 +42,5 @@ def greedy_iterations(data: OrderedDictType[_T1, List[_T2]], iterations: int) ->
 def greedy_default(data: OrderedDictType[_T1, List[_T2]]) -> OrderedSet[_T1]:
   # maybe own method in greedy_methods
   available_set = values_to_set(data)
-  result = sort_greedy(ngrams=available_set)
+  result = sort_greedy(data=available_set)
   return result

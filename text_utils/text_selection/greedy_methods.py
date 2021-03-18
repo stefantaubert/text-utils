@@ -10,11 +10,11 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
-def sort_greedy(ngrams: OrderedDictType[_T1, Set[_T2]]) -> OrderedSet[_T1]:
-  assert isinstance(ngrams, OrderedDict)
+def sort_greedy(data: OrderedDictType[_T1, Set[_T2]]) -> OrderedSet[_T1]:
+  assert isinstance(data, OrderedDict)
   result: OrderedSet[_T1] = OrderedSet()
-  available_entries = ngrams.copy()
-  progress_bar = tqdm(total=len(ngrams), initial=0)
+  available_entries = data.copy()
+  progress_bar = tqdm(total=len(data), initial=0)
   while len(available_entries) > 0:
     selection = get_greedy(available_entries)
     result.update(selection)
@@ -25,11 +25,11 @@ def sort_greedy(ngrams: OrderedDictType[_T1, Set[_T2]]) -> OrderedSet[_T1]:
   return result
 
 
-def sort_greedy_epochs(ngrams: OrderedDictType[_T1, Set[_T2]], epochs: int) -> OrderedSet[_T1]:
-  assert isinstance(ngrams, OrderedDict)
+def sort_greedy_epochs(data: OrderedDictType[_T1, Set[_T2]], epochs: int) -> OrderedSet[_T1]:
+  assert isinstance(data, OrderedDict)
   assert epochs >= 0
   result: OrderedSet[_T1] = OrderedSet()
-  available_entries = ngrams.copy()
+  available_entries = data.copy()
   epochs_done = 0
   epochs_goal = min(epochs, len(available_entries))
   progress_bar = tqdm(total=epochs_goal, initial=0)
@@ -44,10 +44,10 @@ def sort_greedy_epochs(ngrams: OrderedDictType[_T1, Set[_T2]], epochs: int) -> O
   return result
 
 
-def sort_greedy_until(ngrams: OrderedDictType[_T1, Set[_T2]], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> OrderedSet[_T1]:
-  assert isinstance(ngrams, OrderedDict)
+def sort_greedy_until(data: OrderedDictType[_T1, Set[_T2]], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> OrderedSet[_T1]:
+  assert isinstance(data, OrderedDict)
   result: OrderedSet[_T1] = OrderedSet()
-  available_entries = ngrams.copy()
+  available_entries = data.copy()
   total = 0
   continue_while = True
   progress_bar = tqdm(total=int(round(until_value, 0)), initial=0)
