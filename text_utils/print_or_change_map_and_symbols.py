@@ -32,7 +32,7 @@ def print_headline(arrow_type: str) -> None:
   if arrow_type == "weights":
     headline = f"Trained symbol {RIGHT_ARROW} symbol to be trained"
   else:
-    headline = f"Occuring symbol in input {LEFT_ARROW} synthesizable symbol"
+    headline = f"Occurring symbol in input {LEFT_ARROW} synthesizable symbol"
   print('\033[1m' + '\033[4m' + headline + '\033[0m')
 
 

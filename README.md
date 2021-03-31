@@ -69,7 +69,7 @@ pipenv run python -m text_utils.cli print_map \
   --arrow_type="weights"
 ```
 
-If you want to print the map showing all occuring symbols and the corresponding synthesizable symbols that are assigned to them, use
+If you want to print the map showing all occurring symbols and the corresponding synthesizable symbols that are assigned to them, use
 
 ```sh
 pipenv run python -m text_utils.cli print_map \
