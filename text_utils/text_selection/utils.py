@@ -12,11 +12,16 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
-def get_top_n(data: OrderedDictType[int, List[_T1]], top_percent: float) -> Set[_T1]:
+def get_top_n(data: OrderedDictType[int, List[_T1]], top_percent: float) -> OrderedSet[_T1]:
+  """
+  if the distribution is same then it will take the _T1 by ascending sorting to make it deterministic
+  """
   distr = get_distribution(data)
   top_n = round(len(distr) * top_percent)
-  distr_sorted = OrderedDict(sorted(distr.items(), key=lambda x: x[1], reverse=True))
-  top_ngrams: Set[_T1] = set(list(distr_sorted.keys())[:top_n])
+  distr_sorted_after_key = OrderedDict(sorted(distr.items(), key=lambda x: x[0], reverse=False))
+  distr_sorted = OrderedDict(sorted(distr_sorted_after_key.items(),
+                             key=lambda x: x[1], reverse=True))
+  top_ngrams: OrderedSet[_T1] = OrderedSet(list(distr_sorted.keys())[:top_n])
   return top_ngrams
 
 

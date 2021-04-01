@@ -25,6 +25,25 @@ class UnitTests(unittest.TestCase):
     assert_res = OrderedSet([1, 2])
     self.assertEqual(assert_res, res)
 
+  def test_greedy_ngrams_cover__one_grams__return_correct_sorting_after_value(self):
+    data = OrderedDict({
+      1: ["a"],
+      2: ["c"],
+      3: ["b"],
+      4: ["d"],
+    })
+
+    res = greedy_ngrams_cover(
+      data=data,
+      already_covered=OrderedDict(),
+      top_percent=0.5,
+      n_gram=1,
+      ignore_symbols=None,
+    )
+
+    assert_res = OrderedSet([1, 3])
+    self.assertEqual(assert_res, res)
+
   def test_greedy_ngrams_cover__one_grams_and_already_covered__return_correct_sorting(self):
     data = OrderedDict({
       2: ["c", "c"],
