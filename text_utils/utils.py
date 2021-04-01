@@ -26,6 +26,11 @@ def filter_ngrams(ngrams: List[Tuple[_T2]], ignore_symbol_ids: Set[_T1]) -> List
   return res
 
 
+def get_filtered_list(l: List[_T1], take_only: Set[_T1]) -> List[_T1]:
+  res = [x for x in l if x in take_only]
+  return res
+
+
 def save_json(path: str, mapping_dict: dict) -> None:
   with open(path, 'w', encoding='utf-8') as f:
     json.dump(mapping_dict, f, ensure_ascii=False, indent=2)

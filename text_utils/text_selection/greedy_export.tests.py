@@ -5,6 +5,71 @@ from text_utils.text_selection.utils import *
 
 
 class UnitTests(unittest.TestCase):
+
+  def test_greedy_ngrams_cover__one_grams__return_correct_sorting(self):
+    data = OrderedDict({
+      1: ["a", "a", "a"],
+      2: ["c", "c"],
+      3: ["d"],
+      4: ["e"],
+    })
+
+    res = greedy_ngrams_cover(
+      data=data,
+      already_covered=OrderedDict(),
+      top_percent=0.5,
+      n_gram=1,
+      ignore_symbols=None,
+    )
+
+    assert_res = OrderedSet([1, 2])
+    self.assertEqual(assert_res, res)
+
+  def test_greedy_ngrams_cover__one_grams_and_already_covered__return_correct_sorting(self):
+    data = OrderedDict({
+      2: ["c", "c"],
+      3: ["d"],
+      4: ["e"],
+    })
+
+    already_covered = OrderedDict({
+      1: ["a", "a", "a"],  # one new
+    })
+
+    res = greedy_ngrams_cover(
+      data=data,
+      already_covered=already_covered,
+      top_percent=0.5,
+      n_gram=1,
+      ignore_symbols=None,
+    )
+
+    assert_res = OrderedSet([2])
+    self.assertEqual(assert_res, res)
+
+  def test_greedy_ngrams_cover__one_grams_and_already_covered_and_ignoring__return_correct_sorting(self):
+    data = OrderedDict({
+      2: ["c", "c", "c"],
+      3: ["d"],
+      4: ["e", "e"],
+      5: ["f"],
+    })
+
+    already_covered = OrderedDict({
+      1: ["a", "a", "a", "a"],  # one new
+    })
+
+    res = greedy_ngrams_cover(
+      data=data,
+      already_covered=already_covered,
+      top_percent=0.5,
+      n_gram=1,
+      ignore_symbols={"a"},
+    )
+
+    assert_res = OrderedSet([2, 4])
+    self.assertEqual(assert_res, res)
+
   def test_greedy_ngrams_iterations__one_grams__return_correct_sorting(self):
     data = OrderedDict({
       1: ["a", "a"],  # one new

@@ -10,6 +10,20 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
+def get_greedy_cover(data: OrderedDictType[_T1, Set[_T2]], already_covered: Set[_T2]) -> OrderedSet[_T1]:
+  assert isinstance(data, OrderedDict)
+  data_containing_only_new_units = OrderedDict(
+    {k: v for k, v in data.items() if len(v.difference(already_covered)) > 0}
+  )
+  all_already_covered = len(data_containing_only_new_units) == 0
+
+  if all_already_covered:
+    return OrderedSet()
+
+  res = get_greedy(data_containing_only_new_units)
+  return res
+
+
 def sort_greedy(data: OrderedDictType[_T1, Set[_T2]]) -> OrderedSet[_T1]:
   assert isinstance(data, OrderedDict)
   result: OrderedSet[_T1] = OrderedSet()

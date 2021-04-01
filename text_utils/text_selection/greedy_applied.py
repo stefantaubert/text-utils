@@ -3,13 +3,22 @@ from typing import OrderedDict as OrderedDictType
 from typing import Tuple, TypeVar
 
 from ordered_set import OrderedSet
-from text_utils.text_selection.greedy_methods import (sort_greedy,
+from text_utils.text_selection.greedy_methods import (get_greedy_cover,
+                                                      sort_greedy,
                                                       sort_greedy_epochs,
                                                       sort_greedy_until)
 from text_utils.utils import values_to_set
 
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
+
+
+def greedy_cover(data: OrderedDictType[_T1, List[_T2]], already_covered: OrderedDictType[_T1, List[_T2]]) -> OrderedSet[_T1]:
+  available_set = values_to_set(data)
+  already_covered_set = values_to_set(already_covered)
+  already_covered_units = {x for y in already_covered_set.values() for x in y}
+  result = get_greedy_cover(data=available_set, already_covered=already_covered_units)
+  return result
 
 
 def greedy_seconds(data: OrderedDictType[_T1, List[_T2]], durations_s: Dict[int, float], seconds: float) -> OrderedSet[_T1]:

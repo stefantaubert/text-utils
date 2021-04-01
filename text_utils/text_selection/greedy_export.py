@@ -1,14 +1,38 @@
-from logging import getLogger
+from collections import OrderedDict
 from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set
 
 from ordered_set import OrderedSet
-from text_utils.text_selection.greedy_applied import (greedy_default, greedy_count,
+from text_utils.text_selection.greedy_applied import (greedy_count,
+                                                      greedy_cover,
+                                                      greedy_default,
                                                       greedy_epochs,
                                                       greedy_iterations,
                                                       greedy_seconds)
-from text_utils.text_selection.utils import get_filtered_ngrams
+from text_utils.text_selection.utils import get_filtered_ngrams, get_top_n
+from text_utils.utils import get_filtered_list
+
+
+def greedy_ngrams_cover(data: OrderedDictType[int, List[str]], already_covered: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]], top_percent: Optional[float]) -> OrderedSet[int]:
+  """
+  cover each ngram at least one time
+  top_percent: top percent of all data + already_covered occuring ngrams after filtering; 0 <= top_percent < 1
+  """
+  data_ngrams = get_filtered_ngrams(data, n_gram, ignore_symbols)
+  already_covered_ngrams = get_filtered_ngrams(already_covered, n_gram, ignore_symbols)
+  if top_percent is not None and 0 <= top_percent < 1:
+    all_data = data_ngrams.copy()
+    all_data.update(already_covered_ngrams)
+    top_ngrams = get_top_n(all_data, top_percent)
+    data_ngrams = OrderedDict({k: get_filtered_list(v, top_ngrams) for k, v in data_ngrams.items()})
+    already_covered_ngrams = OrderedDict({k: get_filtered_list(
+      v, top_ngrams) for k, v in already_covered_ngrams.items()})
+
+  return greedy_cover(
+    data=data_ngrams,
+    already_covered=already_covered_ngrams,
+  )
 
 
 def greedy_ngrams_default(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]]) -> OrderedSet[int]:

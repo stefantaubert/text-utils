@@ -1,5 +1,6 @@
 import cProfile
 import random
+from text_utils.text_selection.utils import get_distribution, get_reverse_distribution
 import time
 import unittest
 from collections import OrderedDict

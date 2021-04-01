@@ -1,5 +1,6 @@
 from text_utils.text_selection.cover_export import cover_symbols_default
 from text_utils.text_selection.greedy_export import (greedy_ngrams_count,
+                                                     greedy_ngrams_cover,
                                                      greedy_ngrams_default,
                                                      greedy_ngrams_epochs,
                                                      greedy_ngrams_seconds)

@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from logging import getLogger
 from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
@@ -7,6 +7,35 @@ from typing import Set, Tuple, TypeVar
 from ordered_set import OrderedSet
 from text_utils.text import get_ngrams
 from text_utils.utils import filter_ngrams
+
+_T1 = TypeVar("_T1")
+_T2 = TypeVar("_T2")
+
+
+def get_top_n(data: OrderedDictType[int, List[_T1]], top_percent: float) -> Set[_T1]:
+  distr = get_distribution(data)
+  top_n = round(len(distr) * top_percent)
+  distr_sorted = OrderedDict(sorted(distr.items(), key=lambda x: x[1], reverse=True))
+  top_ngrams: Set[_T1] = set(list(distr_sorted.keys())[:top_n])
+  return top_ngrams
+
+
+def get_distribution(ngrams: Dict[_T1, List[_T2]]) -> Dict[_T2, float]:
+  ngrams_counter = Counter(x for y in ngrams.values() for x in y)
+  vals = list(ngrams_counter.values())
+  sum_vals = sum(vals)
+  distr: Dict[_T2, float] = {k: v / sum_vals for k, v in ngrams_counter.items()}
+  return distr
+
+
+def get_reverse_distribution(ngrams: Dict[_T1, List[_T2]]) -> Dict[_T2, float]:
+  ngrams_counter = Counter(x for y in ngrams.values() for x in y)
+  keys_sorted = list(sorted(ngrams_counter.keys()))
+  od = OrderedDict({k: ngrams_counter[k] for k in keys_sorted})
+  vals = list(od.values())
+  sum_vals = sum(vals)
+  distr: Dict[_T2, float] = {k: vals[i] / sum_vals for i, k in enumerate(reversed(keys_sorted))}
+  return distr
 
 
 def get_filtered_ngrams(data: OrderedDictType[int, List[str]], n_gram: int, ignore_symbols: Optional[Set[str]]) -> OrderedDictType[int, List[Tuple]]:

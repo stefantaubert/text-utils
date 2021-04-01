@@ -153,25 +153,6 @@ def get_uniform_distribution(ngrams: Dict[_T1, List[_T2]]) -> Dict[_T2, float]:
   res: Dict[_T2, float] = {k: distr for k in unique_ngrams}
   return res
 
-
-def get_distribution(ngrams: Dict[_T1, List[_T2]]) -> Dict[_T2, float]:
-  ngrams_counter = Counter(x for y in ngrams.values() for x in y)
-  vals = list(ngrams_counter.values())
-  sum_vals = sum(vals)
-  distr: Dict[_T2, float] = {k: v / sum_vals for k, v in ngrams_counter.items()}
-  return distr
-
-
-def get_reverse_distribution(ngrams: Dict[_T1, List[_T2]]) -> Dict[_T2, float]:
-  ngrams_counter = Counter(x for y in ngrams.values() for x in y)
-  keys_sorted = list(sorted(ngrams_counter.keys()))
-  od = OrderedDict({k: ngrams_counter[k] for k in keys_sorted})
-  vals = list(od.values())
-  sum_vals = sum(vals)
-  distr: Dict[_T2, float] = {k: vals[i] / sum_vals for i, k in enumerate(reversed(keys_sorted))}
-  return distr
-
-
 def add_missing_keys(counter: Counter, keys: Set[_T1]) -> None:
   for k in keys:
     if k not in counter:
