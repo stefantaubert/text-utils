@@ -5,6 +5,29 @@ from text_utils.text_selection.utils import *
 
 class UnitTests(unittest.TestCase):
 
+  def __init__(self, methodName: str) -> None:
+    super().__init__(methodName)
+
+  def test_vectorize_set(self):
+    sample_set = {1, 4, 5}
+    max_id = 6
+    res = vectorize_set(sample_set, max_id)
+
+    self.assertTrue(np.array_equal(res, np.array([0, 1, 0, 0, 1, 1, 0])))
+
+  def test_vectorize_all_sets(self):
+    sample_set_list = [{1, 4, 5}, {1, 4, 6}]
+    max_id = 6
+    res = vectorize_all_sets(sample_set_list, max_id)
+
+    self.assertTrue(np.array_equal(res, np.array([[0, 1, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 1]])))
+
+  def test_get_max_entry(self):
+    sample_set_list = [{1, 4, 5}, {1, 4, 6}]
+    res = get_max_entry(sample_set_list)
+
+    self.assertEqual(res, 6)
+
   def test_get_first_percent_20percent(self):
     data = OrderedSet([1, 2, 3, 4, 5])
 

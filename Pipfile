@@ -21,6 +21,7 @@ unidecode = "*"
 cmudict-parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
 scipy = "*"
 ordered-set = "*"
+sklearn = "*"
 
 [requires]
 python_version = "3.8"
