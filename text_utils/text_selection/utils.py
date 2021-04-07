@@ -4,12 +4,39 @@ from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar
 
+import numpy as np
 from ordered_set import OrderedSet
+from sklearn.cluster import KMeans
 from text_utils.text import get_ngrams
 from text_utils.utils import filter_ngrams
 
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
+
+
+def find_unlike_sets(sample_set_list: List[Set[int]], n: int) -> List[Set[int]]:
+  k_means = KMeans(n_clusters=n, init='k-means++')
+  max_id = get_max_entry(sample_set_list)
+  vecs = vectorize_all_sets(sample_set_list, max_id)
+  cluster_dists = k_means.fit_transform(vecs)
+  chosen_indices = np.argmin(cluster_dists, axis=0)
+  chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  return chosen_sets
+
+
+def vectorize_all_sets(sample_set_list: List[Set[int]], max_id: int) -> List[List[int]]:
+  vec_list = [vectorize_set(sample_set, max_id) for sample_set in sample_set_list]
+  return vec_list
+
+
+def vectorize_set(sample_set: Set[int], max_id: int) -> List[int]:
+  vec = [int(i in sample_set) for i in range(max_id + 1)]
+  return vec
+
+
+def get_max_entry(sample_set_list: List[Set[int]]) -> int:
+  max_of_each_set = [max(sample_set) for sample_set in sample_set_list]
+  return max(max_of_each_set)
 
 
 def get_top_n(data: OrderedDictType[int, List[_T1]], top_percent: float) -> OrderedSet[_T1]:
@@ -20,7 +47,7 @@ def get_top_n(data: OrderedDictType[int, List[_T1]], top_percent: float) -> Orde
   top_n = round(len(distr) * top_percent)
   distr_sorted_after_key = OrderedDict(sorted(distr.items(), key=lambda x: x[0], reverse=False))
   distr_sorted = OrderedDict(sorted(distr_sorted_after_key.items(),
-                             key=lambda x: x[1], reverse=True))
+                                    key=lambda x: x[1], reverse=True))
   top_ngrams: OrderedSet[_T1] = OrderedSet(list(distr_sorted.keys())[:top_n])
   return top_ngrams
 
