@@ -1,3 +1,4 @@
+import random
 from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, TypeVar
@@ -5,8 +6,9 @@ from typing import Set, TypeVar
 from ordered_set import OrderedSet
 from text_utils.text_selection.random_method import (sort_random,
                                                      sort_random_set_cover)
-from text_utils.text_selection.utils import get_first_percent
+from text_utils.text_selection.utils import find_unlike_sets, get_first_percent
 from text_utils.utils import get_until_sum_set, values_to_set
+from tqdm import tqdm
 
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
@@ -30,7 +32,22 @@ def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, duratio
 
 
 def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> Set[int]:
-  pass
+  potential_seeds = range(samples)
+  # random.shuffle(potential_seeds)
+
+  potential_sets = []
+  for sample_seed in tqdm(potential_seeds):
+    sample_set = get_random_seconds(
+      data=data,
+      seed=sample_seed,
+      durations_s=durations_s,
+      seconds=seconds,
+    )
+    potential_sets.append(sample_set)
+  
+  selected_set_idxs = find_unlike_sets(potential_sets, n, seed)
+  selected_seeds = {potential_seeds[i] for i in selected_set_idxs}
+  return selected_seeds
 
 
 def get_random_seconds_cover(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float) -> OrderedSet[_T1]:

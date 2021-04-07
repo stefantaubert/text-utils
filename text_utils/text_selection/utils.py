@@ -14,14 +14,22 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
-def find_unlike_sets(sample_set_list: List[Set[int]], n: int) -> List[Set[int]]:
-  k_means = KMeans(n_clusters=n, init='k-means++')
+def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int]) -> List[int]:
+  k_means = KMeans(
+    n_clusters=n,
+    init='k-means++',
+    random_state=seed,
+  )
+
   max_id = get_max_entry(sample_set_list)
   vecs = vectorize_all_sets(sample_set_list, max_id)
   cluster_dists = k_means.fit_transform(vecs)
+  assert cluster_dists.shape[1] == n
   chosen_indices = np.argmin(cluster_dists, axis=0)
-  chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
-  return chosen_sets
+  # chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  assert len(chosen_indices) == n
+  assert len(set(chosen_indices)) == n
+  return chosen_indices
 
 
 def vectorize_all_sets(sample_set_list: List[Set[int]], max_id: int) -> List[List[int]]:
