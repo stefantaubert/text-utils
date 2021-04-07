@@ -33,6 +33,7 @@ setup(
         "wget>=3.2",
         "zhon>=1.1.5",
         "ordered-set",
+        "pytest",
         "scipy",
     ],
 )
