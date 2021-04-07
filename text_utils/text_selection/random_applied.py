@@ -31,7 +31,7 @@ def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, duratio
   return result
 
 
-def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> Set[int]:
+def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> OrderedSet[int]:
   potential_seeds = range(samples)
   # random.shuffle(potential_seeds)
 
@@ -44,7 +44,7 @@ def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], s
       seconds=seconds,
     )
     potential_sets.append(sample_set)
-  
+
   selected_set_idxs = find_unlike_sets(potential_sets, n, seed)
   selected_seeds = {potential_seeds[i] for i in selected_set_idxs}
   return selected_seeds
