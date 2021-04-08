@@ -27,26 +27,40 @@ def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int
     random_state=seed,
   )
   cluster_dists = k_means.fit_transform(vecs)
+  assert cluster_dists.shape[1] == n
   cluster_labels = k_means.labels_
-  first_empty_cluster_index = n
+  first_empty_cluster_index = find_empty_clusters(cluster_labels, n)
+  chosen_indices = np.argmin(cluster_dists, axis=0)
+  replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(
+    cluster_labels, cluster_dists, chosen_indices, first_empty_cluster_index)
+  unselected_indices = set(range(len(sample_set_list))) - set(chosen_indices)
+  replace_chosen_indices_that_correspond_to_empty_clusters_with_random_but_unused_indices(
+    chosen_indices, unselected_indices, first_empty_cluster_index, n)
+  assert len(chosen_indices) == n
+  assert len(set(chosen_indices)) == n
+  return chosen_indices
+
+
+def find_empty_clusters(cluster_labels: np.ndarray, n: int) -> int:
   for cluster_index in range(n):
     cluster_is_not_empty_for_this_index = any(cluster_labels == cluster_index)
     if not cluster_is_not_empty_for_this_index:
       first_empty_cluster_index = cluster_index
-      break
-  assert cluster_dists.shape[1] == n
-  chosen_indices = np.argmin(cluster_dists, axis=0)
-  for i in range(first_empty_cluster_index):
-    while cluster_labels[chosen_indices[i]] != i:
-      cluster_dists[chosen_indices[i], i] = inf
-      chosen_indices[i] = np.argmin(cluster_dists[:, i])
-  unselected_indices = set(range(len(sample_set_list))) - set(chosen_indices)
-  for i in range(first_empty_cluster_index, n):
-    chosen_indices[i] = random.sample(unselected_indices, 1)[0]
-    unselected_indices.remove(chosen_indices[i])
-  assert len(chosen_indices) == n
-  assert len(set(chosen_indices)) == n
-  return chosen_indices
+      return first_empty_cluster_index
+  return n
+
+
+def replace_chosen_indices_that_correspond_to_empty_clusters_with_random_but_unused_indices(chosen_indices: np.ndarray, unselected_indices: Set, first_empty_cluster_index: int, n: int) -> None:
+  for cluster_index in range(first_empty_cluster_index, n):
+    chosen_indices[cluster_index] = random.sample(unselected_indices, 1)[0]
+    unselected_indices.remove(chosen_indices[cluster_index])
+
+
+def replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(cluster_labels: np.ndarray, cluster_dists: np.ndarray, chosen_indices: List[int], first_empty_cluster_index: int) -> None:
+  for cluster_index in range(first_empty_cluster_index):
+    while cluster_labels[chosen_indices[cluster_index]] != cluster_index:
+      cluster_dists[chosen_indices[cluster_index], cluster_index] = inf
+      chosen_indices[cluster_index] = np.argmin(cluster_dists[:, cluster_index])
 
 
 def vectorize_all_sets(sample_set_list: List[Set[int]], max_id: int) -> List[List[int]]:
