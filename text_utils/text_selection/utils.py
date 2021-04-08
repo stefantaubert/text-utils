@@ -19,25 +19,31 @@ _T2 = TypeVar("_T2")
 
 
 def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int]) -> List[int]:
+  max_id = get_max_entry(sample_set_list)
+  vecs = vectorize_all_sets(sample_set_list, max_id)
   k_means = KMeans(
     n_clusters=n,
     init='k-means++',
     random_state=seed,
   )
-  max_id = get_max_entry(sample_set_list)
-  vecs = vectorize_all_sets(sample_set_list, max_id)
   cluster_dists = k_means.fit_transform(vecs)
   cluster_labels = k_means.labels_
+  first_empty_cluster_index = n
   for cluster_index in range(n):
     cluster_is_not_empty_for_this_index = any(cluster_labels == cluster_index)
-    assert cluster_is_not_empty_for_this_index
+    if not cluster_is_not_empty_for_this_index:
+      first_empty_cluster_index = cluster_index
+      break
   assert cluster_dists.shape[1] == n
   chosen_indices = np.argmin(cluster_dists, axis=0)
-  for i in range(n):
+  for i in range(first_empty_cluster_index):
     while cluster_labels[chosen_indices[i]] != i:
       cluster_dists[chosen_indices[i], i] = inf
       chosen_indices[i] = np.argmin(cluster_dists[:, i])
-  #chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  unselected_indices = set(range(len(sample_set_list))) - set(chosen_indices)
+  for i in range(first_empty_cluster_index, n):
+    chosen_indices[i] = random.sample(unselected_indices, 1)[0]
+    unselected_indices.remove(chosen_indices[i])
   assert len(chosen_indices) == n
   assert len(set(chosen_indices)) == n
   return chosen_indices
