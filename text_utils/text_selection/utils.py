@@ -1,12 +1,16 @@
+import random
 from collections import Counter, OrderedDict
 from logging import getLogger
+from math import inf
 from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar
 
+import matplotlib.pyplot as plt
 import numpy as np
 from ordered_set import OrderedSet
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 from text_utils.text import get_ngrams
 from text_utils.utils import filter_ngrams
 
@@ -14,14 +18,29 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
-def find_unlike_sets(sample_set_list: List[Set[int]], n: int) -> List[Set[int]]:
-  k_means = KMeans(n_clusters=n, init='k-means++')
+def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int]) -> List[int]:
+  k_means = KMeans(
+    n_clusters=n,
+    init='k-means++',
+    random_state=seed,
+  )
   max_id = get_max_entry(sample_set_list)
   vecs = vectorize_all_sets(sample_set_list, max_id)
   cluster_dists = k_means.fit_transform(vecs)
+  cluster_labels = k_means.labels_
+  for cluster_index in range(n):
+    cluster_is_not_empty_for_this_index = any(cluster_labels == cluster_index)
+    assert cluster_is_not_empty_for_this_index
+  assert cluster_dists.shape[1] == n
   chosen_indices = np.argmin(cluster_dists, axis=0)
-  chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
-  return chosen_sets
+  for i in range(n):
+    while cluster_labels[chosen_indices[i]] != i:
+      cluster_dists[chosen_indices[i], i] = inf
+      chosen_indices[i] = np.argmin(cluster_dists[:, i])
+  #chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  assert len(chosen_indices) == n
+  assert len(set(chosen_indices)) == n
+  return chosen_indices
 
 
 def vectorize_all_sets(sample_set_list: List[Set[int]], max_id: int) -> List[List[int]]:

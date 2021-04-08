@@ -1,3 +1,4 @@
+import pickle
 import unittest
 
 from text_utils.text_selection.utils import *
@@ -8,12 +9,18 @@ class UnitTests(unittest.TestCase):
   def __init__(self, methodName: str) -> None:
     super().__init__(methodName)
 
-  def test_vectorize_set(self):
-    sample_set = {1, 4, 5}
-    max_id = 6
-    res = vectorize_set(sample_set, max_id)
+  def test_fail(self):
+    with open("/tmp/data.pkl", "rb") as f:
+      data = pickle.load(f)
 
-    self.assertTrue(np.array_equal(res, np.array([0, 1, 0, 0, 1, 1, 0])))
+    selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
+    self.assertEqual(2, len(set(selected_set_idxs)))
+
+  def test_find_unlike_sets__same_sets__choose_different_idxs(self):
+    data = [set(range(10)) for _ in range(10)]
+
+    selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
+    self.assertEqual(2, len(set(selected_set_idxs)))
 
   def test_vectorize_all_sets(self):
     sample_set_list = [{1, 4, 5}, {1, 4, 6}]
