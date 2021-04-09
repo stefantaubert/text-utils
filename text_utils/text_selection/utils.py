@@ -1,4 +1,3 @@
-import random
 from collections import Counter, OrderedDict
 from logging import getLogger
 from math import inf
@@ -18,7 +17,13 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
-def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int]) -> List[int]:
+def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int]) -> Set[int]:
+  sample_number = len(sample_set_list)
+  if n > sample_number:
+    raise ValueError(
+      "The number of indices you want to choose is greater than the number of available sets.")
+  if n == sample_number:
+    return set(range(sample_number))
   max_id = get_max_entry(sample_set_list)
   vecs = vectorize_all_sets(sample_set_list, max_id)
   k_means = KMeans(
@@ -33,12 +38,13 @@ def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int
   chosen_indices = np.argmin(cluster_dists, axis=0)
   replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(
     cluster_labels, cluster_dists, chosen_indices, first_empty_cluster_index)
-  unselected_indices = set(range(len(sample_set_list))) - set(chosen_indices)
+  unselected_indices = [index for index in range(
+    sample_number) if index not in chosen_indices]
   replace_chosen_indices_that_correspond_to_empty_clusters_with_random_but_unused_indices(
     chosen_indices, unselected_indices, first_empty_cluster_index, n)
   assert len(chosen_indices) == n
   assert len(set(chosen_indices)) == n
-  return chosen_indices
+  return set(chosen_indices)
 
 
 def find_empty_clusters(cluster_labels: np.ndarray, n: int) -> int:
@@ -52,8 +58,8 @@ def find_empty_clusters(cluster_labels: np.ndarray, n: int) -> int:
 
 def replace_chosen_indices_that_correspond_to_empty_clusters_with_random_but_unused_indices(chosen_indices: np.ndarray, unselected_indices: Set, first_empty_cluster_index: int, n: int) -> None:
   for cluster_index in range(first_empty_cluster_index, n):
-    chosen_indices[cluster_index] = random.sample(unselected_indices, 1)[0]
-    unselected_indices.remove(chosen_indices[cluster_index])
+    chosen_indices[cluster_index] = unselected_indices[0]
+    unselected_indices = unselected_indices[1:]
 
 
 def replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(cluster_labels: np.ndarray, cluster_dists: np.ndarray, chosen_indices: List[int], first_empty_cluster_index: int) -> None:

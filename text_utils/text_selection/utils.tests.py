@@ -9,18 +9,43 @@ class UnitTests(unittest.TestCase):
   def __init__(self, methodName: str) -> None:
     super().__init__(methodName)
 
-  def test_fail(self):
-    with open("/tmp/data.pkl", "rb") as f:
-      data = pickle.load(f)
+  def test_find_unlike_sets_n_too_big_raises_ValueError(self):
+    data = [{1, 2, 3}, {1, 2, 4}]
+    with self.assertRaises(ValueError):
+      find_unlike_sets(data, n=3, seed=1111)
 
-    selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
-    self.assertEqual(2, len(set(selected_set_idxs)))
+  def test_find_unlike_sets_n_is_length_of_sample_set_list(self):
+    data = [{1, 2, 3}, {1, 2, 4}, {1, 2}]
+
+    selected_set_idxs = find_unlike_sets(data, n=3, seed=1111)
+    self.assertEqual(selected_set_idxs, {0, 1, 2})
+
+  # def test_find_unlike_sets(self):
+  #   with open("/tmp/data.pkl", "rb") as f:
+  #     data = pickle.load(f)
+
+  #   selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
+  #   self.assertEqual(2, len(set(selected_set_idxs)))
 
   def test_find_unlike_sets__same_sets__choose_different_idxs(self):
     data = [set(range(10)) for _ in range(10)]
 
     selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
     self.assertEqual(2, len(set(selected_set_idxs)))
+
+  def test_find_empty_clusters__empty_cluster_index_equals_n(self):
+    cluster_labels = np.array([0,1,2,2,1,0,1])
+    n=3
+
+    empty_cluster_index = find_empty_clusters(cluster_labels, n)
+    self.assertEqual(3, empty_cluster_index)
+
+  def test_find_empty_clusters__empty_cluster_index_is_smaller_than_n(self):
+    cluster_labels = np.array([0,1,2,2,1,0,1,3])
+    n=10
+
+    empty_cluster_index = find_empty_clusters(cluster_labels, n)
+    self.assertEqual(4, empty_cluster_index)
 
   def test_vectorize_all_sets(self):
     sample_set_list = [{1, 4, 5}, {1, 4, 6}]
