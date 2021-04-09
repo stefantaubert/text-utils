@@ -47,6 +47,11 @@ class UnitTests(unittest.TestCase):
     empty_cluster_index = find_empty_clusters(cluster_labels, n)
     self.assertEqual(4, empty_cluster_index)
 
+  def test_replace_chosen_indices_that_correspond_to_empty_clusters_with_first_unused_indices(self):
+    chosen_indices = [3,6,1]
+    unselected_indices = [0,2,4,5]
+    first_empty_cluster_index = 1
+
   def test_vectorize_all_sets(self):
     sample_set_list = [{1, 4, 5}, {1, 4, 6}]
     max_id = 6

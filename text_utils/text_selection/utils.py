@@ -1,3 +1,4 @@
+import random
 from collections import Counter, OrderedDict
 from logging import getLogger
 from math import inf
@@ -40,7 +41,7 @@ def find_unlike_sets(sample_set_list: List[Set[int]], n: int, seed: Optional[int
     cluster_labels, cluster_dists, chosen_indices, first_empty_cluster_index)
   unselected_indices = [index for index in range(
     sample_number) if index not in chosen_indices]
-  replace_chosen_indices_that_correspond_to_empty_clusters_with_random_but_unused_indices(
+  replace_chosen_indices_that_correspond_to_empty_clusters_with_first_unused_indices(
     chosen_indices, unselected_indices, first_empty_cluster_index, n)
   assert len(chosen_indices) == n
   assert len(set(chosen_indices)) == n
@@ -56,7 +57,7 @@ def find_empty_clusters(cluster_labels: np.ndarray, n: int) -> int:
   return n
 
 
-def replace_chosen_indices_that_correspond_to_empty_clusters_with_random_but_unused_indices(chosen_indices: np.ndarray, unselected_indices: Set, first_empty_cluster_index: int, n: int) -> None:
+def replace_chosen_indices_that_correspond_to_empty_clusters_with_first_unused_indices(chosen_indices: np.ndarray, unselected_indices: Set, first_empty_cluster_index: int, n: int) -> None:
   for cluster_index in range(first_empty_cluster_index, n):
     chosen_indices[cluster_index] = unselected_indices[0]
     unselected_indices = unselected_indices[1:]
@@ -82,6 +83,38 @@ def vectorize_set(sample_set: Set[int], max_id: int) -> List[int]:
 def get_max_entry(sample_set_list: List[Set[int]]) -> int:
   max_of_each_set = [max(sample_set) for sample_set in sample_set_list]
   return max(max_of_each_set)
+
+
+def get_random_subsets(sample_set_list: List[Set[int]], n: int) -> List[Set[int]]:
+  chosen_indices = random.sample(range(len(sample_set_list)), n)
+  while len(set(chosen_indices)) != n:
+    chosen_indices = random.sample(range(len(sample_set_list)), n)
+  chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  return chosen_sets
+
+
+def get_total_number_of_common_elements(chosen_sets: List[Set[int]]) -> int:
+  common_elements_dict = get_number_of_common_elements(chosen_sets)
+  total_number = sum(common_elements_dict.values()) / 2
+  return int(total_number)
+
+
+def get_number_of_common_elements(chosen_sets: List[Set]) -> Dict[int, int]:
+  dict_of_common_elements = {index: sum(list_of_numbers_of_common_elements_for_one_index(
+    chosen_sets, index)) for index in range(len(chosen_sets))}
+  return dict_of_common_elements
+
+
+def get_number_of_common_elements_per_set(chosen_sets: List[Set]) -> Dict[int, List[int]]:
+  dict_of_common_elements = {index: list_of_numbers_of_common_elements_for_one_index(
+    chosen_sets, index) for index in range(len(chosen_sets))}
+  return dict_of_common_elements
+
+
+def list_of_numbers_of_common_elements_for_one_index(chosen_sets: List[Set], index: int) -> List[int]:
+  common_number_list = [len(chosen_sets[index] & chosen_set)
+                        for chosen_set in chosen_sets if chosen_set != chosen_sets[index]]
+  return common_number_list
 
 
 def get_top_n(data: OrderedDictType[int, List[_T1]], top_percent: float) -> OrderedSet[_T1]:
