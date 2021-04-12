@@ -67,7 +67,7 @@ def replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(cluster_l
   for cluster_index in range(first_empty_cluster_index):
     while cluster_labels[chosen_indices[cluster_index]] != cluster_index:
       cluster_dists[chosen_indices[cluster_index], cluster_index] = np.inf
-      chosen_indices[cluster_index] = np.argmin(np.array(cluster_dists)[:, cluster_index])
+      chosen_indices[cluster_index] = np.argmin(cluster_dists[:, cluster_index])
 
 
 def vectorize_all_sets(sample_set_list: List[Set[int]], max_id: int) -> List[List[int]]:
