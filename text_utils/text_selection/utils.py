@@ -112,7 +112,7 @@ def get_number_of_common_elements_per_set(chosen_sets: List[Set]) -> Dict[int, L
 
 def list_of_numbers_of_common_elements_for_one_index(chosen_sets: List[Set], index: int) -> List[int]:
   common_number_list = [len(chosen_sets[index] & chosen_set)
-                        for chosen_set in chosen_sets if chosen_set != chosen_sets[index]]
+                        for set_index, chosen_set in enumerate(chosen_sets) if set_index != index]
   return common_number_list
 
 
