@@ -17,7 +17,27 @@ def get_random_list(length: int, chars: List[str]) -> List[str]:
 
 class UnitTests(unittest.TestCase):
 
-  def test_get_random_seconds_divergence_seeds(self):
+  def test_get_random_seconds_divergence_seeds__is_sorted(self):
+    seed = 1111
+    random.seed(seed)
+
+    n_data = 100
+    data = OrderedDict({i: get_random_list(random.randint(1, 50), ALPHABET) for i in range(n_data)})
+
+    durations = {k: random.randint(1, 10) for k in data.keys()}
+
+    res, sets = get_random_seconds_divergence_seeds(
+      data=data,
+      durations_s=durations,
+      seconds=60,
+      seed=seed,
+      samples=1000,
+      n=500,
+    )
+
+    self.assertEqual(list(res), list(sorted(res)))
+
+  def test_get_random_seconds_divergence_seeds__big_set(self):
     seed = 1111
     random.seed(seed)
 
