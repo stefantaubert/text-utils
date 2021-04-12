@@ -35,7 +35,7 @@ class UnitTests(unittest.TestCase):
       n=2,
     )
 
-    self.assertEqual({2781, 135}, res)
+    self.assertEqual(OrderedDict({2781, 135}), res)
     self.assertEqual(2, len(sets))
 
 
