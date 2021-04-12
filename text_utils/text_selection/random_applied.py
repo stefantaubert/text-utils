@@ -1,7 +1,7 @@
 import random
 from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
-from typing import Set, TypeVar
+from typing import Set, Tuple, TypeVar
 
 from ordered_set import OrderedSet
 from text_utils.text_selection.random_method import (sort_random,
@@ -31,11 +31,11 @@ def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, duratio
   return result
 
 
-def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> OrderedSet[int]:
+def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> Tuple[OrderedSet[int], List[OrderedSet[_T1]]]:
   potential_seeds = range(samples)
   # random.shuffle(potential_seeds)
 
-  potential_sets = []
+  potential_sets: List[OrderedSet[_T1]] = []
   for sample_seed in tqdm(potential_seeds):
     sample_set = get_random_seconds(
       data=data,
@@ -46,8 +46,9 @@ def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], s
     potential_sets.append(sample_set)
 
   selected_set_idxs = find_unlike_sets(potential_sets, n, seed)
-  selected_seeds = {potential_seeds[i] for i in selected_set_idxs}
-  return selected_seeds
+  selected_seeds = OrderedSet({potential_seeds[i] for i in selected_set_idxs})
+  selected_sets = [potential_sets[selected_seed] for selected_seed in selected_seeds]
+  return selected_seeds, selected_sets
 
 
 def get_random_seconds_cover(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float) -> OrderedSet[_T1]:
