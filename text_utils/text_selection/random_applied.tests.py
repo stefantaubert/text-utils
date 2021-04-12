@@ -9,6 +9,7 @@ from text_utils.text_selection.utils import *
 ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
             'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
+
 def get_random_list(length: int, chars: List[str]) -> List[str]:
   res = [random.choice(chars) for _ in range(length)]
   return res
@@ -25,7 +26,7 @@ class UnitTests(unittest.TestCase):
 
     durations = {k: random.randint(1, 10) for k in data.keys()}
 
-    res = get_random_seconds_divergence_seeds(
+    res, sets = get_random_seconds_divergence_seeds(
       data=data,
       durations_s=durations,
       seconds=60 * 60,
@@ -35,6 +36,8 @@ class UnitTests(unittest.TestCase):
     )
 
     self.assertEqual({2781, 135}, res)
+    self.assertEqual(2, len(sets))
+
 
 if __name__ == '__main__':
   suite = unittest.TestLoader().loadTestsFromTestCase(UnitTests)

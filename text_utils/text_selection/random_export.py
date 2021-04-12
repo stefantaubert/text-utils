@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
-from typing import Set
+from typing import Set, Tuple
 
 from ordered_set import OrderedSet
 from text_utils.text_selection.random_applied import (
@@ -18,7 +18,7 @@ def random_default(data: OrderedDictType[int, Any], seed: int) -> OrderedSet[int
   )
 
 
-def random_seconds_divergence_seeds(data: OrderedDictType[int, Any], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> OrderedSet[int]:
+def random_seconds_divergence_seeds(data: OrderedDictType[int, Any], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> Tuple[OrderedSet[int], List[OrderedSet[int]]]:
   return get_random_seconds_divergence_seeds(
     data=data,
     seed=seed,

@@ -22,7 +22,6 @@ cmudict-parser = {editable = true, ref = "master", git = "https://github.com/ste
 scipy = "*"
 ordered-set = "*"
 sklearn = "*"
-matplotlib = "*"
 pytest = "*"
 
 [requires]

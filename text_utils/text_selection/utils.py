@@ -6,7 +6,6 @@ from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar
 
-import matplotlib.pyplot as plt
 import numpy as np
 from ordered_set import OrderedSet
 from sklearn.cluster import KMeans
