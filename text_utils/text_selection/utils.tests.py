@@ -20,12 +20,12 @@ class UnitTests(unittest.TestCase):
     selected_set_idxs = find_unlike_sets(data, n=3, seed=1111)
     self.assertEqual(selected_set_idxs, {0, 1, 2})
 
-  # def test_find_unlike_sets(self):
-  #   with open("/tmp/data.pkl", "rb") as f:
-  #     data = pickle.load(f)
+  def test_find_unlike_sets(self):
+    with open("/tmp/data.pkl", "rb") as f:
+      data = pickle.load(f)
 
-  #   selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
-  #   self.assertEqual(2, len(set(selected_set_idxs)))
+    selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
+    self.assertEqual(2, len(set(selected_set_idxs)))
 
   def test_find_unlike_sets__same_sets__choose_different_idxs(self):
     data = [set(range(10)) for _ in range(10)]
@@ -63,10 +63,15 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(chosen_indices, [3, 6, 0])
 
   def test_replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(self):
-    cluster_labels = 1
-    cluster_dists = 1
+    cluster_labels = np.array([1, 2, 2, 1, 0, 0, 1])
+    cluster_dists = np.array([[5, 1, 4], [4, 3, 1], [7, 8, 9], [1, 1, 8],
+                              [5, 7, 9], [1.5, 1, 3], [2, 0.5, 2]])
     chosen_indices = [3, 6, 1]
     first_empty_cluster_index = 2
+    replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(
+      cluster_labels, cluster_dists, chosen_indices, first_empty_cluster_index)
+
+    self.assertEqual(chosen_indices, [5, 6, 1])
 
   def test_vectorize_all_sets(self):
     sample_set_list = [{1, 4, 5}, {1, 4, 6}]

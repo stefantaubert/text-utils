@@ -65,7 +65,7 @@ def replace_chosen_indices_that_correspond_to_empty_clusters_with_first_unused_i
 def replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(cluster_labels: np.ndarray, cluster_dists: np.ndarray, chosen_indices: List[int], first_empty_cluster_index: int) -> None:
   for cluster_index in range(first_empty_cluster_index):
     while cluster_labels[chosen_indices[cluster_index]] != cluster_index:
-      cluster_dists[chosen_indices[cluster_index], cluster_index] = inf
+      cluster_dists[chosen_indices[cluster_index], cluster_index] = np.inf
       chosen_indices[cluster_index] = np.argmin(cluster_dists[:, cluster_index])
 
 
