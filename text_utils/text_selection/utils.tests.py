@@ -9,12 +9,23 @@ class UnitTests(unittest.TestCase):
   def __init__(self, methodName: str) -> None:
     super().__init__(methodName)
 
-  def test_fail(self):
-    with open("/tmp/data.pkl", "rb") as f:
-      data = pickle.load(f)
+  def test_find_unlike_sets_n_too_big_raises_ValueError(self):
+    data = [{1, 2, 3}, {1, 2, 4}]
+    with self.assertRaises(ValueError):
+      find_unlike_sets(data, n=3, seed=1111)
 
-    selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
-    self.assertEqual(2, len(set(selected_set_idxs)))
+  def test_find_unlike_sets_n_is_length_of_sample_set_list(self):
+    data = [{1, 2, 3}, {1, 2, 4}, {1, 2}]
+
+    selected_set_idxs = find_unlike_sets(data, n=3, seed=1111)
+    self.assertEqual(selected_set_idxs, {0, 1, 2})
+
+  # def test_find_unlike_sets(self):
+  #   with open("/tmp/data.pkl", "rb") as f:
+  #     data = pickle.load(f)
+
+  #   selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
+  #   self.assertEqual(2, len(set(selected_set_idxs)))
 
   def test_find_unlike_sets__same_sets__choose_different_idxs(self):
     data = [set(range(10)) for _ in range(10)]
@@ -22,12 +33,40 @@ class UnitTests(unittest.TestCase):
     selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
     self.assertEqual(2, len(set(selected_set_idxs)))
 
+  def test_find_empty_clusters__empty_cluster_index_equals_n(self):
+    cluster_labels = np.array([0, 1, 2, 2, 1, 0, 1])
+    n = 3
+
+    empty_cluster_index = find_empty_clusters(cluster_labels, n)
+    self.assertEqual(3, empty_cluster_index)
+
+  def test_find_empty_clusters__empty_cluster_index_is_smaller_than_n(self):
+    cluster_labels = np.array([0, 1, 2, 2, 1, 0, 1, 3])
+    n = 10
+
+    empty_cluster_index = find_empty_clusters(cluster_labels, n)
+    self.assertEqual(4, empty_cluster_index)
+
   def test_vectorize_set(self):
     sample_set = {1, 4, 5}
     max_id = 6
     res = vectorize_set(sample_set, max_id)
+    self.assertEqual(res, [0, 1, 0, 0, 1, 1, 0])
 
-    self.assertTrue(np.array_equal(res, np.array([0, 1, 0, 0, 1, 1, 0])))
+  def test_replace_chosen_indices_that_correspond_to_empty_clusters_with_first_unused_indices(self):
+    chosen_indices = [3, 6, 1]
+    unselected_indices = [0, 2, 4, 5]
+    first_empty_cluster_index = 2
+    replace_chosen_indices_that_correspond_to_empty_clusters_with_first_unused_indices(
+      chosen_indices, unselected_indices, first_empty_cluster_index, 3)
+
+    self.assertEqual(chosen_indices, [3, 6, 0])
+
+  def test_replace_chosen_indices_that_do_not_belong_to_corresponding_cluster(self):
+    cluster_labels = 1
+    cluster_dists = 1
+    chosen_indices = [3, 6, 1]
+    first_empty_cluster_index = 2
 
   def test_vectorize_all_sets(self):
     sample_set_list = [{1, 4, 5}, {1, 4, 6}]
