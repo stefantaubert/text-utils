@@ -20,12 +20,12 @@ class UnitTests(unittest.TestCase):
     selected_set_idxs = find_unlike_sets(data, n=3, seed=1111)
     self.assertEqual(selected_set_idxs, {0, 1, 2})
 
-  def test_find_unlike_sets(self):
-    with open("/tmp/data.pkl", "rb") as f:
-      data = pickle.load(f)
+  # def test_find_unlike_sets(self):
+  #   with open("/tmp/data.pkl", "rb") as f:
+  #     data = pickle.load(f)
 
-    selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
-    self.assertEqual(2, len(set(selected_set_idxs)))
+  #   selected_set_idxs = find_unlike_sets(data, n=2, seed=1111)
+  #   self.assertEqual(2, len(set(selected_set_idxs)))
 
   def test_find_unlike_sets__same_sets__choose_different_idxs(self):
     data = [set(range(10)) for _ in range(10)]
@@ -85,6 +85,12 @@ class UnitTests(unittest.TestCase):
     res = get_max_entry(sample_set_list)
 
     self.assertEqual(res, 6)
+
+  def test_get_chosen_sets(self):
+    sample_set_list =[{1,2,3},{2,3,4},{5,6,7},{8,9,0}]
+    chosen_indices = {3,0}
+    res = get_chosen_sets(sample_set_list, chosen_indices)
+    self.assertEqual(res, [{1,2,3},{8,9,0}])
 
   def test_get_first_percent_20percent(self):
     data = OrderedSet([1, 2, 3, 4, 5])

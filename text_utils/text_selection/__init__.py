@@ -14,4 +14,4 @@ from text_utils.text_selection.random_export import (
     random_ngrams_cover_percent, random_ngrams_cover_seconds, random_percent,
     random_seconds, random_seconds_divergence_seeds)
 from text_utils.text_selection.utils import (
-    find_unlike_sets, get_random_subsets, get_total_number_of_common_elements)
+    find_unlike_sets, get_random_subset_indices, get_total_number_of_common_elements)

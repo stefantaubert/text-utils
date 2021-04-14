@@ -84,11 +84,17 @@ def get_max_entry(sample_set_list: List[Set[int]]) -> int:
   return max(max_of_each_set)
 
 
-def get_random_subsets(sample_set_list: List[Set[int]], n: int) -> List[Set[int]]:
+def get_random_subset_indices(sample_set_list: List[Set[int]], n: int) -> List[Set[int]]:
   chosen_indices = random.sample(range(len(sample_set_list)), n)
   while len(set(chosen_indices)) != n:
     chosen_indices = random.sample(range(len(sample_set_list)), n)
-  chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  #chosen_sets = [sample_set_list[i] for i in range(len(sample_set_list)) if i in chosen_indices]
+  return chosen_indices
+
+
+def get_chosen_sets(sample_set_list: List[Set[int]], chosen_indices: Set[int]) -> List[Set[int]]:
+  ordered_chosen_indices = sorted(list(chosen_indices))
+  chosen_sets = [sample_set_list[index] for index in ordered_chosen_indices]
   return chosen_sets
 
 
@@ -98,19 +104,19 @@ def get_total_number_of_common_elements(chosen_sets: List[Set[int]]) -> int:
   return int(total_number)
 
 
-def get_number_of_common_elements(chosen_sets: List[Set]) -> Dict[int, int]:
+def get_number_of_common_elements(chosen_sets: List[Set[int]]) -> Dict[int, int]:
   dict_of_common_elements = {index: sum(list_of_numbers_of_common_elements_for_one_index(
     chosen_sets, index)) for index in range(len(chosen_sets))}
   return dict_of_common_elements
 
 
-def get_number_of_common_elements_per_set(chosen_sets: List[Set]) -> Dict[int, List[int]]:
+def get_number_of_common_elements_per_set(chosen_sets: List[Set[int]]) -> Dict[int, List[int]]:
   dict_of_common_elements = {index: list_of_numbers_of_common_elements_for_one_index(
     chosen_sets, index) for index in range(len(chosen_sets))}
   return dict_of_common_elements
 
 
-def list_of_numbers_of_common_elements_for_one_index(chosen_sets: List[Set], index: int) -> List[int]:
+def list_of_numbers_of_common_elements_for_one_index(chosen_sets: List[Set[int]], index: int) -> List[int]:
   common_number_list = [len(chosen_sets[index] & chosen_set)
                         for set_index, chosen_set in enumerate(chosen_sets) if set_index != index]
   return common_number_list
