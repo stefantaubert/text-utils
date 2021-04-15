@@ -8,7 +8,6 @@ from ordered_set import OrderedSet
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
-
 def sort_random(data: OrderedDictType[_T1, _T2], seed: int) -> OrderedSet[_T1]:
   assert isinstance(data, OrderedDict)
   all_keys = list(data.keys())
