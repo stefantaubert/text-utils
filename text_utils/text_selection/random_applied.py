@@ -1,9 +1,11 @@
+import math
 import random
 from collections import OrderedDict
 from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar
 
+import numpy as np
 from ordered_set import OrderedSet
 from text_utils.text_selection.random_method import (sort_random,
                                                      sort_random_set_cover)
@@ -32,37 +34,54 @@ def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, duratio
   return result
 
 
-def get_n_divergent_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, n: int) -> List[OrderedSet[_T1]]:
-  available = data
-  backup = None
-  not_available_keys = set()
+# def get_n_divergent_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, n: int) -> List[OrderedSet[_T1]]:
+#   available = data
+#   backup = None
+#   not_available_keys = set()
+#   res: List[OrderedSet[_T1]] = []
+
+#   for _ in range(n):
+#     tmp = sort_random(data=available, seed=seed)
+#     selected, total = get_until_sum_set(tmp, until_values=durations_s, until_value=seconds)
+
+#     if backup is not None:
+#       backup_random = sort_random(data=backup, seed=seed)
+#       remaining_seconds = seconds - total
+#       assert remaining_seconds >= 0
+#       result_backup, total = get_until_sum_set(
+#         backup_random, until_values=durations_s, until_value=remaining_seconds)
+#       selected |= result_backup
+
+#     res.append(selected)
+
+#     not_available_keys |= selected
+#     available_keys = set(data.keys()).difference(not_available_keys)
+#     all_were_selected = len(available_keys) == 0
+
+#     if all_were_selected:
+#       not_available_keys = set()
+#       available = data
+#       backup = None
+#     else:
+#       available = OrderedDict({k: v for k, v in data.items() if k in available_keys})
+#       backup = OrderedDict({k: v for k, v in data.items() if k in not_available_keys})
+#   return res
+
+def get_n_divergent_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, n: int = 3) -> List[OrderedSet[_T1]]:
+  data_keys = list(data.keys())
+  random.seed(seed)
+  random.shuffle(data_keys)
+  total_dur = np.sum(list(durations_s.values()))
+  dur_to_fill = n * seconds
+  stack_times = math.ceil(dur_to_fill / total_dur)
+  data_keys *= stack_times
+  step_length = int(np.round(total_dur / n))
   res: List[OrderedSet[_T1]] = []
 
-  for _ in range(n):
-    tmp = sort_random(data=available, seed=seed)
-    selected, total = get_until_sum_set(tmp, until_values=durations_s, until_value=seconds)
-
-    if backup is not None:
-      backup_random = sort_random(data=backup, seed=seed)
-      remaining_seconds = seconds - total
-      assert remaining_seconds >= 0
-      result_backup, total = get_until_sum_set(
-        backup_random, until_values=durations_s, until_value=remaining_seconds)
-      selected |= result_backup
-
+  for index in range(n):
+    selected, _ = get_until_sum_set(
+      data_keys[index * step_length:], until_values=durations_s, until_value=seconds)
     res.append(selected)
-
-    not_available_keys |= selected
-    available_keys = set(data.keys()).difference(not_available_keys)
-    all_were_selected = len(available_keys) == 0
-
-    if all_were_selected:
-      not_available_keys = set()
-      available = data
-      backup = None
-    else:
-      available = OrderedDict({k: v for k, v in data.items() if k in available_keys})
-      backup = OrderedDict({k: v for k, v in data.items() if k in not_available_keys})
   return res
 
 
