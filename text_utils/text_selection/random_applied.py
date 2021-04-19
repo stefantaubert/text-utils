@@ -1,5 +1,6 @@
 import random
-from typing import Dict, List
+from collections import OrderedDict
+from typing import Dict, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar
 
@@ -27,8 +28,42 @@ def get_random_cover_default(data: OrderedDictType[_T1, _T2], seed: int) -> Orde
 
 def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float) -> OrderedSet[_T1]:
   greedy_selected = sort_random(data=data, seed=seed)
-  result = get_until_sum_set(greedy_selected, until_values=durations_s, until_value=seconds)
+  result, _ = get_until_sum_set(greedy_selected, until_values=durations_s, until_value=seconds)
   return result
+
+
+def get_n_divergent_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, n: int) -> List[OrderedSet[_T1]]:
+  available = data
+  backup = None
+  not_available_keys = set()
+  res: List[OrderedSet[_T1]] = []
+
+  for _ in range(n):
+    tmp = sort_random(data=available, seed=seed)
+    selected, total = get_until_sum_set(tmp, until_values=durations_s, until_value=seconds)
+
+    if backup is not None:
+      backup_random = sort_random(data=backup, seed=seed)
+      remaining_seconds = seconds - total
+      assert remaining_seconds >= 0
+      result_backup, total = get_until_sum_set(
+        backup_random, until_values=durations_s, until_value=remaining_seconds)
+      selected |= result_backup
+
+    res.append(selected)
+
+    not_available_keys |= selected
+    available_keys = set(data.keys()).difference(not_available_keys)
+    all_were_selected = len(available_keys) == 0
+
+    if all_were_selected:
+      not_available_keys = set()
+      available = data
+      backup = None
+    else:
+      available = OrderedDict({k: v for k, v in data.items() if k in available_keys})
+      backup = OrderedDict({k: v for k, v in data.items() if k in not_available_keys})
+  return res
 
 
 def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float, samples: int, n: int) -> Tuple[OrderedSet[int], List[OrderedSet[_T1]]]:
@@ -54,20 +89,20 @@ def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], s
 def get_random_seconds_cover(data: OrderedDictType[_T1, List[_T2]], seed: int, durations_s: Dict[int, float], seconds: float) -> OrderedSet[_T1]:
   available_set = values_to_set(data)
   greedy_selected = sort_random_set_cover(data=available_set, seed=seed)
-  result = get_until_sum_set(greedy_selected, until_values=durations_s, until_value=seconds)
+  result, _ = get_until_sum_set(greedy_selected, until_values=durations_s, until_value=seconds)
   return result
 
 
 def get_random_count(data: OrderedDictType[_T1, List[_T2]], seed: int, chars: Dict[int, int], count: int) -> OrderedSet[_T1]:
   greedy_selected = sort_random(data=data, seed=seed)
-  result = get_until_sum_set(greedy_selected, until_values=chars, until_value=count)
+  result, _ = get_until_sum_set(greedy_selected, until_values=chars, until_value=count)
   return result
 
 
 def get_random_count_cover(data: OrderedDictType[_T1, List[_T2]], seed: int, chars: Dict[int, int], count: int) -> OrderedSet[_T1]:
   available_set = values_to_set(data)
   greedy_selected = sort_random_set_cover(data=available_set, seed=seed)
-  result = get_until_sum_set(greedy_selected, until_values=chars, until_value=count)
+  result, _ = get_until_sum_set(greedy_selected, until_values=chars, until_value=count)
   return result
 
 

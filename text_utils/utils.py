@@ -85,7 +85,7 @@ def filter_entries_from_lists(d: OrderedDictType[_T1, List[_T2]], allowed_entrie
   return res
 
 
-def get_until_sum_set(d: OrderedSet[_T1], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> OrderedSet[_T1]:
+def get_until_sum_set(d: OrderedSet[_T1], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> Tuple[OrderedSet[_T1], Union[float, int]]:
   total = 0
   res: OrderedSet[_T1] = OrderedSet()
   for k in d:
@@ -96,7 +96,7 @@ def get_until_sum_set(d: OrderedSet[_T1], until_values: Dict[_T1, Union[float, i
     res.add(k)
     total += current_val
 
-  return res
+  return res, total
 
 
 def get_until_sum(d: OrderedDictType[_T1, _T2], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> OrderedDictType[_T1, _T2]:
