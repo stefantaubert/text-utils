@@ -34,7 +34,7 @@ def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, duratio
   return result
 
 
-def get_n_divergent_seconds(durations_s: OrderedDictType[int, float], seconds: float, n: int = 3) -> List[List[_T1]]:
+def get_n_divergent_seconds(durations_s: OrderedDictType[int, float], seconds: float, n: int) -> List[List[_T1]]:
   data_keys = list(durations_s.keys())
   # random.seed(seed)
   # random.shuffle(data_keys)
