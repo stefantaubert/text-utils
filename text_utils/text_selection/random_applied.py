@@ -105,7 +105,8 @@ def get_random_seconds_divergence_seeds(data: OrderedDictType[_T1, List[_T2]], s
     potential_sets.append(sample_set)
 
   selected_set_idxs = sorted(find_unlike_sets(potential_sets, n, seed))
-  selected_seeds = OrderedSet({potential_seeds[i] for i in selected_set_idxs})
+  selected_seeds = OrderedSet([potential_seeds[i] for i in selected_set_idxs])
+  assert len(selected_seeds) == len(selected_set_idxs)
   selected_sets = [potential_sets[i] for i in selected_set_idxs]
   return selected_seeds, selected_sets
 
