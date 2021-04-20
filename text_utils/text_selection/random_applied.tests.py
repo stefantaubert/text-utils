@@ -25,10 +25,8 @@ class UnitTests(unittest.TestCase):
     durations = {k: 1 for k in data.keys()}
 
     res = get_n_divergent_random_seconds(
-      data=data,
       durations_s=durations,
       seconds=6,
-      seed=seed,
       n=1,
     )
 
@@ -42,17 +40,15 @@ class UnitTests(unittest.TestCase):
     durations = {k: 1 for k in data.keys()}
 
     res = get_n_divergent_random_seconds(
-      data=data,
       durations_s=durations,
       seconds=4,
-      seed=seed,
       n=2,
     )
 
     self.assertEqual(2, len(res))
     self.assertEqual(4, len(res[0]))
     self.assertEqual(4, len(res[1]))
-    self.assertEqual(0, len(res[0].intersection(res[1])))
+    self.assertEqual(0, len(set(res[0]).intersection(set(res[1]))))
 
   def test_get_n_divergent_random_seconds__two_iterations__with_overflowing_once(self):
     seed = 1111
@@ -61,17 +57,15 @@ class UnitTests(unittest.TestCase):
     durations = {k: 1 for k in data.keys()}
 
     res = get_n_divergent_random_seconds(
-      data=data,
       durations_s=durations,
       seconds=4,
-      seed=seed,
       n=2,
     )
 
     self.assertEqual(2, len(res))
     self.assertEqual(4, len(res[0]))
     self.assertEqual(4, len(res[1]))
-    self.assertEqual(2, len(res[0].intersection(res[1])))
+    self.assertEqual(2, len(set(res[0]).intersection(set(res[1]))))
 
   def test_get_n_divergent_random_seconds__two_iterations__with_overflowing_twice(self):
     seed = 1111
@@ -80,10 +74,8 @@ class UnitTests(unittest.TestCase):
     durations = {k: 1 for k in data.keys()}
 
     res = get_n_divergent_random_seconds(
-      data=data,
       durations_s=durations,
       seconds=4,
-      seed=seed,
       n=3,
     )
 
@@ -91,11 +83,33 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(4, len(res[0]))
     self.assertEqual(4, len(res[1]))
     self.assertEqual(4, len(res[2]))
-    self.assertEqual(2, len(res[0].intersection(res[1])))
-    self.assertEqual(2, len(res[1].intersection(res[2])))
-    self.assertEqual(2, len(res[0].intersection(res[2])))
+    self.assertEqual(2, len(set(res[0]).intersection(set(res[1]))))
+    self.assertEqual(2, len(set(res[1]).intersection(set(res[2]))))
+    self.assertEqual(2, len(set(res[0]).intersection(set(res[2]))))
 
-  def test_get_random_seconds_divergence_seeds(self):
+  def test_n_divergent_random_seconds__with_different_durations(self):
+    n_data = 7
+    data = OrderedDict({i: ["a"] for i in range(n_data)})
+    durations = {0: 1, 1: 2, 2: 3, 3: 1, 4: 1, 5: 2, 6: 2}
+
+    res = get_n_divergent_random_seconds(
+      durations_s=durations,
+      seconds=7,
+      n=3,
+    )
+
+    self.assertEqual(3, len(res))
+    #self.assertEqual(4, len(res[0]))
+    #self.assertEqual(4, len(res[1]))
+    #self.assertEqual(5, len(res[2]))
+    self.assertEqual([0, 1, 2, 3], res[0])
+    self.assertEqual([2, 3, 4, 5], res[1])
+    self.assertEqual([3, 4, 5, 6, 0], res[2])
+    #self.assertEqual(2, len(set(res[0]).intersection(set(res[1]))))
+    #self.assertEqual(2, len(set(res[1]).intersection(set(res[2]))))
+    #self.assertEqual(2, len(set(res[0]).intersection(set(res[2]))))
+
+  def xtest_get_random_seconds_divergence_seeds(self):
     seed = 1111
     random.seed(seed)
 
