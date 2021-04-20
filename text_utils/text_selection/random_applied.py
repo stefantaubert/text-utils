@@ -34,7 +34,7 @@ def get_random_seconds(data: OrderedDictType[_T1, List[_T2]], seed: int, duratio
   return result
 
 
-def get_n_divergent_random_seconds(durations_s: OrderedDictType[int, float], seconds: float, n: int = 3) -> List[OrderedSet[_T1]]:
+def get_n_divergent_seconds(durations_s: OrderedDictType[int, float], seconds: float, n: int = 3) -> List[List[_T1]]:
   data_keys = list(durations_s.keys())
   # random.seed(seed)
   # random.shuffle(data_keys)
@@ -47,10 +47,10 @@ def get_n_divergent_random_seconds(durations_s: OrderedDictType[int, float], sec
   selected, _ = get_until_sum_set(
       data_keys, until_values=durations_s, until_value=seconds)
   selected = list(selected)
-  res: List[OrderedSet[_T1]] = [selected]
+  res: List[List[_T1]] = [selected]
 
   for _ in range(n - 1):
-    start_index = get_right_start_index(step_length, durations_s, res[-1], data_keys)
+    start_index = get_next_start_index(step_length, durations_s, res[-1], data_keys)
     selected, _ = get_until_sum_set(
       data_keys[start_index:], until_values=durations_s, until_value=seconds)
     selected = list(selected)
@@ -58,7 +58,7 @@ def get_n_divergent_random_seconds(durations_s: OrderedDictType[int, float], sec
   return res
 
 
-def get_right_start_index(step_length: int, durations_s: OrderedDictType[int, float], prev_vec: List[_T1], data_keys: List[int]) -> int:
+def get_next_start_index(step_length: int, durations_s: OrderedDictType[int, float], prev_vec: List[_T1], data_keys: List[int]) -> int:
   # der Startindex soll auf das Element in data_keys referieren, das zu dem ersten Element in prev_vec mindestens den Abstand step_length hat (d.h. genau diesen Abstand hat oder das erste Element ist, für das dieser Abstand überschritten wird). Abstand ist hierbei definiert als die aufsummierten Durations vom ersten Element in prev_vec (dieses wird nicht mit einberechnet) bis zum Element, für das der Abstand berechnet wird (dieses wird mit einberechnet).
   # Falls kein Element in prev_vec einen Abstand >= step_length vom 1. Element in prev_vec aus gesehen hat, so soll der Index des nächsten Eintrags in data_keys zurückgegeben werden
   """
