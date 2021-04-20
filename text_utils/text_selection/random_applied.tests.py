@@ -1,8 +1,8 @@
 import random
 import unittest
 
-from text_utils.text_selection.random_applied import \
-    get_n_divergent_random_seconds
+from text_utils.text_selection.random_applied import (
+    get_n_divergent_random_seconds, get_right_start_index)
 from text_utils.text_selection.random_export import *
 from text_utils.text_selection.utils import *
 
@@ -18,8 +18,92 @@ def get_random_list(length: int, chars: List[str]) -> List[str]:
 
 
 class UnitTests(unittest.TestCase):
+
+  def test_get_right_start_index__expect_indice_following_prev_vec(self):
+    n_data = 8
+    step_length = 4
+    durations = {index: 1 for index in range(n_data)}
+    prev_vec = [0, 1, 2, 3]
+    data_keys = list(range(n_data))
+
+    res = get_right_start_index(
+      step_length=step_length,
+      durations_s=durations,
+      prev_vec=prev_vec,
+      data_keys=data_keys
+    )
+
+    self.assertTrue(isinstance(res, int))
+    self.assertEqual(4, res)
+
+  def test_get_right_start_index__expect_indice_following_prev_vec_although_step_length_is_not_reached(self):
+    n_data = 8
+    step_length = 5
+    durations = {index: 1 for index in range(n_data)}
+    prev_vec = [0, 1, 2, 3]
+    data_keys = list(range(n_data))
+
+    res = get_right_start_index(
+      step_length=step_length,
+      durations_s=durations,
+      prev_vec=prev_vec,
+      data_keys=data_keys
+    )
+
+    self.assertTrue(isinstance(res, int))
+    self.assertEqual(4, res)
+
+  def test_get_right_start_index__dur_sum_will_equal_than_step_length(self):
+    n_data = 8
+    step_length = 4
+    durations = {index: 2 for index in range(n_data)}
+    prev_vec = [0, 1, 2, 3]
+    data_keys = list(range(n_data))
+
+    res = get_right_start_index(
+      step_length=step_length,
+      durations_s=durations,
+      prev_vec=prev_vec,
+      data_keys=data_keys
+    )
+
+    self.assertTrue(isinstance(res, int))
+    self.assertEqual(2, res)
+
+  def test_get_right_start_index__dur_sum_will_get_bigger_than_step_length(self):
+    n_data = 8
+    step_length = 3
+    durations = {index: 2 for index in range(n_data)}
+    prev_vec = [0, 1, 2, 3]
+    data_keys = list(range(n_data))
+
+    res = get_right_start_index(
+      step_length=step_length,
+      durations_s=durations,
+      prev_vec=prev_vec,
+      data_keys=data_keys
+    )
+
+    self.assertTrue(isinstance(res, int))
+    self.assertEqual(2, res)
+
+  def test_get_right_start_index__durs_differ(self):
+    step_length = 2
+    durations = {0: 1, 1: 7, 2: 1}
+    prev_vec = [0, 1, 2]
+    data_keys = list(range(3))
+
+    res = get_right_start_index(
+      step_length=step_length,
+      durations_s=durations,
+      prev_vec=prev_vec,
+      data_keys=data_keys
+    )
+
+    self.assertTrue(isinstance(res, int))
+    self.assertEqual(1, res)
+
   def test_get_n_divergent_random_seconds__one_iteration(self):
-    seed = 1111
     n_data = 8
     data = OrderedDict({i: ["a"] for i in range(n_data)})
     durations = {k: 1 for k in data.keys()}
@@ -34,7 +118,6 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(6, len(res[0]))
 
   def test_get_n_divergent_random_seconds__two_iterations__no_overflowing(self):
-    seed = 1111
     n_data = 8
     data = OrderedDict({i: ["a"] for i in range(n_data)})
     durations = {k: 1 for k in data.keys()}
@@ -51,7 +134,6 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(0, len(set(res[0]).intersection(set(res[1]))))
 
   def test_get_n_divergent_random_seconds__two_iterations__with_overflowing_once(self):
-    seed = 1111
     n_data = 6
     data = OrderedDict({i: ["a"] for i in range(n_data)})
     durations = {k: 1 for k in data.keys()}
@@ -68,7 +150,6 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(2, len(set(res[0]).intersection(set(res[1]))))
 
   def test_get_n_divergent_random_seconds__two_iterations__with_overflowing_twice(self):
-    seed = 1111
     n_data = 6
     data = OrderedDict({i: ["a"] for i in range(n_data)})
     durations = {k: 1 for k in data.keys()}
@@ -88,8 +169,38 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(2, len(set(res[0]).intersection(set(res[2]))))
 
   def test_n_divergent_random_seconds__with_different_durations(self):
-    n_data = 7
-    data = OrderedDict({i: ["a"] for i in range(n_data)})
+    durations = {0: 1, 1: 7, 2: 1}
+    res = get_n_divergent_random_seconds(
+      durations_s=durations,
+      seconds=7,
+      n=3
+    )
+
+    self.assertEqual(3, len(res))
+    self.assertEqual(1, len(res[0]))
+    self.assertEqual(1, len(res[1]))
+    self.assertEqual(2, len(res[2]))
+    self.assertEqual([0], res[0])
+    self.assertEqual([1], res[1])
+    self.assertEqual([2, 0], res[2])
+
+  def test_n_divergent_random_seconds__expect_three_times_all_keys_but_in_different_order(self):
+    durations = {0: 1, 1: 7, 2: 1}
+    res = get_n_divergent_random_seconds(
+      durations_s=durations,
+      seconds=9,
+      n=3
+    )
+
+    self.assertEqual(3, len(res))
+    self.assertEqual(3, len(res[0]))
+    self.assertEqual(3, len(res[1]))
+    self.assertEqual(3, len(res[2]))
+    self.assertEqual([0, 1, 2], res[0])
+    self.assertEqual([1, 2, 0], res[1])
+    self.assertEqual([1, 2, 0], res[2])
+
+  def test_n_divergent_random_seconds__with_different_durations_long(self):
     durations = {0: 1, 1: 2, 2: 3, 3: 1, 4: 1, 5: 2, 6: 2}
 
     res = get_n_divergent_random_seconds(
@@ -99,15 +210,12 @@ class UnitTests(unittest.TestCase):
     )
 
     self.assertEqual(3, len(res))
-    #self.assertEqual(4, len(res[0]))
-    #self.assertEqual(4, len(res[1]))
-    #self.assertEqual(5, len(res[2]))
+    self.assertEqual(4, len(res[0]))
+    self.assertEqual(4, len(res[1]))
+    self.assertEqual(4, len(res[2]))
     self.assertEqual([0, 1, 2, 3], res[0])
     self.assertEqual([2, 3, 4, 5], res[1])
-    self.assertEqual([3, 4, 5, 6, 0], res[2])
-    #self.assertEqual(2, len(set(res[0]).intersection(set(res[1]))))
-    #self.assertEqual(2, len(set(res[1]).intersection(set(res[2]))))
-    #self.assertEqual(2, len(set(res[0]).intersection(set(res[2]))))
+    self.assertEqual([5, 6, 0, 1], res[2])
 
   def xtest_get_random_seconds_divergence_seeds(self):
     seed = 1111
