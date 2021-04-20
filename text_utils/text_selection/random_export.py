@@ -4,7 +4,7 @@ from typing import Set, Tuple
 
 from ordered_set import OrderedSet
 from text_utils.text_selection.random_applied import (
-    get_n_divergent_random_seconds, get_random_count, get_random_count_cover,
+    get_n_divergent_seconds, get_random_count, get_random_count_cover,
     get_random_cover_default, get_random_default, get_random_iterations,
     get_random_iterations_cover, get_random_percent, get_random_percent_cover,
     get_random_seconds, get_random_seconds_cover,
@@ -31,7 +31,7 @@ def random_seconds_divergence_seeds(data: OrderedDictType[int, Any], seed: int, 
 
 
 def n_divergent_random_seconds(data: OrderedDictType[int, Any], seed: int, durations_s: Dict[int, float], seconds: float, n: int) -> List[OrderedSet[int]]:
-  return get_n_divergent_random_seconds(
+  return get_n_divergent_seconds(
     data=data,
     durations_s=durations_s,
     n=n,
