@@ -21,16 +21,6 @@ def parse_json(path: str) -> Dict:
   return tmp
 
 
-def filter_ngrams(ngrams: List[Tuple[_T2]], ignore_symbol_ids: Set[_T1]) -> List[Tuple]:
-  res = [x for x in ngrams if len(set(x).intersection(ignore_symbol_ids)) == 0]
-  return res
-
-
-def get_filtered_list(l: List[_T1], take_only: Set[_T1]) -> List[_T1]:
-  res = [x for x in l if x in take_only]
-  return res
-
-
 def save_json(path: str, mapping_dict: dict) -> None:
   with open(path, 'w', encoding='utf-8') as f:
     json.dump(mapping_dict, f, ensure_ascii=False, indent=2)
@@ -75,42 +65,12 @@ def get_basename(filepath: str) -> str:
   return basename
 
 
-def values_to_set(d: OrderedDictType[_T1, _T2]) -> OrderedDictType[_T1, _T2]:
-  res: OrderedDictType[_T1, _T2] = OrderedDict({k: set(v) for k, v in d.items()})
-  return res
-
 
 def filter_entries_from_lists(d: OrderedDictType[_T1, List[_T2]], allowed_entries: Set[_T2]) -> OrderedDictType[_T1, List[_T2]]:
   res = OrderedDict({k: [x for x in v if x in allowed_entries] for k, v in d.items()})
   return res
 
 
-def get_until_sum_set(d: OrderedSet[_T1], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> Tuple[OrderedSet[_T1], Union[float, int]]:
-  total = 0
-  res: OrderedSet[_T1] = OrderedSet()
-  for k in d:
-    current_val = until_values[k]
-    include = total + current_val <= until_value
-    if not include:
-      break
-    res.add(k)
-    total += current_val
-
-  return res, total
-
-
-def get_until_sum(d: OrderedDictType[_T1, _T2], until_values: Dict[_T1, Union[float, int]], until_value: Union[float, int]) -> OrderedDictType[_T1, _T2]:
-  total = 0
-  res: OrderedDictType[_T1, _T2] = OrderedDict()
-  for k, v in d.items():
-    current_val = until_values[k]
-    include = total + current_val <= until_value
-    if not include:
-      break
-    res[k] = v
-    total += current_val
-
-  return res
 
 
 def get_first_n(d: OrderedDictType[_T1, _T2], n: int) -> OrderedDictType[_T1, _T2]:
