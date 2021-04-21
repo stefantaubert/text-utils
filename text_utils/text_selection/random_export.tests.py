@@ -44,7 +44,6 @@ class UnitTests(unittest.TestCase):
       self.assertEqual({"a", "c", "d"}, set(entries[:3]))
       self.assertEqual(5, len(res))
 
-
   def test_random_ngrams_cover_seconds__one_gram_two_seconds__return_correct_sorting(self):
     data = OrderedDict({
       1: ["a", "a"],  # one new
@@ -68,6 +67,99 @@ class UnitTests(unittest.TestCase):
     )
 
     assert_res = OrderedSet([1, 2])
+    self.assertEqual(assert_res, res)
+
+  def test_get_n_divergent_random_seconds__one_entry__return_correct_sorting(self):
+    data = OrderedDict({
+      1: [],
+      2: [],
+      3: [],
+    })
+
+    durations = {
+      1: 1,
+      2: 1,
+      3: 1,
+      4: 1,
+      5: 1,
+    }
+
+    res = n_divergent_random_seconds(
+      data=data,
+      durations_s=durations,
+      seconds=1,
+      seed=1,
+      n=3,
+    )
+
+    assert_res = [
+      OrderedSet([2]),
+      OrderedSet([3]),
+      OrderedSet([1]),
+    ]
+
+    self.assertEqual(assert_res, res)
+
+  def test_get_n_divergent_random_seconds__two_entries__return_correct_sorting(self):
+    data = OrderedDict({
+      1: [],
+      2: [],
+      3: [],
+    })
+
+    durations = {
+      1: 1,
+      2: 1,
+      3: 1,
+      4: 1,
+      5: 1,
+    }
+
+    res = n_divergent_random_seconds(
+      data=data,
+      durations_s=durations,
+      seconds=2,
+      seed=1,
+      n=3,
+    )
+
+    assert_res = [
+      OrderedSet([2, 3]),
+      OrderedSet([3, 1]),
+      OrderedSet([1, 2]),
+    ]
+
+    self.assertEqual(assert_res, res)
+
+  def test_get_n_divergent_random_seconds__three_entries__return_correct_sorting(self):
+    data = OrderedDict({
+      1: [],
+      2: [],
+      3: [],
+    })
+
+    durations = {
+      1: 1,
+      2: 1,
+      3: 1,
+      4: 1,
+      5: 1,
+    }
+
+    res = n_divergent_random_seconds(
+      data=data,
+      durations_s=durations,
+      seconds=3,
+      seed=1,
+      n=3,
+    )
+
+    assert_res = [
+      OrderedSet([2, 3, 1]),
+      OrderedSet([3, 1, 2]),
+      OrderedSet([1, 2, 3]),
+    ]
+
     self.assertEqual(assert_res, res)
 
 

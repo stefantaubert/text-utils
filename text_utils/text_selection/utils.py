@@ -1,3 +1,4 @@
+import math
 import random
 from collections import Counter, OrderedDict
 from logging import getLogger
@@ -11,7 +12,7 @@ from ordered_set import OrderedSet
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from text_utils.text import get_ngrams
-from text_utils.utils import filter_ngrams
+from text_utils.utils import filter_ngrams, get_until_sum_set
 
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
@@ -199,6 +200,60 @@ def get_first_percent(data: OrderedSet, percent: float) -> OrderedSet:
   percent_count = round(proportion)
   res = data[:percent_count]
   return res
+
+
+def get_n_divergent_seconds(durations_s: OrderedDictType[_T1, float], seconds: float, n: int) -> List[OrderedSet[_T1]]:
+  total_dur = sum(durations_s.values())
+  assert seconds <= total_dur
+  dur_to_fill = n * seconds
+  stack_times = math.ceil(dur_to_fill / total_dur)
+  data_keys = list(durations_s.keys())
+  data_keys *= stack_times
+  step_length = round(total_dur / n)
+
+  selected, _ = get_until_sum_set(
+      data_keys, until_values=durations_s, until_value=seconds)
+  res: List[OrderedSet[_T1]] = [selected]
+
+  for _ in range(n - 1):
+    start_index = get_next_start_index(step_length, durations_s, list(res[-1]), data_keys)
+    selected, _ = get_until_sum_set(
+      data_keys[start_index:], until_values=durations_s, until_value=seconds)
+    res.append(selected)
+  return res
+
+
+def get_next_start_index(step_length: int, durations_s: OrderedDictType[_T1, float], prev_vec: List[_T1], data_keys: List[_T1]) -> int:
+  # der Startindex soll auf das Element in data_keys referieren, das zu dem ersten Element in prev_vec mindestens den Abstand step_length hat (d.h. genau diesen Abstand hat oder das erste Element ist, für das dieser Abstand überschritten wird). Abstand ist hierbei definiert als die aufsummierten Durations vom ersten Element in prev_vec (dieses wird nicht mit einberechnet) bis zum Element, für das der Abstand berechnet wird (dieses wird mit einberechnet).
+  # Falls kein Element in prev_vec einen Abstand >= step_length vom 1. Element in prev_vec aus gesehen hat, so soll der Index des nächsten Eintrags in data_keys zurückgegeben werden
+  """
+  Bsp.: step_length = 4
+       durations = {0: 1, 1: 2, 2: 3, 3: 1, 4: 1, 5: 2, 6: 2}
+       prev_vec = [0, 1, 2, 3]
+       Es ist das Element in {0,...,6} gesucht, das zu 0 mindestens Abstand 4 hat
+       Das wäre hier die 2, denn Entfernung(0,2) = dur(1) + dur(2) = 2+3>4
+
+  Bsp. 2: step_length = 4
+          durations = {index: 1 for index in range(8)}
+          prev_vec = [0, 1, 2, 3]
+          data_keys = [0, 1, 2, 3, 4, 5, 6, 7]
+          Hier ist dur(1) + dur(2) + dur(3) < 4, daher wird der Index des auf 3 in data_keys folgenden Elements zurückgegeben (also die 4)
+  """
+  assert len(prev_vec) > 0
+  assert len(data_keys) > 0
+  dur_sum = 0
+  index = 0
+  while dur_sum < step_length:
+    index += 1
+    if index == len(prev_vec):
+      prev_element = prev_vec[-1]
+      start_index = data_keys.index(prev_element) + 1
+      return start_index
+    dur_sum += durations_s[prev_vec[index]]
+  start_element = prev_vec[index]
+  start_index = data_keys.index(start_element)
+  return start_index
+
 
 # def ignore_ngrams(available_ngrams: OrderedDictType[int, List[Tuple]], ignore_symbols: Set[str]):
 #   logger = getLogger(__name__)
