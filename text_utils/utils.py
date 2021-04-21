@@ -5,8 +5,6 @@ from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar, Union
 
-from ordered_set import OrderedSet
-
 T = TypeVar('T')
 
 

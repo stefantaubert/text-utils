@@ -19,10 +19,6 @@ ipapy = "*"
 inflect = "*"
 unidecode = "*"
 cmudict-parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
-scipy = "*"
-ordered-set = "*"
-sklearn = "*"
-pytest = "*"
 
 [requires]
 python_version = "3.8"
