@@ -18,7 +18,7 @@ dragonmapper = "*"
 ipapy = "*"
 inflect = "*"
 unidecode = "*"
-cmudict-parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
+cmudict_parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
 
 [requires]
 python_version = "3.8"
