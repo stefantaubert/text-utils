@@ -1,3 +1,6 @@
+from text_utils.accent_symbols import (get_accent_symbol_id,
+                                       get_accent_symbol_ids,
+                                       get_accent_symbols_count, get_symbol_id)
 from text_utils.accents_dict import AccentsDict
 from text_utils.gender import Gender
 from text_utils.ipa2symb import IPAExtractionSettings
