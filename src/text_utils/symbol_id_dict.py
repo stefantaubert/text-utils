@@ -138,7 +138,3 @@ class SymbolIdDict():
     final_symbols = [pad_symbol] + unique_entries
     ids_to_symbols = get_entries_ids_dict_order(final_symbols)
     return cls(ids_to_symbols)
-
-# if __name__ == "__main__":
-#   res = SymbolIdDict.load_from_file("/tmp/symbols.v2.json")
-#   print(res)
