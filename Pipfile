@@ -13,6 +13,7 @@ rope = "*"
 pytest = "*"
 text-utils = {editable = true, path = "."}
 unittest2pytest = "*"
+pytest-xdist = "*"
 
 [packages]
 epitran = "*"
