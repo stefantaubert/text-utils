@@ -59,12 +59,16 @@ see [details](https://pypi.org/project/pipenv-setup/)
 
 There are files containing an example map and example symbols in the folder examples. You can use them to test the client. The commands are the following:
 
+```sh
+cd ./src
+```
+
 ### For printing the map
 
 If you want to print the pretrained weights mapping, use
 
 ```sh
-pipenv run python -m text_utils.cli print_map \
+pipenv run python -m cli print_map \
   --path="examples/examplemap.json" \
   --arrow_type="weights"
 ```
@@ -72,7 +76,7 @@ pipenv run python -m text_utils.cli print_map \
 If you want to print the map showing all occurring symbols and the corresponding synthesizable symbols that are assigned to them, use
 
 ```sh
-pipenv run python -m text_utils.cli print_map \
+pipenv run python -m cli print_map \
   --path="examples/examplemap.json" \
   --arrow_type="inference"
 ```
@@ -82,7 +86,7 @@ pipenv run python -m text_utils.cli print_map \
 If you want to print all allowed symbols, use
 
 ```sh
-pipenv run python -m text_utils.cli print_symbols \
+pipenv run python -m cli print_symbols \
   --path="examples/examplesymbols.symb"
 ```
 
@@ -91,7 +95,7 @@ pipenv run python -m text_utils.cli print_symbols \
 If you want to change the symbol for a specific key, use
 
 ```sh
-pipenv run python -m text_utils.cli change_symbols \
+pipenv run python -m cli change_symbols \
   --path="examples/examplemap.json" \
   --symbol_path="examples/examplesymbols.symb" \
   --arrow_type="weights"
@@ -100,7 +104,7 @@ pipenv run python -m text_utils.cli change_symbols \
 or
 
 ```sh
-pipenv run python -m text_utils.cli change_symbols \
+pipenv run python -m cli change_symbols \
  --path="examples/examplemap.json" \
  --symbol_path="examples/examplesymbols.symb" \
  --arrow_type="inference"
@@ -112,7 +116,7 @@ and follow the instructions.
 It is also possible to change one symbol without the interactive mode via for example
 
 ```sh
-pipenv run python -m text_utils.cli change_symbols \
+pipenv run python -m cli change_symbols \
   --path="examples/examplemap.json" \
   --symbol_path="examples/examplesymbols.symb" \
   --to_key="ʒ" \
