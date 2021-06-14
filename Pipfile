@@ -12,6 +12,7 @@ pipenv-setup = "*"
 rope = "*"
 pytest = "*"
 text-utils = {editable = true, path = "."}
+unittest2pytest = "*"
 
 [packages]
 epitran = "*"
