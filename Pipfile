@@ -10,6 +10,8 @@ pycodestyle = "*"
 isort = "*"
 pipenv-setup = "*"
 rope = "*"
+pytest = "*"
+text-utils = {editable = true, path = "."}
 
 [packages]
 epitran = "*"
