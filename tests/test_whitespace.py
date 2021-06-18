@@ -7,7 +7,7 @@ class UnitTests(unittest.TestCase):
 
   def test_collapse_whitespace(self):
     res = collapse_whitespace("test  a b   c d  e \n  f")
-    self.assertEqual("test a b c d e f", res)
+    assert res == "test a b c d e f"
 
 
 if __name__ == '__main__':

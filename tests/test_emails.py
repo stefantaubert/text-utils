@@ -8,39 +8,39 @@ class UnitTests(unittest.TestCase):
 
   def test_replace_mail_addresses_valid_mail(self):
     res = replace_mail_addresses("abc@def.de")
-    self.assertEqual("abc at def dot de", res)
+    assert res == "abc at def dot de"
 
   def test_replace_mail_addresses_invalid_mail_no_dot(self):
     res = replace_mail_addresses("abc@defde")
-    self.assertEqual("abc@defde", res)
+    assert res == "abc@defde"
 
   def test_replace_mail_addresses_invalid_mail_no_at(self):
     res = replace_mail_addresses("abcdef.de")
-    self.assertEqual("abcdef.de", res)
+    assert res == "abcdef.de"
 
   def test_replace_mail_addresses_invalid_mail_no_dot_and_at(self):
     res = replace_mail_addresses("abcdefde")
-    self.assertEqual("abcdefde", res)
+    assert res == "abcdefde"
 
   def test_replace_at_symbols_no_space(self):
     res = replace_at_symbols("abc@def")
-    self.assertEqual("abc at def", res)
+    assert res == "abc at def"
 
   def test_replace_at_symbols_l_space(self):
     res = replace_at_symbols("abc @def")
-    self.assertEqual("abc at def", res)
+    assert res == "abc at def"
 
   def test_replace_at_symbols_r_space(self):
     res = replace_at_symbols("abc@ def")
-    self.assertEqual("abc at def", res)
+    assert res == "abc at def"
 
   def test_replace_at_symbols_both_space(self):
     res = replace_at_symbols("abc @ def")
-    self.assertEqual("abc at def", res)
+    assert res == "abc at def"
 
   def test_replace_at_symbols_double_at(self):
     res = replace_at_symbols("abc@@def")
-    self.assertEqual("abc at  at def", res)
+    assert res == "abc at  at def"
 
 
 if __name__ == '__main__':
