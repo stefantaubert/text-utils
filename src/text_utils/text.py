@@ -11,13 +11,11 @@ from nltk import download
 from nltk.tokenize import sent_tokenize
 from unidecode import unidecode as convert_to_ascii
 
-from text_utils.adjustments.abbreviations import (
-    expand_abbreviations, expand_units_of_measure,
-    replace_big_letter_abbreviations)
-from text_utils.adjustments.emails import (replace_at_symbols,
-                                           replace_mail_addresses)
-from text_utils.adjustments.numbers import normalize_numbers
-from text_utils.adjustments.whitespace import collapse_whitespace
+from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
+                                    expand_units_of_measure, normalize_numbers,
+                                    replace_at_symbols,
+                                    replace_big_letter_abbreviations,
+                                    replace_mail_addresses)
 from text_utils.ipa2symb import (IPAExtractionSettings,
                                  check_is_ipa_and_return_closest_ipa,
                                  extract_from_sentence)
