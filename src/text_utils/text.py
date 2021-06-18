@@ -66,9 +66,9 @@ def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
   return res
 
 
-def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, logger: Logger) -> str:
+def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, consider_ipa_annotations: bool, logger: Logger) -> str:
   assert mode is not None
-  if is_phonetic_transcription_in_text(text):
+  if consider_ipa_annotations and is_phonetic_transcription_in_text(text):
     words = text.split(" ")
     ipa_list = [
       ipa_of_phonetic_transcription(word, logger)
@@ -250,8 +250,8 @@ def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
     raise ex from orig_exception
 
 
-def ger_to_ipa(text: str, logger: Logger) -> str:
-  if is_phonetic_transcription_in_text(text):
+def ger_to_ipa(text: str, consider_ipa_annotations: bool, logger: Logger) -> str:
+  if consider_ipa_annotations and is_phonetic_transcription_in_text(text):
     words = text.split(" ")
     ipa_list = [ipa_of_phonetic_transcription(word, logger)
                 if is_phonetic_transcription(word)
@@ -321,7 +321,7 @@ def clear_en_word_cache() -> None:
   EPITRAN_EN_WORD_CACHE.clear()
 
 
-def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger, use_cache: bool = True) -> str:
+def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger, consider_ipa_annotations: bool = False, use_cache: bool = True) -> str:
   if lang == Language.ENG:
     if mode is None:
       ex = ValueError(f"Parameter mode is required for {lang!r}!")
@@ -333,11 +333,12 @@ def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace
       mode=mode,
       replace_unknown_with=replace_unknown_with,
       use_cache=use_cache,
+      consider_ipa_annotations=consider_ipa_annotations,
       logger=logger,
     )
 
   if lang == Language.GER:
-    return ger_to_ipa(text, logger)
+    return ger_to_ipa(text, consider_ipa_annotations, logger)
 
   if lang == Language.CHN:
     return chn_to_ipa(text, logger)

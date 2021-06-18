@@ -7,6 +7,7 @@ from text_utils.text import *
 
 # region is_phonetic_transcription
 
+
 def test_is_phonetic_transcription__missing_space__returns_false():
   text = "/I/if"
   res = is_phonetic_transcription(text)
@@ -21,35 +22,35 @@ def test_is_phonetic_transcription__missing_space__returns_false():
 def test_en_to_ipa_with_phones():
   text = "This is /ð/ a test."
   res = en_to_ipa(text, EngToIpaMode.EPITRAN,
-                  replace_unknown_with=None, use_cache=False, logger=getLogger())
+                  replace_unknown_with=None, use_cache=False, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ðɪs ɪz ð ə tɛst."
 
 
 def test_en_to_ipa_with_phones_at_beginning():
   text = "/ð/ a test."
   res = en_to_ipa(text, EngToIpaMode.EPITRAN,
-                  replace_unknown_with=None, use_cache=False, logger=getLogger())
+                  replace_unknown_with=None, use_cache=False, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ð ə tɛst."
 
 
 def test_en_to_ipa_with_phones_at_end():
   text = "This is /ð/"
   res = en_to_ipa(text, EngToIpaMode.EPITRAN,
-                  replace_unknown_with=None, use_cache=False, logger=getLogger())
+                  replace_unknown_with=None, use_cache=False, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ðɪs ɪz ð"
 
 
 def test_en_to_ipa_with_only_phones():
   text = "/ð/"
   res = en_to_ipa(text, EngToIpaMode.EPITRAN,
-                  replace_unknown_with=None, use_cache=False, logger=getLogger())
+                  replace_unknown_with=None, use_cache=False, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ð"
 
 
 def test_en_to_ipa_with_only_phones_and_dot():
   text = "/ð./"
   res = en_to_ipa(text, EngToIpaMode.EPITRAN,
-                  replace_unknown_with=None, use_cache=False, logger=getLogger())
+                  replace_unknown_with=None, use_cache=False, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ð."
 
 # endregion
@@ -60,38 +61,38 @@ def test_en_to_ipa_with_only_phones_and_dot():
 def test_ger_to_ipa_with_phones_logging_is_disabled():
   text = "Das ist /ð/ ein Test."
   getLogger().setLevel(0)
-  ger_to_ipa(text, logger=getLogger())
+  ger_to_ipa(text, consider_ipa_annotations=True, logger=getLogger())
   level = getLogger().level
   assert level == 0
 
 
 def test_ger_to_ipa_with_phones():
   text = "Das ist /ð/ ein Test."
-  res = ger_to_ipa(text, logger=getLogger())
+  res = ger_to_ipa(text, consider_ipa_annotations=True, logger=getLogger())
   assert res == "das ist ð ain test."
 
 
 def test_ger_to_ipa_with_phones_at_beginning():
   text = "/ð/ ein Test."
-  res = ger_to_ipa(text, logger=getLogger())
+  res = ger_to_ipa(text, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ð ain test."
 
 
 def test_ger_to_ipa_with_phones_at_end():
   text = "Das ist /ð/"
-  res = ger_to_ipa(text, logger=getLogger())
+  res = ger_to_ipa(text, consider_ipa_annotations=True, logger=getLogger())
   assert res == "das ist ð"
 
 
 def test_ger_to_ipa_with_only_phones():
   text = "/ð/"
-  res = ger_to_ipa(text, logger=getLogger())
+  res = ger_to_ipa(text, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ð"
 
 
 def test_ger_to_ipa_with_only_phones_and_dot():
   text = "/ð./"
-  res = ger_to_ipa(text, logger=getLogger())
+  res = ger_to_ipa(text, consider_ipa_annotations=True, logger=getLogger())
   assert res == "ð."
 
 # endregion
@@ -165,6 +166,7 @@ def test_text_to_ipa__no_mode_for_eng__raise_exception():
       mode=None,
       replace_unknown_with="_",
       use_cache=False,
+      consider_ipa_annotations=False,
       logger=getLogger(),
     )
 
@@ -176,6 +178,7 @@ def test_en_to_ipa__no_replace_on_cmu__raise_exception():
       mode=EngToIpaMode.CMUDICT,
       replace_unknown_with=None,
       use_cache=False,
+      consider_ipa_annotations=False,
       logger=getLogger(),
     )
 
@@ -197,7 +200,7 @@ def test_en_to_ipa__both_without_cache__takes_longer_time():
   start = time.time()
   # , to prevent caching in cmudict, i could also clear the cache on every iteration
   res = [en_to_ipa(text + ("," * i), EngToIpaMode.BOTH,
-                   replace_unknown_with="_", use_cache=False, logger=getLogger()) for i in range(100)]
+                   replace_unknown_with="_", use_cache=False, consider_ipa_annotations=False, logger=getLogger()) for i in range(100)]
   duration_s = time.time() - start
 
   assert duration_s < 9
@@ -217,7 +220,7 @@ def test_en_to_ipa__both_with_cache__takes_shorter_time():
   start = time.time()
   # , to prevent caching in cmudict, i could also clear the cache on every iteration
   res = [en_to_ipa(text + ("," * i), EngToIpaMode.BOTH,
-                   replace_unknown_with="_", use_cache=True, logger=getLogger()) for i in range(100)]
+                   replace_unknown_with="_", use_cache=True, consider_ipa_annotations=False, logger=getLogger()) for i in range(100)]
   duration_s = time.time() - start
 
   assert duration_s < 5
@@ -258,7 +261,7 @@ def test_en_to_ipa():
 
   start = time.time()
   res = [en_to_ipa(text, EngToIpaMode.EPITRAN,
-                   replace_unknown_with=None, use_cache=False, logger=getLogger()) for _ in range(25)]
+                   replace_unknown_with=None, use_cache=False, consider_ipa_annotations=False, logger=getLogger()) for _ in range(25)]
   duration_s = time.time() - start
 
   # 21s with no caching
@@ -273,7 +276,7 @@ def test_ger_to_ipa():
   ensure_ger_epitran_is_loaded(getLogger())
 
   start = time.time()
-  res = [ger_to_ipa(text, getLogger()) for _ in range(25)]
+  res = [ger_to_ipa(text, consider_ipa_annotations=False, logger=getLogger()) for _ in range(25)]
   duration_s = time.time() - start
   # 16.39s with no caching
   assert duration_s < 2
