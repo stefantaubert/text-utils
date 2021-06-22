@@ -53,7 +53,7 @@ def _extract_symbols(input_symbols: List[str], settings: IPAExtractionSettings, 
   is_valid_ipa, ipa = check_is_ipa_and_return_closest_ipa(input_word)
   if not is_valid_ipa:
     result = [settings.replace_unknown_ipa_by] * len(input_symbols)
-    logger.info(
+    logger.warning(
       f"Conversion of '{input_word}' to IPA failed. Result would be: '{ipa}'. Replaced with '{''.join(result)}' instead.")
     # TODO: Conversion of 'ðӕ' to IPA failed. Result would be: 'ð'. Replaced with '__' instead.
     return result
