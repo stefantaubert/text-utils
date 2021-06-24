@@ -16,6 +16,16 @@ def test_is_phonetic_transcription__missing_space__returns_false():
 
 # endregion
 
+
+def test_text_to_symbols_empty_input():
+  res = text_to_symbols(
+    text="",
+    lang=Language.ENG,
+    ipa_settings=None,
+    logger=getLogger(__name__),
+  )
+  assert res == []
+
 # region en_to_ipa
 
 
