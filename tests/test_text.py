@@ -382,3 +382,59 @@ def test_split_ger():
 #   res = chn_to_ipa(inp)
 
 #   self.assertEqual('aɪ˥˩nɤ？', res)
+
+
+def test_sentence_to_words__empty_list():
+  sentence = []
+
+  res = sentence_to_words(sentence)
+
+  assert res == []
+
+
+def test_sentence_to_words__only_one_space():
+  sentence = [" "]
+
+  res = sentence_to_words(sentence)
+
+  assert res == [[], []]
+
+
+def test_sentence_to_words__one_word():
+  sentence = ["a"]
+
+  res = sentence_to_words(sentence)
+
+  assert res == [["a"]]
+
+
+def test_sentence_to_words__two_words():
+  sentence = ["a", " ", "b"]
+
+  res = sentence_to_words(sentence)
+
+  assert res == [["a"], ["b"]]
+
+
+def test_words_to_sentence__empty_list():
+  words = []
+
+  res = words_to_sentence(words)
+
+  assert res == []
+
+
+def test_words_to_sentence__one_word():
+  words = [["a"]]
+
+  res = words_to_sentence(words)
+
+  assert res == ["a"]
+
+
+def test_words_to_sentence__two_words():
+  words = [["a"], ["b"]]
+
+  res = words_to_sentence(words)
+
+  assert res == ["a", " ", "b"]

@@ -366,6 +366,31 @@ def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
   assert False
 
 
+def sentence_to_words(sentence_symbols: List[str]) -> List[List[str]]:
+  if len(sentence_symbols) == 0:
+    return []
+  res = []
+  current_word = []
+  for symbol in sentence_symbols:
+    if symbol == " ":
+      res.append(current_word)
+      current_word = []
+    else:
+      current_word.append(symbol)
+  res.append(current_word)
+  return res
+
+
+def words_to_sentence(words: List[List[str]]) -> List[str]:
+  res = []
+  for i, word in enumerate(words):
+    res.extend(word)
+    is_last_word = i == len(words) - 1
+    if not is_last_word:
+      res.append(" ")
+  return res
+
+
 def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
   if lang in (Language.ENG, Language.GER, Language.CHN):
     return list(text)
@@ -421,7 +446,7 @@ def split_chn_text(text: str) -> List[str]:
 
 
 def split_chn_sentence(sentence: str) -> List[str]:
-  chn_words = sentence.split(' ')
+  chn_words = sentence.split(" ")
   return chn_words
 
 
