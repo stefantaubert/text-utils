@@ -493,3 +493,8 @@ def test_strip_word__strip_not_inside():
   res = strip_word(word, ["b"])
 
   assert res == ["a", "b", "a"]
+
+
+def test_symbols_to_lower():
+  res = symbols_to_lower(["A", "a", "B"])
+  assert res == ["a", "a", "b"]

@@ -408,6 +408,17 @@ def strip_word(word: List[str], symbols: List[str]) -> List[str]:
   return res
 
 
+def symbols_to_lower(symbols: List[str]) -> List[str]:
+  res = []
+  for symbol in symbols:
+    res.append(symbol.lower())
+  return res
+
+
+def symbols_replace(symbols: List[str], search_for: List[str], replace_with: List[str], ignore_case: bool) -> bool:
+  raise Exception()
+
+
 def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
   if lang in (Language.ENG, Language.GER, Language.CHN):
     return list(text)
