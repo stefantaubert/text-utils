@@ -438,3 +438,58 @@ def test_words_to_sentence__two_words():
   res = words_to_sentence(words)
 
   assert res == ["a", " ", "b"]
+
+
+def test_strip_word__empty_word():
+  word = []
+
+  res = strip_word(word, ["a"])
+  assert res == []
+
+
+def test_strip_word__empty_strip():
+  word = ["a"]
+
+  res = strip_word(word, [])
+
+  assert res == ["a"]
+
+
+def test_strip_word__strip_start():
+  word = ["a", "b"]
+
+  res = strip_word(word, ["a"])
+
+  assert res == ["b"]
+
+
+def test_strip_word__strip_end():
+  word = ["a", "b"]
+
+  res = strip_word(word, ["b"])
+
+  assert res == ["a"]
+
+
+def test_strip_word__strip_start_and_end():
+  word = ["b", "a", "b"]
+
+  res = strip_word(word, ["b"])
+
+  assert res == ["a"]
+
+
+def test_strip_word__strip_start_and_end_multiple_symbols():
+  word = ["b", "c", "a", "e", "b", "d"]
+
+  res = strip_word(word, ["b", "c", "d"])
+
+  assert res == ["a", "e"]
+
+
+def test_strip_word__strip_not_inside():
+  word = ["a", "b", "a"]
+
+  res = strip_word(word, ["b"])
+
+  assert res == ["a", "b", "a"]

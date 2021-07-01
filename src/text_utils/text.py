@@ -391,6 +391,23 @@ def words_to_sentence(words: List[List[str]]) -> List[str]:
   return res
 
 
+def strip_word(word: List[str], symbols: List[str]) -> List[str]:
+  res = []
+  for i, char in enumerate(word):
+    if char in symbols:
+      continue
+    res = word[i:]
+    break
+
+  for i in range(len(res)):
+    char = res[-1 - i]
+    if char in symbols:
+      continue
+    res = res[:len(res) - i]
+    break
+  return res
+
+
 def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
   if lang in (Language.ENG, Language.GER, Language.CHN):
     return list(text)
