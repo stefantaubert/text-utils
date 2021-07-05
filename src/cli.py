@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+from logging import getLogger
 from typing import Any, Callable, List, Optional
 
 from text_utils.symbols_map import SymbolsMap
@@ -24,7 +25,11 @@ def print_map(path: str, arrow_type: str) -> None:
   print_headline(arrow_type)
   symbols_map = SymbolsMap.load(path)
   for map_input, map_output in symbols_map.items():
-    string_to_print = f"{get_symbol_representation(map_input)} {arrow(arrow_type)} {get_symbol_representation(map_output)}"
+    if arrow_type == WEIGHTS:
+      string_to_print = f"{get_symbol_representation(map_output)} {arrow(arrow_type)} {get_symbol_representation(map_input)}"
+    else:
+      string_to_print = f"{get_symbol_representation(map_input)} {arrow(arrow_type)} {get_symbol_representation(map_output)}"
+
     print_bold_or_normal(string_to_print, map_input != map_output)
 
 
@@ -114,12 +119,14 @@ def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[
 
 
 def is_given_symbol_in_symbolfile(symbol: str, symbol_path: str) -> bool:
+  logger = getLogger(__name__)
   with open(symbol_path) as symbol_file:
     lines = symbol_file.readlines()
     for line in lines:
       line = line.strip()
       if len(line) > 0:
         line = line[1:-1]
+        #logger.info(f"{symbol} - {line}, {symbol == line}")
         if symbol == line:
           return True
   return False
