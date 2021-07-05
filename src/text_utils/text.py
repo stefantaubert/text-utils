@@ -415,8 +415,54 @@ def symbols_to_lower(symbols: List[str]) -> List[str]:
   return res
 
 
-def symbols_replace(symbols: List[str], search_for: List[str], replace_with: List[str], ignore_case: bool) -> bool:
-  raise Exception()
+def symbols_replace(symbols: List[str], search_for: List[str], replace_with: List[str], ignore_case: bool) -> List[str]:
+  new_symbols = symbols.copy()
+  start_index = is_sublist(
+      search_in=new_symbols,
+      search_for=search_for,
+      ignore_case=ignore_case
+  )
+  if start_index == -1:
+    return new_symbols
+
+  delete_and_insert_in_list(
+    main_list=new_symbols,
+    list_to_delete=search_for,
+    list_to_insert=replace_with,
+    start_index=start_index
+  )
+  if is_sublist(
+    search_in=new_symbols,
+    search_for=search_for,
+    ignore_case=ignore_case
+  ) != -1:
+    new_symbols = symbols_replace(new_symbols, search_for, replace_with, ignore_case)
+  return new_symbols
+
+
+def delete_and_insert_in_list(main_list: List[str], list_to_delete: List[str], list_to_insert: List[str], start_index: int) -> None:
+  del main_list[start_index:start_index + len(list_to_delete)]
+  end_slice = main_list[start_index:]
+  del main_list[start_index:]
+  main_list.extend(list_to_insert)
+  main_list.extend(end_slice)
+
+
+def is_sublist(search_in: List[str], search_for: List[str], ignore_case: bool) -> int:
+  len_search_in, len_search_for = len(search_in), len(search_for)
+  aux_search_in = upper_list_if_true(search_in, ignore_case)
+  aux_search_for = upper_list_if_true(search_for, ignore_case)
+  for i in range(len_search_in):
+    if aux_search_in[i:i + len_search_for] == aux_search_for:
+      return i
+  return -1
+
+
+def upper_list_if_true(l: List[str], upper: bool) -> List[str]:
+  if upper:
+    upper_l = [element.upper() for element in l]
+    return upper_l
+  return l
 
 
 def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
