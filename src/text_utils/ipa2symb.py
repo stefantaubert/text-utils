@@ -2,6 +2,7 @@ import string
 from dataclasses import dataclass
 from logging import Logger
 from typing import List, Tuple
+from ipapy.ipachar import IPAChar
 
 from ipapy.ipastring import IPAString
 
@@ -17,7 +18,7 @@ class IPAExtractionSettings():
   replace_unknown_ipa_by: str
 
 
-def check_is_ipa_and_return_closest_ipa(word_ipa: str) -> Tuple[bool, str]:
+def check_is_ipa_and_return_closest_ipa(word_ipa: str) -> Tuple[bool, IPAString]:
   try:
     ipa = IPAString(unicode_string=word_ipa, ignore=False)
     return True, ipa
@@ -58,6 +59,7 @@ def _extract_symbols(input_symbols: List[str], settings: IPAExtractionSettings, 
     # TODO: Conversion of 'ðӕ' to IPA failed. Result would be: 'ð'. Replaced with '__' instead.
     return result
 
+  char: IPAChar
   for char in ipa.ipa_chars:
     if char.is_diacritic or char.is_tone:
       if len(symbols) > 0:
