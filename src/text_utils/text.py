@@ -30,6 +30,9 @@ WHOLE_STRING_IS_PHONETIC_TRANS = re.compile(r'\A/\S*/\Z')
 SLASH = re.compile(r'/')
 PH_TRANS = re.compile(r'/(\S*)/')
 
+IPA_SENTENCE_SEPARATORS = [r"\?", r"\!", r"\."]
+CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]
+
 
 class EngToIpaMode(IntEnum):
   EPITRAN = 0
@@ -510,13 +513,11 @@ def split_ger_text(text: str) -> List[str]:
 
 
 def split_ipa_text(text: str) -> List[str]:
-  separators = [r"\?", r"\!", r"\."]
-  return split_text(text, separators)
+  return split_text(text, IPA_SENTENCE_SEPARATORS)
 
 
 def split_chn_text(text: str) -> List[str]:
-  separators = [r"？", r"！", r"。"]
-  return split_text(text, separators)
+  return split_text(text, CHN_SENTENCE_SEPARATORS)
 
 
 def split_chn_sentence(sentence: str) -> List[str]:
