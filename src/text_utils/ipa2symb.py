@@ -1,14 +1,16 @@
 import string
 from dataclasses import dataclass
-from logging import Logger
-from typing import List, Tuple
-from ipapy.ipachar import IPAChar
+from logging import Logger, getLogger
+from typing import List, Optional, Tuple
 
+from ipapy.ipachar import IPAChar
 from ipapy.ipastring import IPAString
 
 # _rx = '[{}]'.format(re.escape(string.punctuation))
 
 ARC = '͡'
+
+STRESS_SYMBOLS = {"ˌ", "ˈ"}
 
 
 @dataclass
@@ -27,14 +29,14 @@ def check_is_ipa_and_return_closest_ipa(word_ipa: str) -> Tuple[bool, IPAString]
     return False, ipa
 
 
-def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, logger: Logger):
-  res = []
+def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, logger: Logger, merge_stress: bool = True) -> List[str]:
+  res: List[str] = []
   tmp: List[str] = []
 
   for c in ipa_sentence:
     if c in string.punctuation or c in string.whitespace:
       if len(tmp) > 0:
-        raw_word_symbols = _extract_symbols(tmp, settings, logger)
+        raw_word_symbols = _extract_symbols(tmp, settings, merge_stress)
         res.extend(raw_word_symbols)
         tmp.clear()
       res.append(c)
@@ -42,42 +44,79 @@ def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, lo
       tmp.append(c)
 
   if len(tmp) > 0:
-    raw_word_symbols = _extract_symbols(tmp, settings, logger)
+    raw_word_symbols = _extract_symbols(tmp, settings, merge_stress)
     res.extend(raw_word_symbols)
     tmp.clear()
   return res
 
 
-def _extract_symbols(input_symbols: List[str], settings: IPAExtractionSettings, logger: Logger) -> List[str]:
-  symbols: List[str] = []
+def _extract_symbols(input_symbols: List[str], settings: IPAExtractionSettings, merge_stress: bool) -> List[str]:
   input_word = ''.join(input_symbols)
   is_valid_ipa, ipa = check_is_ipa_and_return_closest_ipa(input_word)
+
   if not is_valid_ipa:
+    logger = getLogger(__name__)
     result = [settings.replace_unknown_ipa_by] * len(input_symbols)
     logger.warning(
       f"Conversion of '{input_word}' to IPA failed. Result would be: '{ipa}'. Replaced with '{''.join(result)}' instead.")
     # TODO: Conversion of 'ðӕ' to IPA failed. Result would be: 'ð'. Replaced with '__' instead.
     return result
 
+  return ipa_str_to_list(ipa, settings.ignore_tones, settings.ignore_arcs, merge_stress)
+
+
+def ipa_str_to_list(ipa_str: IPAString, ignore_tones: bool, ignore_arcs: bool, merge_stress: bool) -> List[str]:
+  symbols: List[str] = []
+
+  tmp_stress: Optional[str] = None
   char: IPAChar
-  for char in ipa.ipa_chars:
+  for char in ipa_str.ipa_chars:
+    char_is_stress = char.unicode_repr in STRESS_SYMBOLS
+    if char_is_stress:
+      if tmp_stress is not None:
+        if merge_stress:
+          tmp_stress = f"{tmp_stress}{char.unicode_repr}"
+        else:
+          symbols.append(tmp_stress)
+          tmp_stress = char.unicode_repr
+      else:
+        tmp_stress = char.unicode_repr
+      continue
+
     if char.is_diacritic or char.is_tone:
       if len(symbols) > 0:
-        if char.is_tone and settings.ignore_tones:
+        if char.is_tone and ignore_tones:
           continue
         # I think it is a bug in IPAString that the arc sometimes gets classified as diacritic and sometimes not
         if char.unicode_repr == ARC:
-          if settings.ignore_arcs:
+          if ignore_arcs:
             continue
-          symbols.append(ARC)
+          # symbols.append(ARC)
+          symbols[-1] += char.unicode_repr
         else:
           symbols[-1] += char.unicode_repr
     else:
       uc = char.unicode_repr
-      if settings.ignore_arcs:
-        uc = uc.split(ARC)
-        symbols.extend(uc)
+      if ignore_arcs:
+        extend_symbols = uc.split(ARC)
+        if tmp_stress is not None:
+          if merge_stress:
+            extend_symbols[0] = f"{tmp_stress}{extend_symbols[0]}"
+          else:
+            extend_symbols = [tmp_stress] + extend_symbols
+          tmp_stress = None
       else:
-        symbols.append(uc)
+        extend_symbols = [uc]
+        if tmp_stress is not None:
+          if merge_stress:
+            extend_symbols[0] = f"{tmp_stress}{extend_symbols[0]}"
+          else:
+            extend_symbols = [tmp_stress] + extend_symbols
+          tmp_stress = None
+
+      symbols.extend(extend_symbols)
+
+  if tmp_stress is not None:
+    symbols.append(tmp_stress)
 
   return symbols
