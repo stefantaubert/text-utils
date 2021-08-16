@@ -468,7 +468,7 @@ def upper_list_if_true(l: List[str], upper: bool) -> List[str]:
   return l
 
 
-def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger) -> List[str]:
+def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger, merge_stress: Optional[bool] = True) -> List[str]:
   if lang in (Language.ENG, Language.GER, Language.CHN):
     return list(text)
   if lang == Language.IPA:
@@ -478,9 +478,9 @@ def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtract
       raise ex
 
     return extract_from_sentence(
-      text,
-      ipa_settings,
-      logger,
+      ipa_sentence=text,
+      settings=ipa_settings,
+      merge_stress=merge_stress,
     )
 
   assert False

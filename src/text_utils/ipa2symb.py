@@ -29,7 +29,7 @@ def check_is_ipa_and_return_closest_ipa(word_ipa: str) -> Tuple[bool, IPAString]
     return False, ipa
 
 
-def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, logger: Logger, merge_stress: bool = True) -> List[str]:
+def extract_from_sentence(ipa_sentence: str, settings: IPAExtractionSettings, merge_stress: bool) -> List[str]:
   res: List[str] = []
   tmp: List[str] = []
 
