@@ -25,6 +25,7 @@ def test_text_to_symbols_empty_input():
     lang=Language.ENG,
     ipa_settings=None,
     logger=getLogger(__name__),
+    merge_stress=None,
   )
   assert res == []
 
@@ -166,7 +167,8 @@ def test_text_to_symbols__no_settings_for_ipa__raise_exception():
       text="test",
       lang=Language.IPA,
       ipa_settings=None,
-      logger=getLogger()
+      logger=getLogger(),
+      merge_stress=None,
     )
 
 
