@@ -23,6 +23,7 @@ ipapy = "*"
 inflect = "*"
 unidecode = "*"
 cmudict_parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
+g2p_en = {editable = true, ref = "master", git = "https://github.com/stefantaubert/g2p.git"}
 
 [requires]
 python_version = "3.8"
