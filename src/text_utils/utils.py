@@ -1,9 +1,13 @@
 import json
 import os
+import re
 from collections import OrderedDict
+from logging import Logger
 from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar, Union
+
+from text_utils.ipa2symb import check_is_ipa_and_return_closest_ipa
 
 T = TypeVar('T')
 
@@ -63,12 +67,9 @@ def get_basename(filepath: str) -> str:
   return basename
 
 
-
 def filter_entries_from_lists(d: OrderedDictType[_T1, List[_T2]], allowed_entries: Set[_T2]) -> OrderedDictType[_T1, List[_T2]]:
   res = OrderedDict({k: [x for x in v if x in allowed_entries] for k, v in d.items()})
   return res
-
-
 
 
 def get_first_n(d: OrderedDictType[_T1, _T2], n: int) -> OrderedDictType[_T1, _T2]:
@@ -82,4 +83,17 @@ def select_enties_from_ordereddict(select_from: OrderedDictType[_T1, _T2], keys:
   keys_exist = len(keys.difference(select_from.keys())) == 0
   assert keys_exist
   res: OrderedDictType[_T1, _T2] = OrderedDict({k: v for k, v in select_from.items() if k in keys})
+  return res
+
+def split_text(text: str, separators: List[str]) -> List[str]:
+  pattern = "|".join(separators)
+  sents = re.split(f'({pattern})', text)
+  res = []
+  for i, sent in enumerate(sents):
+    if i % 2 == 0:
+      res.append(sent)
+      if i + 1 < len(sents):
+        res[-1] += sents[i + 1]
+  res = [x.strip() for x in res]
+  res = [x for x in res if x]
   return res

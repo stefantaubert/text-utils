@@ -1,12 +1,7 @@
-import re
 from enum import IntEnum
-from functools import partial
-from logging import WARNING, Logger, getLogger
-from typing import Dict, List, Optional, Tuple
+from logging import Logger
+from typing import List, Optional, Tuple
 
-from cmudict_parser import CMUDict, get_dict
-from dragonmapper import hanzi
-from epitran import Epitran
 from nltk import download
 from nltk.tokenize import sent_tokenize
 from unidecode import unidecode as convert_to_ascii
@@ -16,46 +11,23 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
                                     replace_at_symbols,
                                     replace_big_letter_abbreviations,
                                     replace_mail_addresses)
-from text_utils.ipa2symb import (IPAExtractionSettings,
-                                 check_is_ipa_and_return_closest_ipa,
-                                 extract_from_sentence)
+from text_utils.chinese_wrapper import chn_to_ipa, split_chn_text
+from text_utils.cmudict_wrapper import en_to_ipa_cmu, en_to_ipa_cmu_epitran
+from text_utils.epitran_wrapper import en_to_ipa_epitran, ger_to_ipa
+from text_utils.ipa2symb import (IPAExtractionSettings, extract_from_sentence,
+                                 ipa_of_phonetic_transcription,
+                                 is_phonetic_transcription,
+                                 is_phonetic_transcription_in_text)
 from text_utils.language import Language
-
-EPITRAN_CACHE: Dict[Language, Epitran] = {}
-EPITRAN_EN_WORD_CACHE: Dict[str, str] = {}
-
-CMU_CACHE: Optional[CMUDict] = None
-
-WHOLE_STRING_IS_PHONETIC_TRANS = re.compile(r'\A/\S*/\Z')
-SLASH = re.compile(r'/')
-PH_TRANS = re.compile(r'/(\S*)/')
+from text_utils.utils import split_text
 
 IPA_SENTENCE_SEPARATORS = [r"\?", r"\!", r"\."]
-CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]
 
 
 class EngToIpaMode(IntEnum):
   EPITRAN = 0
   CMUDICT = 1
   BOTH = 2
-
-
-CHN_MAPPINGS = [
-  (r"。", "."),
-  (r"？", "?"),
-  (r"！", "!"),
-  (r"，", ","),
-  (r"：", ":"),
-  (r"；", ";"),
-  (r"「", "\""),
-  (r"」", "\""),
-  (r"『", "\""),
-  (r"』", "\""),
-  (r"、", ",")
-]
-
-CHN_SUBS = [(re.compile(regex_pattern), replace_with)
-            for regex_pattern, replace_with in CHN_MAPPINGS]
 
 
 def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
@@ -117,162 +89,6 @@ def en_ipa_of_text_not_containing_phonetic_transcription(
   assert False
 
 
-def is_phonetic_transcription_in_text(text: str) -> bool:
-  #ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
-  ph_trans_in_text = PH_TRANS.search(text)
-  return ph_trans_in_text is not None
-
-
-def ipa_of_phonetic_transcription(ph_trans: str, logger: Logger) -> str:
-  assert is_phonetic_transcription(ph_trans)
-  resulting_ipa = re.sub(SLASH, '', ph_trans)
-  is_ipa, _ = check_is_ipa_and_return_closest_ipa(resulting_ipa)
-  if not is_ipa:
-    ex = ValueError(f"'{ph_trans}': '{resulting_ipa}' is no valid IPA!")
-    logger.error("", exc_info=ex)
-    raise ex
-  return resulting_ipa
-
-
-def is_phonetic_transcription(text: str) -> bool:
-  ipa_of_ph_trans = WHOLE_STRING_IS_PHONETIC_TRANS.search(text)
-  return ipa_of_ph_trans is not None
-
-
-def en_to_ipa_epitran(text: str, logger: Logger, use_cache: bool = True) -> str:
-  global EPITRAN_CACHE
-
-  ensure_eng_epitran_is_loaded(logger)
-
-  if use_cache:
-    splitted_text = text.split(" ")
-    splitted_result = [epi_transliterate_word_cached_verbose(
-      word, logger, verbose=False) for word in splitted_text]
-    result = " ".join(splitted_result)
-    return result
-  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], text)
-  return result
-
-
-def ensure_eng_epitran_is_loaded(logger: Logger) -> None:
-  global EPITRAN_CACHE
-  if Language.ENG not in EPITRAN_CACHE.keys():
-    logger.info("Loading English Epitran...")
-    EPITRAN_CACHE[Language.ENG] = Epitran('eng-Latn')
-
-
-def ensure_ger_epitran_is_loaded(logger: Logger) -> None:
-  global EPITRAN_CACHE
-  if Language.GER not in EPITRAN_CACHE.keys():
-    logger.info("Loading German Epitran...")
-    EPITRAN_CACHE[Language.GER] = Epitran('deu-Latn')
-
-
-def ensure_cmudict_is_loaded(logger: Logger) -> None:
-  global CMU_CACHE
-  if CMU_CACHE is None:
-    logger.info("Loading CMU dictionary...")
-    CMU_CACHE = get_dict(silent=True)
-
-
-def en_to_ipa_cmu_epitran(text: str, use_cache: bool, logger: Logger) -> str:
-  global CMU_CACHE
-
-  ensure_cmudict_is_loaded(logger)
-  ensure_eng_epitran_is_loaded(logger)
-
-  try:
-    replacing_func = partial(epi_transliterate_word_cached_verbose, logger=logger) if use_cache else partial(
-        epi_transliterate_word_verbose, logger=logger)
-
-    result = CMU_CACHE.sentence_to_ipa(
-      sentence=text,
-      replace_unknown_with=replacing_func
-    )
-    return result
-  except Exception as orig_exception:
-    ex = ValueError(f"Conversion of '{text}' was not successfull!")
-    logger.error("", exc_info=ex)
-    raise ex from orig_exception
-
-
-def epi_transliterate_word_cached_verbose(word: str, logger: Logger, verbose: bool = True) -> str:
-  # I am assuming there is no IPA difference in EPITRAN.
-  word = word.lower()
-
-  if word in EPITRAN_EN_WORD_CACHE:
-    return EPITRAN_EN_WORD_CACHE[word]
-
-  res = epi_transliterate_word_verbose(word, logger, verbose)
-
-  EPITRAN_EN_WORD_CACHE[word] = res
-
-  return res
-
-
-def epi_transliterate_word_verbose(word: str, logger: Logger, verbose: bool = True) -> str:
-  global EPITRAN_CACHE
-  assert Language.ENG in EPITRAN_CACHE
-
-  res = epi_transliterate_without_logging(EPITRAN_CACHE[Language.ENG], word)
-  # res = EPITRAN_CACHE[Language.ENG].transliterate(word)
-
-  if verbose:
-    logger.info(f"used Epitran for: {word} => {res}")
-
-  return res
-
-
-def epi_transliterate_without_logging(epi_instance: Epitran, word: str) -> str:
-  main_logger = getLogger()
-  old_level = main_logger.level
-  main_logger.setLevel(WARNING)
-
-  result = epi_instance.transliterate(word)
-
-  main_logger.setLevel(old_level)
-
-  return result
-
-
-def en_to_ipa_cmu(text: str, replace_unknown_with: str, logger: Logger) -> str:
-  assert replace_unknown_with is not None
-  global CMU_CACHE
-
-  ensure_cmudict_is_loaded(logger)
-
-  try:
-    result = CMU_CACHE.sentence_to_ipa(
-      sentence=text,
-      replace_unknown_with=replace_unknown_with
-    )
-    return result
-  except Exception as orig_exception:
-    ex = ValueError(f"Conversion of '{text}' was not successfull!")
-    logger.error("", exc_info=ex)
-    raise ex from orig_exception
-
-
-def ger_to_ipa(text: str, consider_ipa_annotations: bool, logger: Logger) -> str:
-  if consider_ipa_annotations and is_phonetic_transcription_in_text(text):
-    words = text.split(" ")
-    ipa_list = [ipa_of_phonetic_transcription(word, logger)
-                if is_phonetic_transcription(word)
-                else ger_ipa_of_text_not_containing_phonetic_transcription(text=word, logger=logger)
-                for word in words]
-    res = " ".join(ipa_list)
-    return res
-  return ger_ipa_of_text_not_containing_phonetic_transcription(text, logger)
-
-
-def ger_ipa_of_text_not_containing_phonetic_transcription(text: str, logger: Logger) -> str:
-  global EPITRAN_CACHE
-  ensure_ger_epitran_is_loaded(logger)
-  result = epi_transliterate_without_logging(EPITRAN_CACHE[Language.GER], text)
-  # result = EPITRAN_CACHE[Language.GER].transliterate(text)
-  return result
-
-
 def normalize_en(text: str) -> str:
   text = convert_to_ascii(text)
   # text = text.lower()
@@ -318,10 +134,6 @@ def text_normalize(text: str, lang: Language, logger: Logger) -> str:
     return normalize_ipa(text)
 
   assert False
-
-
-def clear_en_word_cache() -> None:
-  EPITRAN_EN_WORD_CACHE.clear()
 
 
 def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger, consider_ipa_annotations: bool = False, use_cache: bool = True) -> str:
@@ -486,20 +298,6 @@ def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtract
   assert False
 
 
-def split_text(text: str, separators: List[str]) -> List[str]:
-  pattern = "|".join(separators)
-  sents = re.split(f'({pattern})', text)
-  res = []
-  for i, sent in enumerate(sents):
-    if i % 2 == 0:
-      res.append(sent)
-      if i + 1 < len(sents):
-        res[-1] += sents[i + 1]
-  res = [x.strip() for x in res]
-  res = [x for x in res if x]
-  return res
-
-
 def split_en_text(text: str) -> List[str]:
   download('punkt', quiet=True)
   res = sent_tokenize(text, language="english")
@@ -514,40 +312,3 @@ def split_ger_text(text: str) -> List[str]:
 
 def split_ipa_text(text: str) -> List[str]:
   return split_text(text, IPA_SENTENCE_SEPARATORS)
-
-
-def split_chn_text(text: str) -> List[str]:
-  return split_text(text, CHN_SENTENCE_SEPARATORS)
-
-
-def split_chn_sentence(sentence: str) -> List[str]:
-  chn_words = sentence.split(" ")
-  return chn_words
-
-
-def chn_to_ipa(chn: str, logger: Logger) -> str:
-  res_str = chn_sentence_to_ipa(chn, logger)
-  for regex, replacement in CHN_SUBS:
-    res_str = re.sub(regex, replacement, res_str)
-
-  return res_str
-
-
-def chn_word_to_ipa(word: str, logger: Logger) -> str:
-  if is_phonetic_transcription(word):
-    return ipa_of_phonetic_transcription(word, logger)
-  return chn_ipa_of_word_not_containing_phonetic_transcription(word)
-
-
-def chn_sentence_to_ipa(sentence: str, logger: Logger) -> str:
-  chn_words = split_chn_sentence(sentence)
-  res = [chn_word_to_ipa(word, logger) for word in chn_words]
-  res_str = ' '.join(res)
-  return res_str
-
-
-def chn_ipa_of_word_not_containing_phonetic_transcription(word: str) -> str:
-  assert not is_phonetic_transcription(word)
-  chn_ipa = hanzi.to_ipa(word)
-  chn_ipa = chn_ipa.replace(' ', '')
-  return chn_ipa

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "dbd3bfe57ab16dda88f1a8edd2194b081fd22c75615564ecbec57410e51751c4"
+            "sha256": "a39786d0c0f772dace3436c8e095dfc1772e1ba002c630a6643030229c033089"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -27,7 +27,7 @@
         "cmudict-parser": {
             "editable": true,
             "git": "https://github.com/stefantaubert/cmudict-parser.git",
-            "ref": "67f1a5a64bc72ad87923a7d0eb7989989f4d29a0"
+            "ref": "2a209dc67b25eaaba74845d468ebec4519e13713"
         },
         "dragonmapper": {
             "hashes": [
@@ -217,12 +217,24 @@
             "markers": "python_version < '3.11' and python_version >= '3.7'",
             "version": "==1.21.2"
         },
+        "ordered-set": {
+            "hashes": [
+                "sha256:ba93b2df055bca202116ec44b9bead3df33ea63a7d5827ff8e16738b97f33a95"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==4.0.2"
+        },
         "panphon": {
             "hashes": [
                 "sha256:4e80cd6fe2c7e9ea40c8244f38cabc0cecdf2e3a3c677631ad941343706e21fa",
                 "sha256:8953f0e8bf163ffe87c914b2859721f6abac9caaa0f5e9ef912c5411b1d93da5"
             ],
             "version": "==0.19"
+        },
+        "pronunciation-dict-parser": {
+            "editable": true,
+            "git": "https://github.com/stefantaubert/pronunciation_dict_parser.git",
+            "ref": "11ee0f22536083d48f7f8b829e742b5feb5b3977"
         },
         "pyyaml": {
             "hashes": [
@@ -419,7 +431,7 @@
         "cmudict-parser": {
             "editable": true,
             "git": "https://github.com/stefantaubert/cmudict-parser.git",
-            "ref": "67f1a5a64bc72ad87923a7d0eb7989989f4d29a0"
+            "ref": "2a209dc67b25eaaba74845d468ebec4519e13713"
         },
         "colorama": {
             "hashes": [
@@ -1044,7 +1056,7 @@
                 "sha256:39fb8672126159acb139a7718dd10806104dec1e2f0f6c88aab05d17df10c8d4",
                 "sha256:f57b4c16c62fa2760b7e3d97c35b255512fb6b59a259730f36ba32ce9f8e342f"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4.0'",
             "version": "==1.26.6"
         },
         "vistir": {
