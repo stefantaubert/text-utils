@@ -1,6 +1,6 @@
 import string
-from logging import WARNING, Logger, getLogger
-from typing import Optional, Set, Tuple
+from logging import WARNING, Logger, currentframe, getLogger
+from typing import Any, Iterable, List, Optional, Set, Tuple
 
 from dragonmapper import hanzi
 from pronunciation_dict_parser import PublicDictType, parse_public_dict
@@ -23,6 +23,7 @@ def __get_arpa_oov(word: str) -> Pronunciation:
   logger = getLogger(__name__)
   logger.info(f"Transliterated OOV word \"{word}\" to \"{''.join(result)}\".")
   return result
+
 
 def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Pronunciation:
   pronunciations = get_eng_pronunciation_dict()
@@ -127,5 +128,61 @@ def ignore_symbols(symbols: Pronunciation, ignore: Set[Symbol]) -> Pronunciation
   return res
 
 
-def merge_symbols(pronunciation: Pronunciation, merge_at: Symbol, merge_symbols: Set[Symbol]) -> Pronunciation:
+def merge_symbols(pronunciation: Pronunciation, merge_at: Symbol, merge_on_symbols: Set[Symbol]) -> Pronunciation:
+  subsets, _ = split_symbols(pronunciation, split_on_symbols={merge_at})
+  merged_subsets = [merge_symbols_pronunciation(subset, merge_on_symbols) for subset in subsets]
+  result = join_pronunciations(merged_subsets, merge_at)
+  return result
+
+
+def split_symbols(symbols: Tuple[Symbol], split_on_symbols: Set[Symbol]) -> Tuple[List[Tuple[Symbol]], List[Symbol]]:
+  result = []
+  current = []
+  splitted_on = []
+  for symbol in symbols:
+    if symbol in split_on_symbols:
+      splitted_on.append(symbol)
+      if len(current) > 0:
+        result.append(tuple(current))
+        current.clear()
+    else:
+      result.append(symbol)
+
+  if len(current) > 0:
+    result.append(tuple(current))
+    current.clear()
+
+  return result, splitted_on
+
+
+def join_pronunciations(pronunciations: List[Pronunciation], join_symbol: Symbol) -> Pronunciation:
+  result = []
+  for i, subset in enumerate(pronunciations):
+    result.extend(list(subset))
+    if i < len(pronunciations) - 1:
+      result.append(join_symbol)
+  return tuple(result)
+
+
+def merge_symbols_pronunciation(pronunciation: Pronunciation, merge_on_symbols: Set[Symbol]) -> Pronunciation:
+  if len(pronunciation) == 0:
+    return tuple()
+  if len(merge_on_symbols) == 0:
+    return pronunciation
+  # TODO consider: cat-o-nine-tails
+  merge_symbols_from_start = []
+  for symbol in pronunciation:
+    if symbol in merge_on_symbols:
+      merge_symbols_from_start.append(symbol)
+
+  merge_symbols_from_end = []
+  for symbol in pronunciation[::-1]:
+    if symbol in merge_on_symbols:
+      merge_symbols_from_end.append(symbol)
+  merge_symbols_from_end = merge_symbols_from_end[::-1]
+
+  complete_pronun_has_only_merge_symbols = len(merge_symbols_from_start) == len(pronunciation)
+  if complete_pronun_has_only_merge_symbols:
+    return (''.join(merge_symbols_from_start),)
+
   return pronunciation
