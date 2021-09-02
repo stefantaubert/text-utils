@@ -1,4 +1,4 @@
-from enum import IntEnum
+import re
 from logging import Logger
 from typing import List, Optional, Tuple
 
@@ -11,23 +11,38 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
                                     replace_at_symbols,
                                     replace_big_letter_abbreviations,
                                     replace_mail_addresses)
-from text_utils.chinese_wrapper import chn_to_ipa, split_chn_text
-from text_utils.cmudict_wrapper import en_to_ipa_cmu, en_to_ipa_cmu_epitran
-from text_utils.epitran_wrapper import en_to_ipa_epitran, ger_to_ipa
-from text_utils.ipa2symb import (IPAExtractionSettings, extract_from_sentence,
-                                 ipa_of_phonetic_transcription,
-                                 is_phonetic_transcription,
-                                 is_phonetic_transcription_in_text)
 from text_utils.language import Language
+from text_utils.pronunciation import (IPAExtractionSettings,
+                                      extract_from_sentence)
 from text_utils.utils import split_text
 
+CHN_MAPPINGS = [
+  (r"。", "."),
+  (r"？", "?"),
+  (r"！", "!"),
+  (r"，", ","),
+  (r"：", ":"),
+  (r"；", ";"),
+  (r"「", "\""),
+  (r"」", "\""),
+  (r"『", "\""),
+  (r"』", "\""),
+  (r"、", ",")
+]
+
+CHN_SUBS = [(re.compile(regex_pattern), replace_with)
+            for regex_pattern, replace_with in CHN_MAPPINGS]
 IPA_SENTENCE_SEPARATORS = [r"\?", r"\!", r"\."]
 
 
-class EngToIpaMode(IntEnum):
-  EPITRAN = 0
-  CMUDICT = 1
-  BOTH = 2
+def split_ipa_text(text: str) -> List[str]:
+  return split_text(text, IPA_SENTENCE_SEPARATORS)
+
+
+def replace_chn_punctuation_with_default_punctuation(chn_sentence: str) -> str:
+  for regex, replacement in CHN_SUBS:
+    chn_sentence = re.sub(regex, replacement, chn_sentence)
+  return chn_sentence
 
 
 def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
@@ -41,58 +56,10 @@ def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
   return res
 
 
-def en_to_ipa(text: str, mode: EngToIpaMode, replace_unknown_with: Optional[str], use_cache: bool, consider_ipa_annotations: bool, logger: Logger) -> str:
-  assert mode is not None
-  if consider_ipa_annotations and is_phonetic_transcription_in_text(text):
-    words = text.split(" ")
-    ipa_list = [
-      ipa_of_phonetic_transcription(word, logger)
-        if is_phonetic_transcription(word)
-        else en_ipa_of_text_not_containing_phonetic_transcription(
-        text=word,
-        mode=mode,
-        replace_unknown_with=replace_unknown_with,
-        use_cache=use_cache,
-        logger=logger
-          )
-        for word in words
-    ]
-    res = " ".join(ipa_list)
-    return res
-  return en_ipa_of_text_not_containing_phonetic_transcription(
-     text=text,
-     mode=mode,
-     replace_unknown_with=replace_unknown_with,
-     use_cache=use_cache,
-     logger=logger
-    )
-
-
-def en_ipa_of_text_not_containing_phonetic_transcription(
-    text: str,
-    mode: EngToIpaMode,
-    replace_unknown_with: Optional[str],
-    use_cache: bool,
-    logger: Logger
-  ) -> str:
-  if mode == EngToIpaMode.EPITRAN:
-    return en_to_ipa_epitran(text, logger)
-  if mode == EngToIpaMode.CMUDICT:
-    if replace_unknown_with is None:
-      ex = ValueError(f"Parameter replace_unknown_with is required for {mode!r}!")
-      logger.error("", exc_info=ex)
-      raise ex
-    return en_to_ipa_cmu(text, replace_unknown_with, logger)
-  if mode == EngToIpaMode.BOTH:
-    return en_to_ipa_cmu_epitran(text, use_cache, logger)
-
-  assert False
-
-
 def normalize_en(text: str) -> str:
   text = convert_to_ascii(text)
   # text = text.lower()
-  # todo datetime conversion
+  # TODO datetime conversion
   text = text.strip()
   text = normalize_numbers(text)
   text = expand_abbreviations(text)
@@ -117,6 +84,7 @@ def normalize_ipa(text: str) -> str:
 def normalize_chn(text: str) -> str:
   text = text.strip()
   text = collapse_whitespace(text)
+  text = replace_chn_punctuation_with_default_punctuation(text)
   return text
 
 
@@ -136,35 +104,6 @@ def text_normalize(text: str, lang: Language, logger: Logger) -> str:
   assert False
 
 
-def text_to_ipa(text: str, lang: Language, mode: Optional[EngToIpaMode], replace_unknown_with: Optional[str], logger: Logger, consider_ipa_annotations: bool = False, use_cache: bool = True) -> str:
-  if lang == Language.ENG:
-    if mode is None:
-      ex = ValueError(f"Parameter mode is required for {lang!r}!")
-      logger.error("", exc_info=ex)
-      raise ex
-
-    return en_to_ipa(
-      text=text,
-      mode=mode,
-      replace_unknown_with=replace_unknown_with,
-      use_cache=use_cache,
-      consider_ipa_annotations=consider_ipa_annotations,
-      logger=logger,
-    )
-
-  if lang == Language.GER:
-    return ger_to_ipa(text, consider_ipa_annotations, logger)
-
-  if lang == Language.CHN:
-    return chn_to_ipa(text, logger)
-
-  if lang == Language.IPA:
-    # maybe check is valid IPA
-    return text
-
-  assert False
-
-
 def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
   if lang == Language.CHN:
     return split_chn_text(text)
@@ -179,6 +118,13 @@ def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
     return split_ger_text(text)
 
   assert False
+
+
+CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]
+
+
+def split_chn_text(text: str) -> List[str]:
+  return split_text(text, CHN_SENTENCE_SEPARATORS)
 
 
 def sentence_to_words(sentence_symbols: List[str]) -> List[List[str]]:
@@ -308,7 +254,3 @@ def split_ger_text(text: str) -> List[str]:
   download('punkt', quiet=True)
   res = sent_tokenize(text, language="german")
   return res
-
-
-def split_ipa_text(text: str) -> List[str]:
-  return split_text(text, IPA_SENTENCE_SEPARATORS)

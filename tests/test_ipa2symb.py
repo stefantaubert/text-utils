@@ -1,8 +1,6 @@
 from logging import getLogger
 
 from ipapy.ipastring import IPAString
-from text_utils.ipa2symb import (IPAExtractionSettings, extract_from_sentence,
-                                 ipa_str_to_list)
 from text_utils.text import check_is_ipa_and_return_closest_ipa
 
 

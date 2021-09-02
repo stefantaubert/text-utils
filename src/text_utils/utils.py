@@ -7,8 +7,6 @@ from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple, TypeVar, Union
 
-from text_utils.ipa2symb import check_is_ipa_and_return_closest_ipa
-
 T = TypeVar('T')
 
 
@@ -84,6 +82,7 @@ def select_enties_from_ordereddict(select_from: OrderedDictType[_T1, _T2], keys:
   assert keys_exist
   res: OrderedDictType[_T1, _T2] = OrderedDict({k: v for k, v in select_from.items() if k in keys})
   return res
+
 
 def split_text(text: str, separators: List[str]) -> List[str]:
   pattern = "|".join(separators)

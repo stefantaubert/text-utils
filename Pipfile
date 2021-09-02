@@ -22,7 +22,6 @@ dragonmapper = "*"
 ipapy = "*"
 inflect = "*"
 unidecode = "*"
-cmudict_parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/cmudict-parser.git"}
 pronunciation_dict_parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/pronunciation_dict_parser.git"}
 g2p_en = {editable = true, ref = "master", git = "https://github.com/stefantaubert/g2p.git"}
 
