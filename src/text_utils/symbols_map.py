@@ -4,12 +4,13 @@ from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple
 
 from text_utils.symbol_id_dict import SymbolIdDict
+from text_utils.types import Symbol, SymbolId, Symbols
 from text_utils.utils import get_sorted_list_from_set, parse_json, save_json
 
 
 class SymbolsMap(OrderedDict):
   @classmethod
-  def from_intersection(cls, map_from: set, map_to: set):
+  def from_intersection(cls, map_from: Set[Symbol], map_to: Set[Symbol]):
     #only_a = list(sorted(list(symbolsA)))
     in_both = list(sorted(list(map_from.intersection(map_to))))
     sym_mapping = cls([(symb, symb) for symb in in_both])
@@ -28,24 +29,24 @@ class SymbolsMap(OrderedDict):
     data = parse_json(file_path)
     return cls(data)
 
-  def apply_to_symbols(self, symbols: List[str]) -> List[str]:
+  def apply_to_symbols(self, symbols: Symbols) -> Symbols:
     res = []
     for symbol in symbols:
       if symbol in self.keys():
         res.append(self[symbol])
       else:
         res.append(symbol)
-    return res
+    return tuple(res)
 
-  def get_symbols_with_empty_mapping(self) -> Set[str]:
+  def get_symbols_with_empty_mapping(self) -> Set[Symbol]:
     result = {map_to for map_to, map_from in self.items() if map_from == ""}
     return result
 
-  def pop_batch(self, batch: Set[str]) -> None:
+  def pop_batch(self, batch: Set[Symbol]) -> None:
     for k in batch:
       self.pop(k)
 
-  def remove_entries_with_unknown_to_symbols(self, known_symbols: Set[str]) -> Set[str]:
+  def remove_entries_with_unknown_to_symbols(self, known_symbols: Set[Symbol]) -> Set[Symbol]:
     all_to_symbols = set(self.keys())
     remove_keys = all_to_symbols.difference(known_symbols)
 
@@ -53,11 +54,11 @@ class SymbolsMap(OrderedDict):
 
     return remove_keys
 
-  def get_unknown_from_symbols(self, known_symbols: Set[str]) -> Set[str]:
+  def get_unknown_from_symbols(self, known_symbols: Set[Symbol]) -> Set[Symbol]:
     result = {x for x, from_symbol in self.items() if from_symbol not in known_symbols}
     return result
 
-  def set_unknown_from_symbols_empty(self, known_symbols: Set[str]) -> Set[str]:
+  def set_unknown_from_symbols_empty(self, known_symbols: Set[Symbol]) -> Set[Symbol]:
     result = self.get_unknown_from_symbols(known_symbols)
 
     for k in result:
@@ -65,20 +66,20 @@ class SymbolsMap(OrderedDict):
 
     return result
 
-  def remove_entries_with_unknown_from_symbols(self, known_symbols: Set[str]) -> Set[str]:
+  def remove_entries_with_unknown_from_symbols(self, known_symbols: Set[Symbol]) -> Set[Symbol]:
     result = self.get_unknown_from_symbols(known_symbols)
 
     self.pop_batch(result)
 
     return result
 
-  def remove_unknown_symbols(self, known_from_symbols: Set[str], known_to_symbol: Set[str]) -> Set[str]:
+  def remove_unknown_symbols(self, known_from_symbols: Set[Symbol], known_to_symbol: Set[Symbol]) -> Set[Symbol]:
     res = self.remove_entries_with_unknown_from_symbols(known_from_symbols)
     res |= self.remove_entries_with_unknown_to_symbols(known_to_symbol)
     return res
 
-  def convert_to_symbols_ids_map(self, to_symbols: SymbolIdDict, from_symbols: SymbolIdDict) -> OrderedDictType[int, int]:
-    result: OrderedDictType[int, int] = OrderedDict()
+  def convert_to_symbols_ids_map(self, to_symbols: SymbolIdDict, from_symbols: SymbolIdDict) -> OrderedDictType[SymbolId, SymbolId]:
+    result: OrderedDictType[SymbolId, SymbolId] = OrderedDict()
 
     for map_to_symbol, map_from_symbol in self.items():
       assert to_symbols.symbol_exists(map_to_symbol)
@@ -140,8 +141,8 @@ def sort_map_after_map_from_symbol(symb_map: SymbolsMap) -> SymbolsMap:
   return new_map
 
 
-def create_or_update_inference_map(orig: Set[str], dest: Set[str], existing_map: Optional[SymbolsMap], template_map: Optional[SymbolsMap]) -> Tuple[SymbolsMap, List[str]]:
-  """keeps all dest symbols in existing map, even if thye were not in the dest set."""
+def create_or_update_inference_map(orig: Set[Symbol], dest: Set[Symbol], existing_map: Optional[SymbolsMap], template_map: Optional[SymbolsMap]) -> Tuple[SymbolsMap, List[Symbol]]:
+  """keeps all dest symbols in existing map, even if they were not in the dest set."""
   new_map = SymbolsMap.from_intersection(orig, dest)
 
   if existing_map is not None:
@@ -153,7 +154,7 @@ def create_or_update_inference_map(orig: Set[str], dest: Set[str], existing_map:
   return _apply_template_map(template_map, dest_map, orig)
 
 
-def create_or_update_weights_map(orig: Set[str], dest: Set[str], existing_map: Optional[SymbolsMap], template_map: Optional[SymbolsMap]) -> Tuple[SymbolsMap, List[str]]:
+def create_or_update_weights_map(orig: Set[Symbol], dest: Set[Symbol], existing_map: Optional[SymbolsMap], template_map: Optional[SymbolsMap]) -> Tuple[SymbolsMap, List[Symbol]]:
   """removes all dest symbols in existing map, that were not in the dest set."""
   dest_map = SymbolsMap.from_intersection(orig, dest)
 
@@ -163,7 +164,7 @@ def create_or_update_weights_map(orig: Set[str], dest: Set[str], existing_map: O
   return _apply_template_map(template_map, dest_map, orig)
 
 
-def _apply_template_map(template_map, dest_map, orig):
+def _apply_template_map(template_map, dest_map, orig) -> Tuple[SymbolsMap, List[Symbol]]:
   if template_map is not None:
     # The usecase is, when thchs map without tones exist and I want to create a map for thchs with tones.
     dest_map.update_existing_to_mappings(template_map)

@@ -6,21 +6,57 @@ from typing import List, Optional, Tuple
 
 from ipapy.ipachar import IPAChar
 from ipapy.ipastring import IPAString
+from text_utils.types import Symbol, Symbols
 
 # _rx = '[{}]'.format(re.escape(string.punctuation))
+# https://www.internationalphoneticalphabet.org/ipa-charts/ipa-symbols-with-unicode-decimal-and-hex-codes/
 
 ARC = '͡'
 
 STRESS_SYMBOLS = {"ˌ", "ˈ"}
 SLASH = re.compile(r'/')
 
+TONE_SYMBOLS_HEX = {"030B", "0301", "0304", "0300", "030F"}
+ARCS_HEX = {"035C", "0361"}
+ASPIRATED_HEX = {"02B0"}
+STRESS_HEX = {"02C8", "02CC"}
+LENGTH_MARKS = {"02D0", "02D1"}
+SYLLABILIC = "0329"
 
 WHOLE_STRING_IS_PHONETIC_TRANS = re.compile(r'\A/\S*/\Z')
 PH_TRANS = re.compile(r'/(\S*)/')
 
 
+def hex_to_str(hex_number: str) -> str:
+  result = chr(int(hex_number, base=16))
+  return result
+
+
+def is_tone(symbol: Symbol) -> bool:
+  return symbol in TONE_SYMBOLS_HEX
+
+
+def is_arc(symbol: Symbol) -> bool:
+  return symbol in ARCS_HEX
+
+
+def parse_ipa_to_symbols(sentence: str) -> Symbols:
+  # TODO
+  return list(sentence)
+
+
+def remove_arcs(symbols: Symbols) -> Symbols:
+  # TODO
+  return symbols
+
+
+def remove_tones(symbols: Symbols) -> Symbols:
+  # TODO
+  return symbols
+
+
 def is_phonetic_transcription_in_text(text: str) -> bool:
-  #ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
+  # ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
   ph_trans_in_text = PH_TRANS.search(text)
   return ph_trans_in_text is not None
 

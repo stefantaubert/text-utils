@@ -12,12 +12,10 @@ from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
-
-Symbol = str
-Pronunciation = Tuple[Symbol, ...]
+from text_utils.types import Symbol, Symbols
 
 
-def __get_arpa_oov(word: str) -> Pronunciation:
+def __get_arpa_oov(word: str) -> Symbols:
   model = get_eng_g2p()
   result = model.predict(word)
   logger = getLogger(__name__)
@@ -25,7 +23,7 @@ def __get_arpa_oov(word: str) -> Pronunciation:
   return result
 
 
-def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Pronunciation:
+def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Symbols:
   pronunciations = get_eng_pronunciation_dict()
   result = sentence2pronunciaton(
     sentence=eng_sentence,
@@ -42,7 +40,7 @@ def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Pronunciation:
   return result
 
 
-def __get_eng_ipa(word: str) -> Pronunciation:
+def __get_eng_ipa(word: str) -> Symbols:
   main_logger = getLogger()
   old_level = main_logger.level
   main_logger.setLevel(WARNING)
@@ -56,7 +54,7 @@ def __get_eng_ipa(word: str) -> Pronunciation:
   return result_tuple
 
 
-def __get_ger_ipa(word: str) -> Pronunciation:
+def __get_ger_ipa(word: str) -> Symbols:
   main_logger = getLogger()
   old_level = main_logger.level
   main_logger.setLevel(WARNING)
@@ -70,7 +68,7 @@ def __get_ger_ipa(word: str) -> Pronunciation:
   return result_tuple
 
 
-def eng_to_ipa(eng_sentence: str, consider_annotations: bool) -> Pronunciation:
+def eng_to_ipa(eng_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   result = sentence2pronunciaton2(
     sentence=eng_sentence,
@@ -86,7 +84,7 @@ def eng_to_ipa(eng_sentence: str, consider_annotations: bool) -> Pronunciation:
   return result
 
 
-def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Pronunciation:
+def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   result = sentence2pronunciaton2(
     sentence=ger_sentence,
@@ -102,13 +100,13 @@ def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Pronunciation:
   return result
 
 
-def __get_chn_ipa(word: str) -> Pronunciation:
+def __get_chn_ipa(word: str) -> Symbols:
   chn_ipa = hanzi.to_ipa(word)
   ipa_symbols = tuple(chn_ipa.split(" "))
   return ipa_symbols
 
 
-def chn_to_ipa(chn_sentence: str, consider_annotations: bool) -> Pronunciation:
+def chn_to_ipa(chn_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   result = sentence2pronunciaton2(
     sentence=chn_sentence,
@@ -123,19 +121,19 @@ def chn_to_ipa(chn_sentence: str, consider_annotations: bool) -> Pronunciation:
   return result
 
 
-def ignore_symbols(symbols: Pronunciation, ignore: Set[Symbol]) -> Pronunciation:
+def ignore_symbols(symbols: Symbols, ignore: Set[Symbol]) -> Symbols:
   res = tuple(symbol for symbol in symbols if symbol not in ignore)
   return res
 
 
-def merge_symbols(pronunciation: Pronunciation, merge_at: Symbol, merge_on_symbols: Set[Symbol]) -> Pronunciation:
+def merge_symbols(pronunciation: Symbols, merge_at: Symbol, merge_on_symbols: Set[Symbol]) -> Symbols:
   subsets, _ = split_symbols(pronunciation, split_on_symbols={merge_at})
   merged_subsets = [merge_symbols_pronunciation(subset, merge_on_symbols) for subset in subsets]
   result = join_pronunciations(merged_subsets, merge_at)
   return result
 
 
-def split_symbols(symbols: Tuple[Symbol], split_on_symbols: Set[Symbol]) -> Tuple[List[Tuple[Symbol]], List[Symbol]]:
+def split_symbols(symbols: Symbols, split_on_symbols: Set[Symbol]) -> Tuple[List[Symbols], List[Symbol]]:
   result = []
   current = []
   splitted_on = []
@@ -155,7 +153,7 @@ def split_symbols(symbols: Tuple[Symbol], split_on_symbols: Set[Symbol]) -> Tupl
   return result, splitted_on
 
 
-def join_pronunciations(pronunciations: List[Pronunciation], join_symbol: Symbol) -> Pronunciation:
+def join_pronunciations(pronunciations: List[Symbols], join_symbol: Symbol) -> Symbols:
   result = []
   for i, subset in enumerate(pronunciations):
     result.extend(list(subset))
@@ -164,7 +162,7 @@ def join_pronunciations(pronunciations: List[Pronunciation], join_symbol: Symbol
   return tuple(result)
 
 
-def merge_symbols_pronunciation(pronunciation: Pronunciation, merge_on_symbols: Set[Symbol]) -> Pronunciation:
+def merge_symbols_pronunciation(pronunciation: Symbols, merge_on_symbols: Set[Symbol]) -> Symbols:
   if len(pronunciation) == 0:
     return tuple()
   if len(merge_on_symbols) == 0:

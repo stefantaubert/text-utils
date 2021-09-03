@@ -3,6 +3,7 @@ from logging import getLogger
 from typing import Any, Callable, List, Optional
 
 from text_utils.symbols_map import SymbolsMap
+from text_utils.types import Symbol
 
 NOTHING = "NOTHING"
 SPACE = "SPACE"
@@ -96,7 +97,7 @@ def init_change_parser(parser: ArgumentParser) -> Callable[[str, str, Optional[s
   return change_symbols_in_map
 
 
-def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[str] = None, to_key: Optional[str] = None, map_symbol: Optional[str] = None) -> None:
+def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[str] = None, to_key: Optional[Symbol] = None, map_symbol: Optional[Symbol] = None) -> None:
   input_map = SymbolsMap.load(map_path)
   if to_key is None and map_symbol is None:
     if arrow_type is None:
@@ -118,7 +119,7 @@ def change_symbols_in_map(map_path: str, symbol_path: str, arrow_type: Optional[
     input_map.save(map_path)
 
 
-def is_given_symbol_in_symbolfile(symbol: str, symbol_path: str) -> bool:
+def is_given_symbol_in_symbolfile(symbol: Symbol, symbol_path: str) -> bool:
   logger = getLogger(__name__)
   with open(symbol_path) as symbol_file:
     lines = symbol_file.readlines()
@@ -155,7 +156,7 @@ def choose_key(input_map: SymbolsMap, arrow_type: str) -> str:
   return chosen_key
 
 
-def choose_symbol(symbol_path: str, old_symbol: str, chosen_key: str) -> str:
+def choose_symbol(symbol_path: str, old_symbol: Symbol, chosen_key: Symbol) -> str:
   print(
     f"Which new symbol instead of {get_symbol_representation(old_symbol)} should be assigned to {get_symbol_representation(chosen_key)}? Please input the corresponding number.")
   with open(symbol_path) as symbol_file:

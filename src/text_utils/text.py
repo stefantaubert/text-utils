@@ -14,6 +14,7 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
 from text_utils.language import Language
 from text_utils.pronunciation import (IPAExtractionSettings,
                                       extract_from_sentence)
+from text_utils.types import Symbols
 from text_utils.utils import split_text
 
 CHN_MAPPINGS = [
@@ -45,11 +46,11 @@ def replace_chn_punctuation_with_default_punctuation(chn_sentence: str) -> str:
   return chn_sentence
 
 
-def get_ngrams(sentence_symbols: List[str], n: int) -> List[Tuple[str]]:
+def get_ngrams(sentence_symbols: Symbols, n: int) -> List[Symbols]:
   if n < 1:
     raise Exception()
 
-  res: List[Tuple[str]] = []
+  res: List[Symbols] = []
   for i in range(len(sentence_symbols) - n + 1):
     tmp = tuple(sentence_symbols[i:i + n])
     res.append(tmp)
@@ -88,7 +89,7 @@ def normalize_chn(text: str) -> str:
   return text
 
 
-def text_normalize(text: str, lang: Language, logger: Logger) -> str:
+def text_normalize(text: str, lang: Language) -> str:
   if lang == Language.ENG:
     return normalize_en(text)
 
@@ -104,7 +105,7 @@ def text_normalize(text: str, lang: Language, logger: Logger) -> str:
   assert False
 
 
-def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
+def text_to_sentences(text: str, lang: Language) -> List[str]:
   if lang == Language.CHN:
     return split_chn_text(text)
 
@@ -123,36 +124,36 @@ def text_to_sentences(text: str, lang: Language, logger: Logger) -> List[str]:
 CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]
 
 
-def split_chn_text(text: str) -> List[str]:
+def split_chn_text(text: str) -> Symbols:
   return split_text(text, CHN_SENTENCE_SEPARATORS)
 
 
-def sentence_to_words(sentence_symbols: List[str]) -> List[List[str]]:
+def sentence_to_words(sentence_symbols: Symbols) -> List[Symbols]:
   if len(sentence_symbols) == 0:
     return []
   res = []
   current_word = []
   for symbol in sentence_symbols:
     if symbol == " ":
-      res.append(current_word)
+      res.append(tuple(current_word))
       current_word = []
     else:
       current_word.append(symbol)
-  res.append(current_word)
+  res.append(tuple(current_word))
   return res
 
 
-def words_to_sentence(words: List[List[str]]) -> List[str]:
+def words_to_sentence(words: List[Symbols]) -> Symbols:
   res = []
   for i, word in enumerate(words):
     res.extend(word)
     is_last_word = i == len(words) - 1
     if not is_last_word:
       res.append(" ")
-  return res
+  return tuple(res)
 
 
-def strip_word(word: List[str], symbols: List[str]) -> List[str]:
+def strip_word(word: Symbols, symbols: Symbols) -> Symbols:
   res = []
   for i, char in enumerate(word):
     if char in symbols:
@@ -166,25 +167,25 @@ def strip_word(word: List[str], symbols: List[str]) -> List[str]:
       continue
     res = res[:len(res) - i]
     break
-  return res
+  return tuple(res)
 
 
-def symbols_to_lower(symbols: List[str]) -> List[str]:
+def symbols_to_lower(symbols: Symbols) -> Symbols:
   res = []
   for symbol in symbols:
     res.append(symbol.lower())
-  return res
+  return tuple(res)
 
 
-def symbols_replace(symbols: List[str], search_for: List[str], replace_with: List[str], ignore_case: bool) -> List[str]:
-  new_symbols = symbols.copy()
+def symbols_replace(symbols: Symbols, search_for: Symbols, replace_with: Symbols, ignore_case: bool) -> Symbols:
+  new_symbols = list(symbols)
   start_index = is_sublist(
       search_in=new_symbols,
       search_for=search_for,
       ignore_case=ignore_case
   )
   if start_index == -1:
-    return new_symbols
+    return tuple(new_symbols)
 
   delete_and_insert_in_list(
     main_list=new_symbols,
@@ -198,7 +199,7 @@ def symbols_replace(symbols: List[str], search_for: List[str], replace_with: Lis
     ignore_case=ignore_case
   ) != -1:
     new_symbols = symbols_replace(new_symbols, search_for, replace_with, ignore_case)
-  return new_symbols
+  return tuple(new_symbols)
 
 
 def delete_and_insert_in_list(main_list: List[str], list_to_delete: List[str], list_to_insert: List[str], start_index: int) -> None:
@@ -226,20 +227,20 @@ def upper_list_if_true(l: List[str], upper: bool) -> List[str]:
   return l
 
 
-def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger, merge_stress: Optional[bool] = True) -> List[str]:
+def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger, merge_stress: Optional[bool] = True) -> Symbols:
   if lang in (Language.ENG, Language.GER, Language.CHN):
-    return list(text)
+    return tuple(text)
   if lang == Language.IPA:
     if ipa_settings is None:
       ex = ValueError(f"You have to pass ipa_settings for {lang!r}!")
       logger.error("", exc_info=ex)
       raise ex
 
-    return extract_from_sentence(
+    return tuple(extract_from_sentence(
       ipa_sentence=text,
       settings=ipa_settings,
       merge_stress=merge_stress,
-    )
+    ))
 
   assert False
 

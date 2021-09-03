@@ -1,11 +1,11 @@
-from typing import List
+from text_utils.types import AccentId, AccentIds, SymbolId, SymbolIds
 
 
-def get_accent_symbol_ids(symbol_ids: List[int], accent_ids: List[int], n_symbols: int,
+def get_accent_symbol_ids(symbol_ids: SymbolIds, accent_ids: AccentIds, n_symbols: int,
                           accents_use_own_symbols: bool,
-                          shared_symbol_count: int) -> List[int]:
+                          shared_symbol_count: int) -> SymbolIds:
   assert len(symbol_ids) == len(accent_ids)
-  model_symbol_ids = [
+  model_symbol_ids = tuple(
     get_accent_symbol_id(
       symbol_id,
       accent_id,
@@ -13,7 +13,7 @@ def get_accent_symbol_ids(symbol_ids: List[int], accent_ids: List[int], n_symbol
       accents_use_own_symbols,
       shared_symbol_count
     ) for symbol_id, accent_id in zip(symbol_ids, accent_ids)
-  ]
+  )
 
   return model_symbol_ids
 
@@ -28,9 +28,9 @@ def get_accent_symbols_count(n_symbols: int, n_accents: int, accents_use_own_sym
   return n_symbols
 
 
-def get_accent_symbol_id(symbol_id: int, accent_id: int, n_symbols: int,
+def get_accent_symbol_id(symbol_id: SymbolId, accent_id: AccentId, n_symbols: int,
                          accents_use_own_symbols: bool,
-                         shared_symbol_count: int) -> int:
+                         shared_symbol_count: int) -> SymbolId:
   assert n_symbols >= shared_symbol_count
   assert symbol_id < n_symbols
   assert accent_id >= 0
@@ -46,8 +46,8 @@ def get_accent_symbol_id(symbol_id: int, accent_id: int, n_symbols: int,
   return symbol_id
 
 
-def get_symbol_id(accent_symbol_id: int, n_symbols: int, accents_use_own_symbols: bool,
-                  shared_symbol_count: int) -> int:
+def get_symbol_id(accent_symbol_id: SymbolId, n_symbols: int, accents_use_own_symbols: bool,
+                  shared_symbol_count: int) -> SymbolId:
   assert n_symbols >= shared_symbol_count
   assert accent_symbol_id >= 0
 

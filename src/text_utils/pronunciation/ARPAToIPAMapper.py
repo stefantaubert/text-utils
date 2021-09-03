@@ -1,7 +1,9 @@
 import re
 from typing import Dict, Optional, Set, Tuple
 
-ARPABET_IPA_MAP: Dict[str, str] = {
+from text_utils.types import Symbol, Symbols
+
+ARPABET_IPA_MAP: Dict[Symbol, Symbol] = {
   # "A": "ə",
   "AA": "ɑ",
   "AE": "æ",
@@ -44,7 +46,7 @@ ARPABET_IPA_MAP: Dict[str, str] = {
   "ZH": "ʒ",
 }
 
-IPA_STRESSES: Dict[str, str] = {
+IPA_STRESSES: Dict[str, Symbol] = {
   "0": "",
   "1": "ˈ",
   "2": "ˌ",
@@ -53,7 +55,7 @@ IPA_STRESSES: Dict[str, str] = {
 ARPABET_PATTERN: str = re.compile(r"([A-Z]+)(\d*)")
 
 
-def get_ipa_mapping_with_stress(arpa_symbol: str, include_stress: bool) -> str:
+def get_ipa_mapping_with_stress(arpa_symbol: Symbol, include_stress: bool) -> Symbol:
   res = re.match(ARPABET_PATTERN, arpa_symbol)
   assert res is not None
   phon, stress = res.groups()
@@ -67,12 +69,12 @@ def get_ipa_mapping_with_stress(arpa_symbol: str, include_stress: bool) -> str:
   return ipa_phoneme
 
 
-def has_ipa_mapping(arpa_symbol: str) -> bool:
+def has_ipa_mapping(arpa_symbol: Symbol) -> bool:
   res = re.match(ARPABET_PATTERN, arpa_symbol)
   return res is not None
 
 
-def map_arpa_to_ipa(arpa_symbols: Tuple[str, ...], ignore: Set[str], replace_unknown: bool, replace_unknown_with: Optional[str], include_stress: bool) -> Tuple[str, ...]:
+def map_arpa_to_ipa(arpa_symbols: Symbols, ignore: Set[Symbol], replace_unknown: bool, replace_unknown_with: Optional[Symbol], include_stress: bool) -> Symbols:
   ipa_symbols = []
   for arpa_symbol in arpa_symbols:
     assert isinstance(arpa_symbol, str)
