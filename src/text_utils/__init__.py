@@ -13,5 +13,8 @@ from text_utils.symbol_id_dict import SymbolIdDict
 from text_utils.symbols_dict import SymbolsDict
 from text_utils.symbols_map import (SymbolsMap, create_or_update_inference_map,
                                     create_or_update_weights_map)
-from text_utils.text import text_normalize, text_to_sentences
+from text_utils.text import text_normalize, text_to_sentences, text_to_symbols
+from text_utils.types import (Accent, AccentId, AccentIds, Accents, Speaker,
+                              SpeakerId, SpeakerIds, Speakers, Symbol,
+                              SymbolId, SymbolIds, Symbols)
 from text_utils.utils import deserialize_list, get_ngrams, serialize_list

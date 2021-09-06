@@ -11,6 +11,7 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
                                     replace_big_letter_abbreviations,
                                     replace_mail_addresses)
 from text_utils.language import Language
+from text_utils.pronunciation import parse_ipa_to_symbols
 from text_utils.types import Symbols
 from text_utils.utils import split_text
 
@@ -41,7 +42,6 @@ def replace_chn_punctuation_with_default_punctuation(chn_sentence: str) -> str:
   for regex, replacement in CHN_SUBS:
     chn_sentence = re.sub(regex, replacement, chn_sentence)
   return chn_sentence
-
 
 
 def normalize_en(text: str) -> str:
@@ -115,22 +115,12 @@ def split_chn_text(text: str) -> Symbols:
   return split_text(text, CHN_SENTENCE_SEPARATORS)
 
 
-# def text_to_symbols(text: str, lang: Language, ipa_settings: Optional[IPAExtractionSettings], logger: Logger, merge_stress: Optional[bool] = True) -> Symbols:
-#   if lang in (Language.ENG, Language.GER, Language.CHN):
-#     return tuple(text)
-#   if lang == Language.IPA:
-#     if ipa_settings is None:
-#       ex = ValueError(f"You have to pass ipa_settings for {lang!r}!")
-#       logger.error("", exc_info=ex)
-#       raise ex
-
-#     return tuple(extract_from_sentence(
-#       ipa_sentence=text,
-#       settings=ipa_settings,
-#       merge_stress=merge_stress,
-#     ))
-
-#   assert False
+def text_to_symbols(text: str, lang: Language) -> Symbols:
+  if lang in {Language.ENG, Language.GER, Language.CHN}:
+    return tuple(text)
+  if lang == Language.IPA:
+    return parse_ipa_to_symbols(text)
+  assert False
 
 
 def split_en_text(text: str) -> List[str]:
