@@ -1,7 +1,9 @@
 import string
+from enum import Enum
 from logging import WARNING, getLogger
 
 from dragonmapper import hanzi
+from text_utils.pronunciation.ARPAToIPAMapper import map_arpa_to_ipa
 from text_utils.pronunciation.dummy_text2pronunciation import (
     sentence2pronunciaton, sentence2pronunciaton2)
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
@@ -65,7 +67,7 @@ def __get_ger_ipa(word: str) -> Symbols:
   return result_tuple
 
 
-def eng_to_ipa(eng_sentence: str, consider_annotations: bool) -> Symbols:
+def eng_to_ipa_epitran(eng_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   result = sentence2pronunciaton2(
     sentence=eng_sentence,
@@ -79,6 +81,29 @@ def eng_to_ipa(eng_sentence: str, consider_annotations: bool) -> Symbols:
   )
 
   return result
+
+
+def eng_to_ipa_pronunciation_dict(eng_sentence: str, consider_annotations: bool) -> Symbols:
+  #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
+  arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations)
+  result_ipa = map_arpa_to_ipa(arpa_symbols, ignore={},
+                               replace_unknown=False, replace_unknown_with=None)
+
+  return result_ipa
+
+
+class EngToIPAMode(Enum):
+  LIBRISPEECH = 0
+  EPITRAN = 1
+
+
+def eng_to_ipa(eng_sentence: str, consider_annotations: bool, mode: EngToIPAMode) -> Symbols:
+  if mode == EngToIPAMode.EPITRAN:
+    return eng_to_ipa_epitran(eng_sentence, consider_annotations)
+  elif mode == EngToIPAMode.LIBRISPEECH:
+    return eng_to_ipa_pronunciation_dict(eng_sentence, consider_annotations)
+  else:
+    assert False
 
 
 def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
