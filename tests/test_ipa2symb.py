@@ -1,7 +1,23 @@
 from logging import getLogger
 
-from ipapy.ipastring import IPAString
+from text_utils.pronunciation.ipa2symb import (merge_left, merge_right,
+                                               merge_together)
 from text_utils.text import check_is_ipa_and_return_closest_ipa
+
+
+def test_merge_together():
+  res = merge_together(tuple("a&b&c&d&"), merge_symbols={"&"}, ignore_merge_symbols={"a"})
+  assert res == ("a", "&", "b&c&d", "&",)
+
+
+def test_merge_left():
+  res = merge_left(tuple("'a,' b"), merge_symbols={"'"}, ignore_merge_symbols={" "})
+  assert res == ("'a", ",", "'", " ", "b",)
+
+
+def test_merge_right():
+  res = merge_right(tuple("'a, ,'b!"), merge_symbols={"'", "!"}, ignore_merge_symbols={" "})
+  assert res == ("'", "a,", " ", ",", "'", "b!",)
 
 
 def test_unprocessable_ipa():

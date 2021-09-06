@@ -391,7 +391,7 @@ def test_split_ger():
 def test_sentence_to_words__empty_list():
   sentence = []
 
-  res = sentence_to_words(sentence)
+  res = split_symbols(sentence)
 
   assert res == []
 
@@ -399,7 +399,7 @@ def test_sentence_to_words__empty_list():
 def test_sentence_to_words__only_one_space():
   sentence = [" "]
 
-  res = sentence_to_words(sentence)
+  res = split_symbols(sentence)
 
   assert res == [[], []]
 
@@ -407,7 +407,7 @@ def test_sentence_to_words__only_one_space():
 def test_sentence_to_words__one_word():
   sentence = ["a"]
 
-  res = sentence_to_words(sentence)
+  res = split_symbols(sentence)
 
   assert res == [["a"]]
 
@@ -415,7 +415,7 @@ def test_sentence_to_words__one_word():
 def test_sentence_to_words__two_words():
   sentence = ["a", " ", "b"]
 
-  res = sentence_to_words(sentence)
+  res = split_symbols(sentence)
 
   assert res == [["a"], ["b"]]
 
@@ -423,7 +423,7 @@ def test_sentence_to_words__two_words():
 def test_words_to_sentence__empty_list():
   words = []
 
-  res = words_to_sentence(words)
+  res = symbols_join(words)
 
   assert res == []
 
@@ -431,7 +431,7 @@ def test_words_to_sentence__empty_list():
 def test_words_to_sentence__one_word():
   words = [["a"]]
 
-  res = words_to_sentence(words)
+  res = symbols_join(words)
 
   assert res == ["a"]
 
@@ -439,7 +439,7 @@ def test_words_to_sentence__one_word():
 def test_words_to_sentence__two_words():
   words = [["a"], ["b"]]
 
-  res = words_to_sentence(words)
+  res = symbols_join(words)
 
   assert res == ["a", " ", "b"]
 
@@ -447,14 +447,14 @@ def test_words_to_sentence__two_words():
 def test_strip_word__empty_word():
   word = []
 
-  res = strip_word(word, ["a"])
+  res = strip_symbols(word, ["a"])
   assert res == []
 
 
 def test_strip_word__empty_strip():
   word = ["a"]
 
-  res = strip_word(word, [])
+  res = strip_symbols(word, [])
 
   assert res == ["a"]
 
@@ -462,7 +462,7 @@ def test_strip_word__empty_strip():
 def test_strip_word__strip_start():
   word = ["a", "b"]
 
-  res = strip_word(word, ["a"])
+  res = strip_symbols(word, ["a"])
 
   assert res == ["b"]
 
@@ -470,7 +470,7 @@ def test_strip_word__strip_start():
 def test_strip_word__strip_end():
   word = ["a", "b"]
 
-  res = strip_word(word, ["b"])
+  res = strip_symbols(word, ["b"])
 
   assert res == ["a"]
 
@@ -478,7 +478,7 @@ def test_strip_word__strip_end():
 def test_strip_word__strip_start_and_end():
   word = ["b", "a", "b"]
 
-  res = strip_word(word, ["b"])
+  res = strip_symbols(word, ["b"])
 
   assert res == ["a"]
 
@@ -486,7 +486,7 @@ def test_strip_word__strip_start_and_end():
 def test_strip_word__strip_start_and_end_multiple_symbols():
   word = ["b", "c", "a", "e", "b", "d"]
 
-  res = strip_word(word, ["b", "c", "d"])
+  res = strip_symbols(word, ["b", "c", "d"])
 
   assert res == ["a", "e"]
 
@@ -494,7 +494,7 @@ def test_strip_word__strip_start_and_end_multiple_symbols():
 def test_strip_word__strip_not_inside():
   word = ["a", "b", "a"]
 
-  res = strip_word(word, ["b"])
+  res = strip_symbols(word, ["b"])
 
   assert res == ["a", "b", "a"]
 

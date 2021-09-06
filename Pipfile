@@ -19,7 +19,6 @@ pytest-xdist = "*"
 epitran = "*"
 nltk = "*"
 dragonmapper = "*"
-ipapy = "*"
 inflect = "*"
 unidecode = "*"
 pronunciation_dict_parser = {editable = true, ref = "master", git = "https://github.com/stefantaubert/pronunciation_dict_parser.git"}

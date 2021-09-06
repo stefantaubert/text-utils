@@ -12,8 +12,8 @@ Accents = Tuple[Accent, ...]
 AccentId = int
 AccentIds = Tuple[AccentId, ...]
 
-Speaker: str
-Speakers: List[Speaker]
+Speaker = str
+Speakers = List[Speaker]
 
-SpeakerId: int
-SpeakerIds: List[SpeakerId]
+SpeakerId = int
+SpeakerIds = List[SpeakerId]
