@@ -2,10 +2,12 @@ import re
 import string
 from dataclasses import dataclass
 from logging import Logger, getLogger
-from typing import List, Optional, Tuple
+from typing import List, Optional, Set, Tuple
 
 from ipapy.ipachar import IPAChar
 from ipapy.ipastring import IPAString
+from text_utils.pronunciation.ipa_symbols import (APPENDIX, DONT_CHANGE, MERGE,
+                                                  PREPEND)
 from text_utils.types import Symbol, Symbols
 
 # _rx = '[{}]'.format(re.escape(string.punctuation))
@@ -40,11 +42,6 @@ def is_arc(symbol: Symbol) -> bool:
   return symbol in ARCS_HEX
 
 
-def parse_ipa_to_symbols(sentence: str) -> Symbols:
-  # TODO
-  return list(sentence)
-
-
 def remove_arcs(symbols: Symbols) -> Symbols:
   # TODO
   return symbols
@@ -53,6 +50,44 @@ def remove_arcs(symbols: Symbols) -> Symbols:
 def remove_tones(symbols: Symbols) -> Symbols:
   # TODO
   return symbols
+
+
+def parse_ipa_to_symbols(sentence: str) -> Symbols:
+  all_symbols = tuple(sentence)
+  all_symbols = merge_together(all_symbols, merge_symbols=MERGE, ignore_merge_symbols=DONT_CHANGE)
+  all_symbols = merge_left(all_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE)
+  all_symbols = merge_right(all_symbols, merge_symbols=APPENDIX, ignore_merge_symbols=DONT_CHANGE)
+  return all_symbols
+
+
+def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
+  # TODO
+  return symbols
+
+
+def test_merge_together():
+  res = merge_together(tuple("a&b&c&d&"), merge_symbols={"&"}, ignore_merge_symbols={"a"})
+  assert res == ("a", "&", "b&c&d", "&",)
+
+
+def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
+  # TODO
+  return symbols
+
+
+def test_merge_left():
+  res = merge_left(tuple("'a,' b"), merge_symbols={"'"}, ignore_merge_symbols={" "})
+  assert res == ("'a", ",", "'", " ", "b",)
+
+
+def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
+  # TODO
+  return symbols
+
+
+def test_merge_right():
+  res = merge_right(tuple("'a, ,'b!"), merge_symbols={"'", "!"}, ignore_merge_symbols={" "})
+  assert res == ("'", "a,", " ", ",", "'", "b!",)
 
 
 def is_phonetic_transcription_in_text(text: str) -> bool:
