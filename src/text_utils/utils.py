@@ -99,7 +99,7 @@ def split_text(text: str, separators: List[str]) -> List[str]:
   return res
 
 
-def ignore_symbols(symbols: Symbols, ignore: Set[Symbol]) -> Symbols:
+def symbols_ignore(symbols: Symbols, ignore: Set[Symbol]) -> Symbols:
   res = tuple(symbol for symbol in symbols if symbol not in ignore)
   return res
 
@@ -115,12 +115,12 @@ def remove_symbols_inside(symbols: Symbols, ignore: Set[Symbols]) -> Symbols:
 
 
 def remove_symbols_at_all_places(symbols: Symbols, ignore: Set[Symbol]) -> Symbols:
-  symbols = ignore_symbols(symbols, ignore=ignore)
+  symbols = symbols_ignore(symbols, ignore=ignore)
   symbols = remove_symbols_inside(symbols, ignore=ignore)
   return symbols
 
 
-def split_symbols(sentence_symbols: Symbols, split_symbol: Symbol) -> List[Symbols]:
+def symbols_split(sentence_symbols: Symbols, split_symbol: Symbol) -> List[Symbols]:
   if len(sentence_symbols) == 0:
     return []
   res = []
@@ -135,7 +135,7 @@ def split_symbols(sentence_symbols: Symbols, split_symbol: Symbol) -> List[Symbo
   return res
 
 
-def strip_symbols(symbols: Symbols, strip: Set[Symbol]) -> Symbols:
+def symbols_strip(symbols: Symbols, strip: Set[Symbol]) -> Symbols:
   res = []
   # strip start
   for i, char in enumerate(symbols):
@@ -171,9 +171,10 @@ def symbols_join(list_of_symbols: List[Symbols], join_symbol: Symbol) -> Symbols
 
 def symbols_replace(symbols: Symbols, search_for: Symbols, replace_with: Symbols, ignore_case: bool) -> Symbols:
   new_symbols = list(symbols)
+  search_for_list = list(search_for)
   start_index = is_sublist(
       search_in=new_symbols,
-      search_for=search_for,
+      search_for=search_for_list,
       ignore_case=ignore_case
   )
   if start_index == -1:
@@ -181,13 +182,13 @@ def symbols_replace(symbols: Symbols, search_for: Symbols, replace_with: Symbols
 
   delete_and_insert_in_list(
     main_list=new_symbols,
-    list_to_delete=search_for,
+    list_to_delete=search_for_list,
     list_to_insert=replace_with,
     start_index=start_index
   )
   if is_sublist(
     search_in=new_symbols,
-    search_for=search_for,
+    search_for=search_for_list,
     ignore_case=ignore_case
   ) != -1:
     new_symbols = symbols_replace(new_symbols, search_for, replace_with, ignore_case)

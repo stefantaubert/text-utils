@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e3efad683c63018e4244b960acdaac7cfa426364a27a19e895a40d370cb538c3"
+            "sha256": "b48ec3f26b30c4f38ebe7e61c44aa7c362a8b91c07089c40bf49a9376e9fef2f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -78,7 +78,7 @@
         "g2p-en": {
             "editable": true,
             "git": "https://github.com/stefantaubert/g2p.git",
-            "ref": "65501f5b4c67890edb9bec7ce430a2b458f7250a"
+            "ref": "a115bdf9260ae56faafafc5d64c4c85adaf07cac"
         },
         "hanzidentifier": {
             "hashes": [
@@ -93,14 +93,6 @@
             ],
             "index": "pypi",
             "version": "==5.3.0"
-        },
-        "ipapy": {
-            "hashes": [
-                "sha256:b96d0435282103c7d893c8226a458b70a810d130ce65fabe127c8a7490d1f82b",
-                "sha256:e1bc73f6a4861b9a0ff562b70b87dab8acf7a63badd98caabd6e248b3839f1c9"
-            ],
-            "index": "pypi",
-            "version": "==0.0.9.0"
         },
         "joblib": {
             "hashes": [
@@ -229,7 +221,7 @@
         "pronunciation-dict-parser": {
             "editable": true,
             "git": "https://github.com/stefantaubert/pronunciation_dict_parser.git",
-            "ref": "a1f81cf2f827652ef8faaa111fc6cd123a17819b"
+            "ref": "fbf4e2ae066445fc26349ffd1651bca87015be4c"
         },
         "pyyaml": {
             "hashes": [
@@ -312,6 +304,11 @@
             ],
             "version": "==2021.8.28"
         },
+        "sentence2pronunciation": {
+            "editable": true,
+            "git": "https://github.com/jasminsternkopf/sentence2pronunciation.git",
+            "ref": "d6a6487c72f141bfd5bb01b6a486b422708cb907"
+        },
         "tqdm": {
             "hashes": [
                 "sha256:80aead664e6c1672c4ae20dc50e1cdc5e20eeff9b14aa23ecd426375b28be588",
@@ -328,11 +325,11 @@
         },
         "unidecode": {
             "hashes": [
-                "sha256:12435ef2fc4cdfd9cf1035a1db7e98b6b047fe591892e81f34e94959591fad00",
-                "sha256:8d73a97d387a956922344f6b74243c2c6771594659778744b2dbdaad8f6b727d"
+                "sha256:9f8235681cc520912fe02e7dd73d455c2f0471f39d36485bc278b97b3e2f2390",
+                "sha256:d01b0a22f7d90dea483da658782884de5162f40359fcaf79630738db93045c84"
             ],
             "index": "pypi",
-            "version": "==1.2.0"
+            "version": "==1.3.0"
         },
         "zhon": {
             "hashes": [
@@ -417,10 +414,6 @@
             "markers": "python_version >= '3.6'",
             "version": "==8.0.1"
         },
-        "cmudict-parser": {
-            "git": "https://github.com/stefantaubert/cmudict-parser.git",
-            "ref": "8f5d1b191a41929f1ce8c7acf391c23c08d2be15"
-        },
         "colorama": {
             "hashes": [
                 "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b",
@@ -495,6 +488,11 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==1.9.0"
         },
+        "g2p-en": {
+            "editable": true,
+            "git": "https://github.com/stefantaubert/g2p.git",
+            "ref": "a115bdf9260ae56faafafc5d64c4c85adaf07cac"
+        },
         "hanzidentifier": {
             "hashes": [
                 "sha256:793a298430aa9a9d6ab344dc0ca0ab4bd1161d88c7da941d6554571093003cba"
@@ -523,14 +521,6 @@
                 "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"
             ],
             "version": "==1.1.1"
-        },
-        "ipapy": {
-            "hashes": [
-                "sha256:b96d0435282103c7d893c8226a458b70a810d130ce65fabe127c8a7490d1f82b",
-                "sha256:e1bc73f6a4861b9a0ff562b70b87dab8acf7a63badd98caabd6e248b3839f1c9"
-            ],
-            "index": "pypi",
-            "version": "==0.0.9.0"
         },
         "isort": {
             "hashes": [
@@ -685,6 +675,13 @@
             "markers": "python_version < '3.11' and python_version >= '3.7'",
             "version": "==1.21.2"
         },
+        "ordered-set": {
+            "hashes": [
+                "sha256:ba93b2df055bca202116ec44b9bead3df33ea63a7d5827ff8e16738b97f33a95"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==4.0.2"
+        },
         "orderedmultidict": {
             "hashes": [
                 "sha256:04070bbb5e87291cc9bfa51df413677faf2141c73c61d2a5f7b26bea3cd882ad",
@@ -769,6 +766,11 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==1.0.0"
+        },
+        "pronunciation-dict-parser": {
+            "editable": true,
+            "git": "https://github.com/stefantaubert/pronunciation_dict_parser.git",
+            "ref": "fbf4e2ae066445fc26349ffd1651bca87015be4c"
         },
         "py": {
             "hashes": [
@@ -1025,11 +1027,11 @@
         },
         "unidecode": {
             "hashes": [
-                "sha256:12435ef2fc4cdfd9cf1035a1db7e98b6b047fe591892e81f34e94959591fad00",
-                "sha256:8d73a97d387a956922344f6b74243c2c6771594659778744b2dbdaad8f6b727d"
+                "sha256:9f8235681cc520912fe02e7dd73d455c2f0471f39d36485bc278b97b3e2f2390",
+                "sha256:d01b0a22f7d90dea483da658782884de5162f40359fcaf79630738db93045c84"
             ],
             "index": "pypi",
-            "version": "==1.2.0"
+            "version": "==1.3.0"
         },
         "unittest2pytest": {
             "hashes": [
@@ -1054,12 +1056,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==0.5.2"
-        },
-        "wget": {
-            "hashes": [
-                "sha256:35e630eca2aa50ce998b9b1a127bb26b30dfee573702782aa982f875e3f16061"
-            ],
-            "version": "==3.2"
         },
         "wheel": {
             "hashes": [

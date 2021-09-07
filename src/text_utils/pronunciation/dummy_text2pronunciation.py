@@ -1,9 +1,10 @@
 from typing import Dict, Optional, Set, Tuple, Union
 
+from sentence2pronunciation import sentence2pronunciation
 from text_utils.types import Symbols
 
 
-def sentence2pronunciaton(sentence: str, dictionary: Dict[str, Tuple[str, ...]], trim_symb: Set[str], split_on_hyphen: bool, replace_unknown_with: Union[str, Tuple[str, ...]], consider_annotations: bool, annotation_indicator: Optional[str] = "/", use_cache: bool = True, ignore_case_in_cache: Optional[bool] = True) -> Symbols:
+def get_sentence2pronunciaton(sentence: str, dictionary: Dict[str, Tuple[str, ...]], trim_symb: Set[str], split_on_hyphen: bool, replace_unknown_with: Union[str, Tuple[str, ...]], consider_annotations: bool, annotation_indicator: Optional[str] = "/", use_cache: bool = True, ignore_case_in_cache: Optional[bool] = True) -> Symbols:
   words = sentence.split()
   result = []
   for word in words:
@@ -17,7 +18,7 @@ def sentence2pronunciaton(sentence: str, dictionary: Dict[str, Tuple[str, ...]],
   return tuple(result)
 
 
-def sentence2pronunciaton2(sentence: str, trim_symb: Set[str], split_on_hyphen: bool, lookup: Union[str, Tuple[str, ...]], consider_annotations: bool, annotation_indicator: Optional[str] = "/", use_cache: bool = True, ignore_case_in_cache: Optional[bool] = True) -> Symbols:
+def get_sentence2pronunciaton2(sentence: str, trim_symb: Set[str], split_on_hyphen: bool, lookup: Union[str, Tuple[str, ...]], consider_annotations: bool, annotation_indicator: Optional[str] = "/", use_cache: bool = True, ignore_case_in_cache: Optional[bool] = True) -> Symbols:
   words = sentence.split()
   result = []
   for word in words:

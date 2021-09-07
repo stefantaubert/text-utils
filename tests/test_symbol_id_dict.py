@@ -1,4 +1,4 @@
-from text_utils.symbol_id_dict import *
+from text_utils.symbol_id_dict import SymbolIdDict
 
 
 def test_remove_symbol_ids():
@@ -35,7 +35,7 @@ def test_get_text_from_serialized_ids():
 def test_get_text_from_ids():
   symbol_ids = SymbolIdDict.init_from_symbols({"a", "b"})
 
-  res = symbol_ids.get_text([0, 1, 1])
+  res = symbol_ids.get_text((0, 1, 1))
 
   assert res == "abb"
 

@@ -5,7 +5,7 @@ from logging import WARNING, getLogger
 from dragonmapper import hanzi
 from text_utils.pronunciation.ARPAToIPAMapper import map_arpa_to_ipa
 from text_utils.pronunciation.dummy_text2pronunciation import (
-    sentence2pronunciaton, sentence2pronunciaton2)
+    get_sentence2pronunciaton, get_sentence2pronunciaton2)
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
                                                     get_ger_epitran)
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
@@ -24,7 +24,7 @@ def __get_arpa_oov(word: str) -> Symbols:
 
 def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Symbols:
   pronunciations = get_eng_pronunciation_dict()
-  result = sentence2pronunciaton(
+  result = get_sentence2pronunciaton(
     sentence=eng_sentence,
     dictionary=pronunciations,
     annotation_indicator="/",
@@ -69,7 +69,7 @@ def __get_ger_ipa(word: str) -> Symbols:
 
 def eng_to_ipa_epitran(eng_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = sentence2pronunciaton2(
+  result = get_sentence2pronunciaton2(
     sentence=eng_sentence,
     annotation_indicator="/",
     consider_annotations=consider_annotations,
@@ -108,7 +108,7 @@ def eng_to_ipa(eng_sentence: str, consider_annotations: bool, mode: EngToIPAMode
 
 def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = sentence2pronunciaton2(
+  result = get_sentence2pronunciaton2(
     sentence=ger_sentence,
     annotation_indicator="/",
     consider_annotations=consider_annotations,
@@ -130,7 +130,7 @@ def __get_chn_ipa(word: str) -> Symbols:
 
 def chn_to_ipa(chn_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = sentence2pronunciaton2(
+  result = get_sentence2pronunciaton2(
     sentence=chn_sentence,
     annotation_indicator="/",
     consider_annotations=consider_annotations,
