@@ -7,7 +7,8 @@ from text_utils.language import Language, get_lang_from_str
 from text_utils.pronunciation import (EngToIPAMode, chn_to_ipa, eng_to_arpa,
                                       eng_to_ipa, ger_to_ipa, map_arpa_to_ipa,
                                       parse_ipa_to_symbols, remove_arcs,
-                                      remove_stress, remove_tones)
+                                      remove_stress, remove_tones,
+                                      symbols_to_ipa)
 from text_utils.speakers_dict import SpeakersDict, SpeakersLogDict
 from text_utils.symbol_format import SymbolFormat, get_format_from_str
 from text_utils.symbol_id_dict import SymbolIdDict
