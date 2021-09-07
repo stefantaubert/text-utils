@@ -2,24 +2,30 @@ from enum import IntEnum
 
 
 class Language(IntEnum):
-  IPA = 0
-  ENG = 1
-  CHN = 2
-  GER = 3
+  ENG = 0
+  CHN = 1
+  GER = 2
 
   def __repr__(self):
-    if self == self.IPA:
-      return str("ipa")
     if self == self.ENG:
-      return str("eng")
+      return str("English")
     if self == self.CHN:
-      return str("chn")
+      return str("Chinese")
     if self == self.GER:
-      return str("ger")
+      return str("German")
+    assert False
+
+  def __str__(self):
+    if self == self.ENG:
+      return str("ENG")
+    if self == self.CHN:
+      return str("CHN")
+    if self == self.GER:
+      return str("GER")
     assert False
 
 
-lang_dict = {repr(x): x for x in list(Language)}
+lang_dict = {str(x): x for x in list(Language)}
 
 
 def is_lang_from_str_supported(lang: str) -> bool:

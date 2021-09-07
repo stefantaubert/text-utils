@@ -199,7 +199,7 @@ def test_en_to_ipa__no_replace_on_cmu__raise_exception():
 
 def test_normalize_en():
   inp = "ü Hello my name is mr. test and    1 + 3 is $4. g 5e12  "
-  res = normalize_en(inp)
+  res = normalize_en_grapheme_text(inp)
   assert res == "u Hello my name is mister test and one + three is four dollars. grams five times ten to the power of twelve"
 
 
@@ -301,7 +301,7 @@ def test_ger_to_ipa():
 def test_split_chn_text():
   example_text = "This is a test。 And an other one。\nAnd a new line。\r\nAnd a line with \r。\n\nAnd a line with \n in it。 This is a question？ This is a error！"
 
-  res = split_chn_text(example_text)
+  res = split_chn_graphemes_text(example_text)
 
   assert len(res) == 7
   assert res[0] == "This is a test。"
@@ -328,7 +328,7 @@ def test_split_ipa():
 
 def test_split_en():
   example_text = "This is a test 4.000. And an other one.\nAnd a new line.\r\nAnd a line with \r.\n\nAnd a line with \n in it. This is a question? This is a error!"
-  res = split_en_text(example_text)
+  res = split_en_graphemes_text(example_text)
   assert len(res) == 7
   assert res[0] == "This is a test 4.000."
   assert res[1] == "And an other one."
@@ -342,14 +342,14 @@ def test_split_en():
 def test_split_en_north():
   # Maybe include splitting on \n
   example_text = "his cloak around him;\nand at last."
-  res = split_en_text(example_text)
+  res = split_en_graphemes_text(example_text)
   assert len(res) == 1
   assert res[0] == "his cloak around him;\nand at last."
 
 
 def test_split_ger():
   example_text = "Das ist ein Test 4.000. Und ein weiterer.\nUnd eine neue Zeile.\r\nUnd eine Zeile mit \r.\n\nUnd eine Zeile mit \n drin. Das ist eine Frage? Das ist ein Fehler!"
-  res = split_ger_text(example_text)
+  res = split_ger_graphemes_text(example_text)
   assert len(res) == 7
   assert res[0] == "Das ist ein Test 4.000."
   assert res[1] == "Und ein weiterer."

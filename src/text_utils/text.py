@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Optional
 
 from nltk import download
 from nltk.tokenize import sent_tokenize
@@ -12,6 +12,7 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
                                     replace_mail_addresses)
 from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
+from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbols
 from text_utils.utils import split_text
 
@@ -44,7 +45,7 @@ def replace_chn_punctuation_with_default_punctuation(chn_sentence: str) -> str:
   return chn_sentence
 
 
-def normalize_en(text: str) -> str:
+def normalize_en_grapheme_text(text: str) -> str:
   text = convert_to_ascii(text)
   # text = text.lower()
   # TODO datetime conversion
@@ -59,51 +60,84 @@ def normalize_en(text: str) -> str:
   return text
 
 
-def normalize_ger(text: str) -> str:
+def normalize_ger_grapheme_text(text: str) -> str:
   text = text.strip()
   text = collapse_whitespace(text)
   return text
 
 
 def normalize_ipa(text: str) -> str:
-  return text.strip()
+  text = text.strip()
+  text = collapse_whitespace(text)
+  return text
 
 
-def normalize_chn(text: str) -> str:
+def normalize_chn_grapheme_text(text: str) -> str:
   text = text.strip()
   text = collapse_whitespace(text)
   text = replace_chn_punctuation_with_default_punctuation(text)
   return text
 
 
-def text_normalize(text: str, lang: Language) -> str:
+def text_normalize(text: str, text_format: SymbolFormat, lang: Optional[Language]) -> str:
+  if text_format.is_IPA:
+    return normalize_ipa(text)
+  if text_format == SymbolFormat.PHONEMES_ARPA:
+    raise ValueError("Not supported!")
+
+  assert text_format == SymbolFormat.GRAPHEMES
+
+  if lang is None:
+    raise ValueError("Language required!")
+
   if lang == Language.ENG:
-    return normalize_en(text)
+    return normalize_en_grapheme_text(text)
 
   if lang == Language.GER:
-    return normalize_ger(text)
+    return normalize_ger_grapheme_text(text)
 
   if lang == Language.CHN:
-    return normalize_chn(text)
-
-  if lang == Language.IPA:
-    return normalize_ipa(text)
+    return normalize_chn_grapheme_text(text)
 
   assert False
 
 
-def text_to_sentences(text: str, lang: Language) -> List[str]:
-  if lang == Language.CHN:
-    return split_chn_text(text)
+def text_to_symbols(text: str, text_format: SymbolFormat, lang: Optional[Language]) -> Symbols:
+  if text_format.is_IPA:
+    return parse_ipa_to_symbols(text)
+  if text_format == SymbolFormat.PHONEMES_ARPA:
+    raise ValueError("Not supported!")
 
-  if lang == Language.IPA:
+  assert text_format == SymbolFormat.GRAPHEMES
+
+  if lang is None:
+    raise ValueError("Language required!")
+
+  if lang in {Language.ENG, Language.GER, Language.CHN}:
+    return tuple(text)
+
+  assert False
+
+
+def text_to_sentences(text: str, text_format: SymbolFormat, lang: Optional[Language]) -> List[str]:
+  if text_format.is_IPA:
     return split_ipa_text(text)
+  if text_format == SymbolFormat.PHONEMES_ARPA:
+    raise ValueError("Not supported!")
+
+  assert text_format == SymbolFormat.GRAPHEMES
+
+  if lang is None:
+    raise ValueError("Language required!")
+
+  if lang == Language.CHN:
+    return split_chn_graphemes_text(text)
 
   if lang == Language.ENG:
-    return split_en_text(text)
+    return split_en_graphemes_text(text)
 
   if lang == Language.GER:
-    return split_ger_text(text)
+    return split_ger_graphemes_text(text)
 
   assert False
 
@@ -111,25 +145,17 @@ def text_to_sentences(text: str, lang: Language) -> List[str]:
 CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]
 
 
-def split_chn_text(text: str) -> Symbols:
+def split_chn_graphemes_text(text: str) -> Symbols:
   return split_text(text, CHN_SENTENCE_SEPARATORS)
 
 
-def text_to_symbols(text: str, lang: Language) -> Symbols:
-  if lang in {Language.ENG, Language.GER, Language.CHN}:
-    return tuple(text)
-  if lang == Language.IPA:
-    return parse_ipa_to_symbols(text)
-  assert False
-
-
-def split_en_text(text: str) -> List[str]:
+def split_en_graphemes_text(text: str) -> List[str]:
   download('punkt', quiet=True)
   res = sent_tokenize(text, language="english")
   return res
 
 
-def split_ger_text(text: str) -> List[str]:
+def split_ger_graphemes_text(text: str) -> List[str]:
   download('punkt', quiet=True)
   res = sent_tokenize(text, language="german")
   return res
