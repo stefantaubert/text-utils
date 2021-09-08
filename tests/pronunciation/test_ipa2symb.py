@@ -12,10 +12,19 @@ def test_merge_left():
   assert res == ("'a", ",", "'", " ", "b",)
 
 
+def test_merge_left_abc():
+  res = merge_left((",", "abc"), merge_symbols={","}, ignore_merge_symbols={" "})
+  assert res == (",abc",)
+
+
 def test_merge_right():
   res = merge_right(tuple("'a, ,'b!"), merge_symbols={"'", "!", ","}, ignore_merge_symbols={" "})
   assert res == ("'", "a,", " ", ",", "'", "b!",)
 
+
+def test_merge_right_abc():
+  res = merge_right(("abc", ","), merge_symbols={","}, ignore_merge_symbols={" "})
+  assert res == ("abc,",)
 
 # def test_unprocessable_ipa():
 #   text = "ɡɹât͡ʃi"
