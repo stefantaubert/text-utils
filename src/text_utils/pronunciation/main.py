@@ -17,7 +17,8 @@ from text_utils.pronunciation.pronunciation_dict_cache import \
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbols
 
-IGONRE_PUNCTUATION = {".", ",", ";", "'", "\""}  # set(string.punctuation)
+#IGONRE_PUNCTUATION = {".", ",", ";", "'", "\""}
+IGONRE_PUNCTUATION = set(string.punctuation)
 
 
 def __get_arpa_oov(word: str) -> Symbols:

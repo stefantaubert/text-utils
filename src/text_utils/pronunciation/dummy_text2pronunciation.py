@@ -17,10 +17,10 @@ def get_sentence2pronunciaton(sentence: str, dictionary: Dict[str, Tuple[str, ..
   result = sentence2pronunciaton(
     sentence=sentence,
     annotation_split_symbol=annotation_indicator,
-    cons_annotation=consider_annotations,
-    get_pronun=method,
+    consider_annotation=consider_annotations,
+    get_pronunciation=method,
     split_on_hyphen=split_on_hyphen,
-    trim_symb=trim_symb,
+    trim_symbols=trim_symb,
   )
   return result
 
@@ -29,9 +29,9 @@ def get_sentence2pronunciaton2(sentence: str, trim_symb: Set[str], split_on_hyph
   result = sentence2pronunciaton(
     sentence=sentence,
     annotation_split_symbol=annotation_indicator,
-    cons_annotation=consider_annotations,
-    get_pronun=lookup,
+    consider_annotation=consider_annotations,
+    get_pronunciation=lookup,
     split_on_hyphen=split_on_hyphen,
-    trim_symb=trim_symb,
+    trim_symbols=trim_symb,
   )
   return result
