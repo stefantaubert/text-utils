@@ -13,7 +13,7 @@ def test_merge_left():
 
 
 def test_merge_right():
-  res = merge_right(tuple("'a, ,'b!"), merge_symbols={"'", "!"}, ignore_merge_symbols={" "})
+  res = merge_right(tuple("'a, ,'b!"), merge_symbols={"'", "!", ","}, ignore_merge_symbols={" "})
   assert res == ("'", "a,", " ", ",", "'", "b!",)
 
 
