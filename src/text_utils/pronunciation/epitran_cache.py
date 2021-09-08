@@ -19,7 +19,7 @@ def get_eng_epitran() -> Epitran:
 def get_ger_epitran() -> Epitran:
   # pylint: disable=global-statement
   global EPITRAN_CACHE
-  ensure_eng_epitran_is_loaded()
+  ensure_ger_epitran_is_loaded()
   return EPITRAN_CACHE[EPITRAN_GER]
 
 

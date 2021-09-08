@@ -1,5 +1,3 @@
-from logging import getLogger
-
 from text_utils.pronunciation.ipa2symb import (merge_left, merge_right,
                                                merge_together)
 

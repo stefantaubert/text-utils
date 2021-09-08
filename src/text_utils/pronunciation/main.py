@@ -5,16 +5,19 @@ from typing import Optional, Tuple
 
 from dragonmapper import hanzi
 from text_utils.language import Language
-from text_utils.pronunciation.ARPAToIPAMapper import map_arpa_to_ipa
+from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
 from text_utils.pronunciation.dummy_text2pronunciation import (
     get_sentence2pronunciaton, get_sentence2pronunciaton2)
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
                                                     get_ger_epitran)
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
+from text_utils.pronunciation.ipa2symb import parse_ipa_to_symbols
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbols
+
+IGONRE_PUNCTUATION = {".", ",", ";", "'", "\""}  # set(string.punctuation)
 
 
 def __get_arpa_oov(word: str) -> Symbols:
@@ -34,7 +37,7 @@ def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Symbols:
     consider_annotations=consider_annotations,
     replace_unknown_with=__get_arpa_oov,
     split_on_hyphen=True,
-    trim_symb=set(string.punctuation),
+    trim_symb=IGONRE_PUNCTUATION,
     use_cache=True,
     ignore_case_in_cache=True,
   )
@@ -78,7 +81,7 @@ def eng_to_ipa_epitran(eng_sentence: str, consider_annotations: bool) -> Symbols
     consider_annotations=consider_annotations,
     lookup=__get_eng_ipa,
     split_on_hyphen=True,
-    trim_symb=set(string.punctuation),
+    trim_symb=IGONRE_PUNCTUATION,
     use_cache=True,
     ignore_case_in_cache=True,
   )
@@ -89,8 +92,8 @@ def eng_to_ipa_epitran(eng_sentence: str, consider_annotations: bool) -> Symbols
 def eng_to_ipa_pronunciation_dict(eng_sentence: str, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations)
-  result_ipa = map_arpa_to_ipa(arpa_symbols, ignore={},
-                               replace_unknown=False, replace_unknown_with=None)
+  result_ipa = symbols_map_arpa_to_ipa(arpa_symbols, ignore={},
+                                       replace_unknown=False, replace_unknown_with=None)
 
   return result_ipa
 
@@ -117,7 +120,7 @@ def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
     consider_annotations=consider_annotations,
     lookup=__get_ger_ipa,
     split_on_hyphen=True,
-    trim_symb=set(string.punctuation),
+    trim_symb=IGONRE_PUNCTUATION,
     use_cache=True,
     ignore_case_in_cache=True,
   )
@@ -126,8 +129,9 @@ def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
 
 
 def __get_chn_ipa(word: str) -> Symbols:
+  # e.g. -> 北风 = peɪ˧˩˧ fɤŋ˥
   chn_ipa = hanzi.to_ipa(word)
-  ipa_symbols = tuple(chn_ipa.split(" "))
+  ipa_symbols = parse_ipa_to_symbols(chn_ipa)
   return ipa_symbols
 
 
@@ -139,33 +143,33 @@ def chn_to_ipa(chn_sentence: str, consider_annotations: bool) -> Symbols:
     consider_annotations=consider_annotations,
     lookup=__get_chn_ipa,
     split_on_hyphen=True,
-    trim_symb=set(string.punctuation),
+    trim_symb=IGONRE_PUNCTUATION,
     use_cache=False,
   )
 
   return result
 
 
+def log_and_return_exception(msg: str) -> Exception:
+  logger = getLogger(__name__)
+  logger.exception(msg)
+  return Exception(msg)
+
+
 def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, mode: Optional[EngToIPAMode], consider_ipa_annotations: Optional[bool]) -> Tuple[Symbols, SymbolFormat]:
   if symbols_format.is_IPA:
     return symbols, symbols_format
   if symbols_format == SymbolFormat.PHONEMES_ARPA:
-    raise Exception("Not supported!")
+    raise log_and_return_exception("Not supported!")
   assert symbols_format == SymbolFormat.GRAPHEMES
 
   if consider_ipa_annotations is None:
-    ex = "Please specify 'consider_ipa_annotations'."
-    logger = getLogger(__name__)
-    logger.exception(ex)
-    raise Exception(ex)
+    raise log_and_return_exception("Please specify 'consider_ipa_annotations'.")
 
   text = ''.join(symbols)
   if lang == Language.ENG:
     if mode is None:
-      ex = "Please specify the IPA conversion mode."
-      logger = getLogger(__name__)
-      logger.exception(ex)
-      raise Exception(ex)
+      raise log_and_return_exception("Please specify the IPA conversion mode.")
     new_symbols = eng_to_ipa(text, consider_ipa_annotations, mode=mode)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.GER:

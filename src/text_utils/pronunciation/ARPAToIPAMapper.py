@@ -52,6 +52,10 @@ IPA_STRESSES: Dict[str, Symbol] = {
   "2": "ˌ",
 }
 
+ALL_ARPABET_SYMBOLS_WITH_STRESS: Set[Symbol] = {
+  k + s for k in ARPABET_IPA_MAP for s in IPA_STRESSES.keys() | {""}
+}
+
 ARPABET_PATTERN: str = re.compile(r"([A-Z]+)(\d*)")
 
 
@@ -70,23 +74,33 @@ def get_ipa_mapping_with_stress(arpa_symbol: Symbol) -> Symbol:
 
 
 def has_ipa_mapping(arpa_symbol: Symbol) -> bool:
-  res = re.match(ARPABET_PATTERN, arpa_symbol)
-  return res is not None
+  return arpa_symbol in ALL_ARPABET_SYMBOLS_WITH_STRESS
+  # res = re.match(ARPABET_PATTERN, arpa_symbol)
+  # return res is not None
 
 
-def map_arpa_to_ipa(arpa_symbols: Symbols, ignore: Set[Symbol], replace_unknown: bool, replace_unknown_with: Optional[Symbol]) -> Symbols:
+def symbols_map_arpa_to_ipa(arpa_symbols: Symbols, ignore: Set[Symbol], replace_unknown: bool, replace_unknown_with: Optional[Symbol]) -> Symbols:
   ipa_symbols = []
   for arpa_symbol in arpa_symbols:
-    assert isinstance(arpa_symbol, str)
-    if has_ipa_mapping(arpa_symbol):
-      ipa_symbols.append(get_ipa_mapping_with_stress(arpa_symbol))
-    elif arpa_symbol in ignore:
-      ipa_symbols.append(arpa_symbol)
-    elif replace_unknown:
-      if replace_unknown_with is None or replace_unknown_with == "":
-        continue
-      ipa_symbols.append(replace_unknown_with)
-    else:
-      ipa_symbols.append(arpa_symbol)
-  result = tuple(ipa_symbols)
-  return result
+    new_symbol = symbol_map_arpa_to_ipa(
+      arpa_symbol=arpa_symbol,
+      ignore=ignore,
+      replace_unknown=replace_unknown,
+      replace_unknown_with=replace_unknown_with,
+    )
+    if new_symbol is not None:
+      ipa_symbols.append(new_symbol)
+  return tuple(ipa_symbols)
+
+
+def symbol_map_arpa_to_ipa(arpa_symbol: Symbol, ignore: Set[Symbol], replace_unknown: bool, replace_unknown_with: Optional[Symbol]) -> Optional[Symbol]:
+  assert isinstance(arpa_symbol, str)
+  if arpa_symbol in ignore:
+    return arpa_symbol
+  if has_ipa_mapping(arpa_symbol):
+    return get_ipa_mapping_with_stress(arpa_symbol)
+  if replace_unknown:
+    if replace_unknown_with is None or replace_unknown_with == "":
+      return None
+    return replace_unknown_with
+  return arpa_symbol

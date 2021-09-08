@@ -5,7 +5,7 @@ from text_utils.accents_dict import AccentsDict
 from text_utils.gender import Gender
 from text_utils.language import Language, get_lang_from_str
 from text_utils.pronunciation import (EngToIPAMode, chn_to_ipa, eng_to_arpa,
-                                      eng_to_ipa, ger_to_ipa, map_arpa_to_ipa,
+                                      eng_to_ipa, ger_to_ipa, symbols_map_arpa_to_ipa,
                                       parse_ipa_to_symbols, remove_arcs,
                                       remove_stress, remove_tones,
                                       symbols_to_ipa)
