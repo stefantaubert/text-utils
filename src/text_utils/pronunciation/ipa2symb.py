@@ -55,22 +55,6 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
   return all_symbols
 
 
-# def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
-#   merge_or_ignore_merge_symbols = merge_symbols.union(ignore_merge_symbols)
-#   j = 0
-#   merged_symbols = []
-#   while j < len(symbols):
-#     new_symbol = symbols[j]
-#     store_j = j
-#     j += 1
-#     if new_symbol not in merge_or_ignore_merge_symbols:
-#       merge_symbol_concat, index = get_all_next_merge_symbols(symbols[j:], merge_symbols)
-#       while j+1 < len(symbols) and symbols[j] in merge_symbols and symbols[j+1] not in merge_or_ignore_merge_symbols:
-#         new_symbol = new_symbol + symbols[j] + symbols[j+1]
-#         j += 2
-#     merged_symbols.append(new_symbol)
-#   return tuple(merged_symbols)
-
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
   merge_or_ignore_merge_symbols = merge_symbols.union(ignore_merge_symbols)
   j = 0
@@ -104,27 +88,32 @@ def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbol
   reversed_symbols = symbols[::-1]
   reversed_merged_symbols = []
   while j < len(reversed_symbols):
-    new_symbol = reversed_symbols[j]
-    j += 1
-    if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
-      while j < len(reversed_symbols) and reversed_symbols[j] in merge_symbols:
-        new_symbol = reversed_symbols[j] + new_symbol
-        j += 1
+    new_symbol, j = get_next_merged_symbol_and_index(
+      reversed_symbols, j, merge_symbols, ignore_merge_symbols, True)
     reversed_merged_symbols.append(new_symbol)
   merged_symbols = reversed_merged_symbols[::-1]
   return tuple(merged_symbols)
+
+
+def get_next_merged_symbol_and_index(symbols, j, merge_symbols, ignore_merge_symbols, from_left):
+  new_symbol = symbols[j]
+  j += 1
+  if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
+    while j < len(symbols) and symbols[j] in merge_symbols:
+      if from_left:
+        new_symbol = symbols[j] + new_symbol
+      else:
+        new_symbol += symbols[j]
+      j += 1
+  return new_symbol, j
 
 
 def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
   j = 0
   merged_symbols = []
   while j < len(symbols):
-    new_symbol = symbols[j]
-    j += 1
-    if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
-      while j < len(symbols) and symbols[j] in merge_symbols:
-        new_symbol = new_symbol + symbols[j]
-        j += 1
+    new_symbol, j = get_next_merged_symbol_and_index(
+      symbols, j, merge_symbols, ignore_merge_symbols, False)
     merged_symbols.append(new_symbol)
   return tuple(merged_symbols)
 
