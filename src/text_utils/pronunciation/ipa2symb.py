@@ -1,3 +1,4 @@
+import re
 from typing import Set
 
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, DONT_CHANGE, MERGE,
@@ -55,26 +56,39 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
 
 
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
-  # TODO
-  return symbols
+  merge_or_ignore_merge_symbols = merge_symbols.union(ignore_merge_symbols)
+  merge_or_ignore_merge_symbols_as_string = "".join(
+    str(symb) for symb in merge_or_ignore_merge_symbols)
+  merge_symbols_as_string = "".join(str(symb) for symb in merge_symbols)
+  merge_group = re.compile(
+    rf"[^{merge_or_ignore_merge_symbols_as_string}]([{merge_symbols_as_string}]+[^{merge_or_ignore_merge_symbols_as_string}])+")
+  merged_symbols = []
+  index = 0
+  while index < len(symbols):
+    symbols_from_index_on = "".join(str(symb) for symb in symbols[index:])
+    match_at_beginning = merge_group.match(symbols_from_index_on)
+    if match_at_beginning is not None:
+      merged_symbols.append(match_at_beginning.group(0))
+      index += len(merged_symbols[-1])
+    else:
+      merged_symbols.append(symbols[index])
+      index += 1
+  return tuple(merged_symbols)
+
 
 def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
+  j = 0
   symbols = symbols[::-1]
-  merged_symbols = merge_right(symbols, merge_symbols, ignore_merge_symbols)
-  return merged_symbols[::-1] #innerhalb noch reversen
-
-# def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
-#   j = 0
-#   merged_symbols = []
-#   while j < len(symbols):
-#     new_symbol = symbols[j]
-#     j += 1
-#     if new_symbol in merge_symbols:
-#       while j < len(symbols) and symbols[j] in merge_symbols:
-#         new_symbol = new_symbol + symbols[j]
-#         j += 1
-#     merged_symbols.append(new_symbol)
-#   return tuple(merged_symbols)
+  merged_symbols = []
+  while j < len(symbols):
+    new_symbol = symbols[j]
+    j += 1
+    if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
+      while j < len(symbols) and symbols[j] in merge_symbols:
+        new_symbol = symbols[j] + new_symbol
+        j += 1
+    merged_symbols.append(new_symbol)
+  return tuple(merged_symbols[::-1])
 
 
 def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
@@ -89,16 +103,6 @@ def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbo
         j += 1
     merged_symbols.append(new_symbol)
   return tuple(merged_symbols)
-
-
-# def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
-#   for index, symbol in enumerate(symbols):
-#     new_symbol = symbol
-#     if symbol not in ignore_merge_symbols and symbol not in merge_symbols:
-#       j = index + 1
-#       while symbols[j] in merge_symbols:
-#         new_symbol =
-#   return symbols
 
 
 # def is_phonetic_transcription_in_text(text: str) -> bool:
