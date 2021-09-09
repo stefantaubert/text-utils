@@ -12,6 +12,10 @@ def test_merge_together():
   res = merge_together(tuple("a&b&c&d&"), merge_symbols={"&"}, ignore_merge_symbols={"a"})
   assert res == ("a", "&", "b&c&d", "&",)
 
+def test_merge_together_double_and():
+  res = merge_together(tuple("a&b&&c&d&"), merge_symbols={"&"}, ignore_merge_symbols={"a"})
+  assert res == ("a", "&", "b&&c&d", "&",)
+
 # endregion
 
 # region iterable_to_string
