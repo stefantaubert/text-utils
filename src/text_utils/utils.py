@@ -2,6 +2,7 @@ import json
 import os
 import re
 from collections import OrderedDict
+from pathlib import Path
 from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, TypeVar
@@ -15,15 +16,15 @@ _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
 
 
-def parse_json(path: str) -> Dict:
-  assert os.path.isfile(path)
-  with open(path, 'r', encoding='utf-8') as f:
+def parse_json(path: Path) -> Dict:
+  assert path.is_file()
+  with path.open(mode='r', encoding='utf-8') as f:
     tmp = json.load(f)
   return tmp
 
 
-def save_json(path: str, mapping_dict: dict) -> None:
-  with open(path, 'w', encoding='utf-8') as f:
+def save_json(path: Path, mapping_dict: dict) -> None:
+  with path.open(mode='w', encoding='utf-8') as f:
     json.dump(mapping_dict, f, ensure_ascii=False, indent=2)
 
 
