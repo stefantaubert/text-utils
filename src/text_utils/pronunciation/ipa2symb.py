@@ -1,5 +1,5 @@
 import re
-from typing import Set
+from typing import Iterable, List, Set
 
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, DONT_CHANGE, MERGE,
                                                   PREPEND, STRESS_PRIMARY,
@@ -55,25 +55,60 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
   return all_symbols
 
 
+# def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
+#   merge_or_ignore_merge_symbols = merge_symbols.union(ignore_merge_symbols)
+#   merge_or_ignore_merge_symbols_as_string = iterable_to_string(merge_or_ignore_merge_symbols)
+#   merge_symbols_as_string = iterable_to_string(merge_symbols)
+#   merge_group = re.compile(
+#     rf"[^{merge_or_ignore_merge_symbols_as_string}]([{merge_symbols_as_string}]+[^{merge_or_ignore_merge_symbols_as_string}])+")
+#   merged_symbols = []
+#   index = 0
+#   while index < len(symbols):
+#     index, new_symbol = get_next_symbol_for_merge_together(index, symbols, merge_group)
+#     merged_symbols.append(new_symbol)
+#   return tuple(merged_symbols)
+
+
+# def get_next_symbol_for_merge_together(index, symbols, merge_group):
+#   symbols_from_index_on = iterable_to_string(symbols[index:])
+#   match_at_beginning = merge_group.match(symbols_from_index_on)
+#   if match_at_beginning is not None:
+#     new_symbol = match_at_beginning.group(0)
+#     index += len(new_symbol)
+#     return index, new_symbol
+#   return index + 1, symbols[index]
+
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
-  merge_or_ignore_merge_symbols = merge_symbols.union(ignore_merge_symbols)
-  merge_or_ignore_merge_symbols_as_string = "".join(
-    str(symb) for symb in merge_or_ignore_merge_symbols)
-  merge_symbols_as_string = "".join(str(symb) for symb in merge_symbols)
-  merge_group = re.compile(
-    rf"[^{merge_or_ignore_merge_symbols_as_string}]([{merge_symbols_as_string}]+[^{merge_or_ignore_merge_symbols_as_string}])+")
+  merge_group = get_merge_group(merge_symbols, ignore_merge_symbols)
   merged_symbols = []
   index = 0
   while index < len(symbols):
-    symbols_from_index_on = "".join(str(symb) for symb in symbols[index:])
-    match_at_beginning = merge_group.match(symbols_from_index_on)
-    if match_at_beginning is not None:
-      merged_symbols.append(match_at_beginning.group(0))
-      index += len(merged_symbols[-1])
-    else:
-      merged_symbols.append(symbols[index])
-      index += 1
+    new_symbol = get_next_symbol_for_merge_together(symbols[index:], merge_group)
+    merged_symbols.append(new_symbol)
+    index += len(new_symbol)
   return tuple(merged_symbols)
+
+
+def get_merge_group(merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]):
+  merge_or_ignore_merge_symbols = merge_symbols.union(ignore_merge_symbols)
+  merge_or_ignore_merge_symbols_as_string = re.escape(iterable_to_string(merge_or_ignore_merge_symbols))
+  merge_symbols_as_string = re.escape(iterable_to_string(merge_symbols))
+  merge_group = re.compile(
+    rf"[^{merge_or_ignore_merge_symbols_as_string}]([{merge_symbols_as_string}]+[^{merge_or_ignore_merge_symbols_as_string}])+")
+  return merge_group
+
+
+def get_next_symbol_for_merge_together(symbols, merge_group) -> Symbol:
+  symbols_from_index_on = iterable_to_string(symbols)
+  match_at_beginning = merge_group.match(symbols_from_index_on)
+  if match_at_beginning is not None:
+    new_symbol = match_at_beginning.group(0)
+    return new_symbol
+  return symbols[0]
+
+
+def iterable_to_string(iterable_symbols: Iterable[Symbol]) -> str:
+  return "".join(str(symb) for symb in iterable_symbols)
 
 
 def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
