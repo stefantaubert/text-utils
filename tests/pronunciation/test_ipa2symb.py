@@ -2,8 +2,8 @@ import re
 import string
 
 from text_utils.pronunciation.ipa2symb import (
-    get_all_next_merge_symbols, get_next_merged_symbol_and_index, merge_left,
-    merge_right, merge_together)
+    get_all_next_consecutive_merge_symbols, get_next_merged_symbol_and_index,
+    merge_left, merge_right, merge_together)
 
 # region merge_together
 
@@ -19,39 +19,44 @@ def test_merge_together_double_and():
 
 # endregion
 
-# region get_all_next_merge_symbols
+# region et_next_merged_together_symbol
+
+# endregion
+
+# region get_all_next_consecutive_merge_symbols
 
 
-def test_get_all_next_merge_symbols__first_symbol_is_merge_symbol_second_is_not():
+def test_get_all_next_consecutive_merge_symbols__first_symbol_is_merge_symbol_second_is_not():
   symbols = ("&", "a")
   merge_symbols = {"&"}
-  res_1, res_2 = get_all_next_merge_symbols(symbols, merge_symbols)
+  res_1, res_2 = get_all_next_consecutive_merge_symbols(symbols, merge_symbols)
 
   assert res_1 == "&"
   assert res_2 == 1
 
 
-def test_get_all_next_merge_symbols__first_symbol_is_not_merge_symbol():
+def test_get_all_next_consecutive_merge_symbols__first_symbol_is_not_merge_symbol():
   symbols = ("a", "&")
   merge_symbols = {"&"}
-  res_1, res_2 = get_all_next_merge_symbols(symbols, merge_symbols)
+  res_1, res_2 = get_all_next_consecutive_merge_symbols(symbols, merge_symbols)
 
   assert res_1 == ""
   assert res_2 == 0
 
 
-def test_get_all_next_merge_symbols__first_and_second_symbols_are_merge_symbols_but_third_symbol_is_not():
+def test_get_all_next_consecutive_merge_symbols__first_and_second_symbols_are_merge_symbols_but_third_symbol_is_not():
   symbols = ("&", "&", "a")
   merge_symbols = {"&"}
-  res_1, res_2 = get_all_next_merge_symbols(symbols, merge_symbols)
+  res_1, res_2 = get_all_next_consecutive_merge_symbols(symbols, merge_symbols)
 
   assert res_1 == "&&"
   assert res_2 == 2
 
-def test_get_all_next_merge_symbols__first_and_second_symbols_are_merge_symbols_third_symbol_does_not_exist():
+
+def test_get_all_next_consecutive_merge_symbols__first_and_second_symbols_are_merge_symbols_third_symbol_does_not_exist():
   symbols = ("&", "&")
   merge_symbols = {"&"}
-  res_1, res_2 = get_all_next_merge_symbols(symbols, merge_symbols)
+  res_1, res_2 = get_all_next_consecutive_merge_symbols(symbols, merge_symbols)
 
   assert res_1 == "&&"
   assert res_2 == 1
