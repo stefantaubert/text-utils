@@ -72,8 +72,11 @@ def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_sy
     merged_symbols.append(new_symbol)
   return tuple(merged_symbols)
 
+def get_next_merged_symbol():
+  pass
 
 def get_all_next_merge_symbols(symbols: Symbols, merge_symbols):
+  assert len(symbols) > 0
   merge_symbol_concat = ""
   for index, symbol in enumerate(symbols):
     if symbol in merge_symbols:
