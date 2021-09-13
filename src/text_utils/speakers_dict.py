@@ -1,4 +1,5 @@
 from collections import Counter, OrderedDict
+from pathlib import Path
 from typing import OrderedDict as OrderedDictType
 from typing import Set
 
@@ -7,7 +8,7 @@ from text_utils.utils import parse_json, save_json, switch_keys_with_values
 
 
 class SpeakersDict(OrderedDict):  # [Speaker, SpeakerId]
-  def save(self, file_path: str):
+  def save(self, file_path: Path):
     save_json(file_path, self.raw())
 
   def get_all_speakers(self) -> Speakers:
@@ -25,7 +26,7 @@ class SpeakersDict(OrderedDict):  # [Speaker, SpeakerId]
     for pop_key in pop_keys:
       self.pop(pop_key)
 
-  def get_id(self, speaker: str) -> SpeakerId:
+  def get_id(self, speaker: Speaker) -> SpeakerId:
     result = self[speaker]
     return result
 
@@ -44,7 +45,7 @@ class SpeakersDict(OrderedDict):  # [Speaker, SpeakerId]
     return cls(raw)
 
   @classmethod
-  def load(cls, file_path: str):
+  def load(cls, file_path: Path):
     data = parse_json(file_path)
     loaded = OrderedDict(data.items())
     return cls.from_raw(loaded)
@@ -56,7 +57,7 @@ class SpeakersDict(OrderedDict):  # [Speaker, SpeakerId]
 
 
 class SpeakersLogDict(OrderedDict):  # [str, int]
-  def save(self, file_path: str):
+  def save(self, file_path: Path):
     save_json(file_path, self)
 
   @classmethod

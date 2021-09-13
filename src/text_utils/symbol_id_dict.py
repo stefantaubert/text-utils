@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from pathlib import Path
 from shutil import copyfile
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Union
@@ -64,7 +65,7 @@ class SymbolIdDict():
       self._symbols_to_ids.pop(symbol_id)
     self._ids_to_symbols = switch_keys_with_values(self._symbols_to_ids)
 
-  def save(self, file_path: str):
+  def save(self, file_path: Path):
     save_json(file_path, self._ids_to_symbols)
 
   def replace_unknown_symbols_with_pad(self, symbols: Symbols, pad_symbol: Symbol) -> Symbols:
@@ -107,7 +108,7 @@ class SymbolIdDict():
     return SymbolIdDict.symbols_to_text(symbols)
 
   @classmethod
-  def load_from_file(cls, filepath: str):
+  def load_from_file(cls, filepath: Path):
     loaded = parse_json(filepath)
     loaded = OrderedDict(loaded.items())
     values = list(loaded.values())

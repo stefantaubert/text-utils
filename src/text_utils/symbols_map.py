@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from pathlib import Path
 from typing import List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Tuple
@@ -21,11 +22,11 @@ class SymbolsMap(OrderedDict):
 
     return sym_mapping
 
-  def save(self, file_path: str):
+  def save(self, file_path: Path):
     save_json(file_path, self)
 
   @classmethod
-  def load(cls, file_path: str):
+  def load(cls, file_path: Path):
     data = parse_json(file_path)
     return cls(data)
 
