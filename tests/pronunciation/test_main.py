@@ -13,30 +13,30 @@ from text_utils.symbol_format import SymbolFormat
 
 def test_eng_to_arpa():
   result = eng_to_arpa(
-    eng_sentence="This is a test.",
+    eng_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
   assert result == ('DH', 'IH0', 'S', ' ', 'IH0', 'Z', ' ', 'AH0', ' ', 'T', 'EH1', 'S', 'T', ".",)
 
 
 def test_get_arpa_oov():
-  result = __get_arpa_oov("test")
+  result = __get_arpa_oov(tuple("test"))
   assert result == ('T', 'EH1', 'S', 'T',)
 
 
 def test_get_eng_ipa():
-  result = __get_eng_ipa("test")
+  result = __get_eng_ipa(tuple("test"))
   assert result == ('t', 'ɛ', 's', 't',)
 
 
 def test__get_ger_ipa():
-  result = __get_ger_ipa("test")
+  result = __get_ger_ipa(tuple("test"))
   assert result == ('t', 'e', 's', 't',)
 
 
 def test_eng_to_ipa_epitran():
   result = eng_to_ipa_epitran(
-    eng_sentence="This is a test.",
+    eng_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
@@ -44,7 +44,7 @@ def test_eng_to_ipa_epitran():
 
 def test_eng_to_ipa_epitran__with_annotations__is_considered():
   result = eng_to_ipa_epitran(
-    eng_sentence="This /ɪz/ /ə/ə/ test.",
+    eng_sentence=tuple("This /ɪz/ /ə/ə/ test."),
     consider_annotations=True,
   )
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪz', ' ', 'ə', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
@@ -52,7 +52,7 @@ def test_eng_to_ipa_epitran__with_annotations__is_considered():
 
 def test_eng_to_ipa_pronunciation_dict():
   result = eng_to_ipa_pronunciation_dict(
-    eng_sentence="This is a test.",
+    eng_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ʌ', ' ', 't', 'ˈɛ', 's', 't', '.',)
@@ -60,7 +60,7 @@ def test_eng_to_ipa_pronunciation_dict():
 
 def test_eng_to_ipa__epitran():
   result = eng_to_ipa(
-    eng_sentence="This is a test.",
+    eng_sentence=tuple("This is a test."),
     consider_annotations=False,
     mode=EngToIPAMode.EPITRAN,
   )
@@ -69,7 +69,7 @@ def test_eng_to_ipa__epitran():
 
 def test_eng_to_ipa__librispeech():
   result = eng_to_ipa(
-    eng_sentence="This is a test.",
+    eng_sentence=tuple("This is a test."),
     consider_annotations=False,
     mode=EngToIPAMode.LIBRISPEECH,
   )
@@ -78,20 +78,20 @@ def test_eng_to_ipa__librispeech():
 
 def test_ger_to_ipa():
   result = ger_to_ipa(
-    ger_sentence="This is a test.",
+    ger_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
   assert result == ('t', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 't', 'e', 's', 't', '.',)
 
 
 def test_get_chn_ipa():
-  result = __get_chn_ipa("堡包")
+  result = __get_chn_ipa(tuple("堡包"))
   assert result == ('p', 'ɑ', 'ʊ˧˩˧', ' ', 'p', 'ɑ', 'ʊ˥',)
 
 
 def test_chn_to_ipa():
   result = chn_to_ipa(
-    chn_sentence="北 冷.",
+    chn_sentence=tuple("北 冷."),
     consider_annotations=False,
   )
   assert result == ('p', 'e', 'ɪ˧˩˧', ' ', 'l', 'ɤ', 'ŋ˧˩˧', '.',)

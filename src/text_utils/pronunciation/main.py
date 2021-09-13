@@ -1,13 +1,13 @@
 import string
 from enum import Enum
 from logging import WARNING, getLogger
-from typing import Optional, Tuple
+from typing import Optional, Set, Tuple
 
 from dragonmapper import hanzi
 from text_utils.language import Language
 from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
 from text_utils.pronunciation.dummy_text2pronunciation import (
-    get_sentence2pronunciaton, get_sentence2pronunciaton2)
+    sentence2pronunciaton, sentence2pronunciaton2)
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
                                                     get_ger_epitran)
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
@@ -15,30 +15,30 @@ from text_utils.pronunciation.ipa2symb import parse_ipa_to_symbols
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
-from text_utils.types import Symbols
+from text_utils.types import Symbol, Symbols
 
-#IGONRE_PUNCTUATION = {".", ",", ";", "'", "\""}
-IGONRE_PUNCTUATION = set(string.punctuation)
+DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
 
 
-def __get_arpa_oov(word: str) -> Symbols:
+def __get_arpa_oov(word: Symbols) -> Symbols:
   model = get_eng_g2p()
-  result = model.predict(word)
+  word_str = ''.join(word)
+  result = model.predict(word_str)
   logger = getLogger(__name__)
-  logger.info(f"Transliterated OOV word \"{word}\" to \"{''.join(result)}\".")
+  logger.info(f"Transliterated OOV word \"{word_str}\" to \"{''.join(result)}\".")
   return result
 
 
-def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Symbols:
+def eng_to_arpa(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
   pronunciations = get_eng_pronunciation_dict()
-  result = get_sentence2pronunciaton(
+  result = sentence2pronunciaton(
     sentence=eng_sentence,
     dictionary=pronunciations,
-    annotation_indicator="/",
-    consider_annotations=consider_annotations,
+    annotation_split_symbol="/",
+    consider_annotation=consider_annotations,
     replace_unknown_with=__get_arpa_oov,
     split_on_hyphen=True,
-    trim_symb=IGONRE_PUNCTUATION,
+    trim_symbols=DEFAULT_IGNORE_PUNCTUATION,
     use_cache=True,
     ignore_case_in_cache=True,
   )
@@ -46,13 +46,15 @@ def eng_to_arpa(eng_sentence: str, consider_annotations: bool) -> Symbols:
   return result
 
 
-def __get_eng_ipa(word: str) -> Symbols:
+def __get_eng_ipa(word: Symbols) -> Symbols:
+  assert isinstance(word, tuple)
   main_logger = getLogger()
   old_level = main_logger.level
   main_logger.setLevel(WARNING)
 
   epi_instance = get_eng_epitran()
-  result = epi_instance.transliterate(word)
+  word_str = ''.join(word)
+  result = epi_instance.transliterate(word_str)
 
   main_logger.setLevel(old_level)
 
@@ -60,13 +62,15 @@ def __get_eng_ipa(word: str) -> Symbols:
   return result_tuple
 
 
-def __get_ger_ipa(word: str) -> Symbols:
+def __get_ger_ipa(word: Symbols) -> Symbols:
+  assert isinstance(word, tuple)
   main_logger = getLogger()
   old_level = main_logger.level
   main_logger.setLevel(WARNING)
 
   epi_instance = get_ger_epitran()
-  result = epi_instance.transliterate(word)
+  word_str = ''.join(word)
+  result = epi_instance.transliterate(word_str)
 
   main_logger.setLevel(old_level)
 
@@ -74,15 +78,15 @@ def __get_ger_ipa(word: str) -> Symbols:
   return result_tuple
 
 
-def eng_to_ipa_epitran(eng_sentence: str, consider_annotations: bool) -> Symbols:
+def eng_to_ipa_epitran(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = get_sentence2pronunciaton2(
+  result = sentence2pronunciaton2(
     sentence=eng_sentence,
     annotation_indicator="/",
     consider_annotations=consider_annotations,
     lookup=__get_eng_ipa,
     split_on_hyphen=True,
-    trim_symb=IGONRE_PUNCTUATION,
+    trim_symb=DEFAULT_IGNORE_PUNCTUATION,
     use_cache=True,
     ignore_case_in_cache=True,
   )
@@ -90,7 +94,7 @@ def eng_to_ipa_epitran(eng_sentence: str, consider_annotations: bool) -> Symbols
   return result
 
 
-def eng_to_ipa_pronunciation_dict(eng_sentence: str, consider_annotations: bool) -> Symbols:
+def eng_to_ipa_pronunciation_dict(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations)
   result_ipa = symbols_map_arpa_to_ipa(arpa_symbols, ignore={},
@@ -104,24 +108,23 @@ class EngToIPAMode(Enum):
   EPITRAN = 1
 
 
-def eng_to_ipa(eng_sentence: str, consider_annotations: bool, mode: EngToIPAMode) -> Symbols:
+def eng_to_ipa(eng_sentence: Symbols, consider_annotations: bool, mode: EngToIPAMode) -> Symbols:
   if mode == EngToIPAMode.EPITRAN:
     return eng_to_ipa_epitran(eng_sentence, consider_annotations)
-  elif mode == EngToIPAMode.LIBRISPEECH:
+  if mode == EngToIPAMode.LIBRISPEECH:
     return eng_to_ipa_pronunciation_dict(eng_sentence, consider_annotations)
-  else:
-    assert False
+  assert False
 
 
-def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
+def ger_to_ipa(ger_sentence: Symbols, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = get_sentence2pronunciaton2(
+  result = sentence2pronunciaton2(
     sentence=ger_sentence,
     annotation_indicator="/",
     consider_annotations=consider_annotations,
     lookup=__get_ger_ipa,
     split_on_hyphen=True,
-    trim_symb=IGONRE_PUNCTUATION,
+    trim_symb=DEFAULT_IGNORE_PUNCTUATION,
     use_cache=True,
     ignore_case_in_cache=True,
   )
@@ -129,23 +132,26 @@ def ger_to_ipa(ger_sentence: str, consider_annotations: bool) -> Symbols:
   return result
 
 
-def __get_chn_ipa(word: str) -> Symbols:
+def __get_chn_ipa(word: Symbols) -> Symbols:
   # e.g. -> 北风 = peɪ˧˩˧ fɤŋ˥
-  chn_ipa = hanzi.to_ipa(word)
+  assert isinstance(word, tuple)
+  word_str = ''.join(word)
+  chn_ipa = hanzi.to_ipa(word_str)
   ipa_symbols = parse_ipa_to_symbols(chn_ipa)
   return ipa_symbols
 
 
-def chn_to_ipa(chn_sentence: str, consider_annotations: bool) -> Symbols:
+def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = get_sentence2pronunciaton2(
+  result = sentence2pronunciaton2(
     sentence=chn_sentence,
     annotation_indicator="/",
     consider_annotations=consider_annotations,
     lookup=__get_chn_ipa,
     split_on_hyphen=True,
-    trim_symb=IGONRE_PUNCTUATION,
+    trim_symb=DEFAULT_IGNORE_PUNCTUATION,
     use_cache=False,
+    ignore_case_in_cache=True,
   )
 
   return result
@@ -167,17 +173,16 @@ def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Languag
   if consider_ipa_annotations is None:
     raise log_and_return_exception("Please specify 'consider_ipa_annotations'.")
 
-  text = ''.join(symbols)
   if lang == Language.ENG:
     if mode is None:
       raise log_and_return_exception("Please specify the IPA conversion mode.")
-    new_symbols = eng_to_ipa(text, consider_ipa_annotations, mode=mode)
+    new_symbols = eng_to_ipa(symbols, consider_ipa_annotations, mode=mode)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.GER:
-    new_symbols = ger_to_ipa(text, consider_ipa_annotations)
+    new_symbols = ger_to_ipa(symbols, consider_ipa_annotations)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.CHN:
-    new_symbols = chn_to_ipa(text, consider_ipa_annotations)
+    new_symbols = chn_to_ipa(symbols, consider_ipa_annotations)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   assert False
 
