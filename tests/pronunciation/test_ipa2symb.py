@@ -118,8 +118,8 @@ def test_merge_left():
 
 
 def test_merge_left_abc():
-  res = merge_left((",", "abc"), merge_symbols={","}, ignore_merge_symbols={" "})
-  assert res == (",abc",)
+  res = merge_left((",", "abc", ","), merge_symbols={","}, ignore_merge_symbols={" "})
+  assert res == (",abc", ",")
 
 # endregion
 
@@ -132,8 +132,8 @@ def test_merge_right():
 
 
 def test_merge_right_abc():
-  res = merge_right(("abc", ","), merge_symbols={","}, ignore_merge_symbols={" "})
-  assert res == ("abc,",)
+  res = merge_right((",", "abc", ","), merge_symbols={","}, ignore_merge_symbols={" "})
+  assert res == (",", "abc,",)
 
 # endregion
 
