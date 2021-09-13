@@ -1,5 +1,6 @@
 import os
 import tempfile
+from pathlib import Path
 
 from text_utils.symbol_id_dict import SymbolIdDict
 from text_utils.symbols_map import SymbolsMap, create_or_update_inference_map
@@ -104,6 +105,7 @@ def test_update_existing_to_mappings_ignores_mapping_with_empty_symbol():
 
 #   res = update_map(old_map, new_map)
 
+
 #   self.assertEqual("c", new_map["a"])
 #   self.assertEqual("a", new_map["b"])
 #   self.assertEqual("x", new_map["d"])
@@ -113,7 +115,7 @@ def test_update_existing_to_mappings_ignores_mapping_with_empty_symbol():
 
 
 def test_save_load_symbols_map():
-  path = tempfile.mktemp()
+  path = Path(tempfile.mktemp())
   symbols_map = SymbolsMap({
     "b": "a",
     "c": "b",

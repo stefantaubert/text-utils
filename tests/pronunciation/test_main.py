@@ -86,7 +86,7 @@ def test_ger_to_ipa():
 
 def test_get_chn_ipa():
   result = __get_chn_ipa("堡包")
-  assert result == ('p', 'ɑ', 'ʊ', '˧', '˩', '˧', ' ', 'p', 'ɑ', 'ʊ', '˥',)
+  assert result == ('p', 'ɑ', 'ʊ˧˩˧', ' ', 'p', 'ɑ', 'ʊ˥',)
 
 
 def test_chn_to_ipa():
@@ -94,7 +94,7 @@ def test_chn_to_ipa():
     chn_sentence="北 冷.",
     consider_annotations=False,
   )
-  assert result == ('p', 'e', 'ɪ', '˧', '˩', '˧', ' ', 'l', 'ɤ', 'ŋ', '˧', '˩', '˧', '.',)
+  assert result == ('p', 'e', 'ɪ˧˩˧', ' ', 'l', 'ɤ', 'ŋ˧˩˧', '.',)
 
 
 def test_symbols_to_ipa__convert_arpa__raises_exception():
