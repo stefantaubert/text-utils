@@ -14,7 +14,7 @@ from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbols
-from text_utils.utils import split_text
+from text_utils.utils import split_text, symbols_split
 
 CHN_MAPPINGS = [
   (r"。", "."),
@@ -140,6 +140,10 @@ def text_to_sentences(text: str, text_format: SymbolFormat, lang: Optional[Langu
     return split_ger_graphemes_text(text)
 
   assert False
+
+
+def symbols_to_words(symbols: Symbols) -> List[Symbols]:
+  return symbols_split(symbols, " ")
 
 
 CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]

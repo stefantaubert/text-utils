@@ -85,7 +85,8 @@ class SymbolIdDict():
     return False
 
   def get_ids(self, symbols: Symbols) -> SymbolIds:
-    ids = tuple(self.get_id(symbol) for symbol in symbols)
+    """Returns the Ids of symbols. If a symbol does not exist then None is inserted."""
+    ids = tuple(self.get_id(symbol) if self.symbol_exists(symbol) else None for symbol in symbols)
     return ids
 
   def get_serialized_ids(self, symbols: Symbols) -> str:

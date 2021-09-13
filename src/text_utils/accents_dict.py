@@ -27,7 +27,7 @@ class AccentsDict():
     return accent_id in self._ids_to_accents.values()
 
   def get_id(self, accent: Accent) -> AccentId:
-    assert accent in self._ids_to_accents.keys()
+    assert accent in self._ids_to_accents
     return self._ids_to_accents[accent]
 
   def get_accent(self, accent_id: AccentId) -> str:
@@ -49,7 +49,8 @@ class AccentsDict():
     return set(self._ids_to_accents.values())
 
   def get_ids(self, accents: Accents) -> AccentIds:
-    ids = tuple(self.get_id(accent) for accent in accents)
+    ids = tuple(self.get_id(accent)
+                if accent in self._ids_to_accents else None for accent in accents)
     return ids
 
   def get_accents(self, accent_ids: Union[str, AccentIds]) -> Accents:
