@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from pathlib import Path
 from typing import OrderedDict as OrderedDictType
 from typing import Set, Union
 
@@ -12,7 +13,7 @@ class AccentsDict():
     super().__init__()
     self._ids_to_accents = ids_to_accents
 
-  def save(self, file_path: str):
+  def save(self, file_path: Path):
     save_json(file_path, self._ids_to_accents)
 
   @classmethod
@@ -25,7 +26,7 @@ class AccentsDict():
   def id_exists(self, accent_id: AccentId) -> bool:
     return accent_id in self._ids_to_accents.values()
 
-  def get_id(self, accent: str) -> AccentId:
+  def get_id(self, accent: Accent) -> AccentId:
     assert accent in self._ids_to_accents.keys()
     return self._ids_to_accents[accent]
 
@@ -67,7 +68,7 @@ class AccentsDict():
     return len(self._ids_to_accents)
 
   @classmethod
-  def load(cls, file_path: str):
+  def load(cls, file_path: Path):
     data = parse_json(file_path)
     loaded = OrderedDict(data.items())
     return cls.from_raw(loaded)
