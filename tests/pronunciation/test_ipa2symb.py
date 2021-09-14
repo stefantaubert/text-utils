@@ -5,6 +5,13 @@ from text_utils.pronunciation.ipa2symb import (
     get_all_next_consecutive_merge_symbols, get_next_merged_left_or_right_symbol_and_index, get_next_merged_together_symbol_and_index,
     merge_left, merge_right, merge_together)
 
+# region merge_fusion
+
+def test_merge_fusion():
+  symbols = ("a", "b", "e", "f", )
+
+# endregion
+
 # region merge_together
 
 

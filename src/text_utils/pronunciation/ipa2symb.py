@@ -58,8 +58,45 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
 
 
 def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
-  # TODO
-  return symbols
+  aux_symbols = list(symbols)
+  fused_symbols = []
+  while len(aux_symbols) != 0:
+    next_fused_symbols = get_next_fused_symbols(symbols, fusion_symbols)
+    fused_symbols.append(next_fused_symbols)
+    del aux_symbols[:len(next_fused_symbols)]
+  return tuple(fused_symbols)
+
+def get_next_fused_symbols(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
+  if symbols[0] not in fusion_symbols:
+    return symbols[0]
+  
+  symbols_of_same_type_as_first_symbol = get_symbols_of_same_type_as_first_symbol(
+    symbols, fusion_symbols)
+  next_fused_symbols = get_next_symbols_of_same_type(symbols, symbols_of_same_type_as_first_symbol)
+  return tuple(next_fused_symbols)
+
+# def get_next_fused_symbols(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
+#   symbols_of_same_type_as_first_symbol = get_symbols_of_same_type_as_first_symbol(
+#     symbols, fusion_symbols)
+#   next_fused_symbols = get_next_symbols_of_same_type(symbols, symbols_of_same_type_as_first_symbol)
+#   return tuple(next_fused_symbols)
+
+
+def get_next_symbols_of_same_type(symbols: Symbols, symbols_of_same_type: Set[Symbol]) -> Symbols:
+  consecutive_same_type_symbols = []
+  for symbol in symbols:
+    if symbol in symbols_of_same_type:
+      consecutive_same_type_symbols.append(symbol)
+    else:
+      break
+  return consecutive_same_type_symbols
+
+
+def get_symbols_of_same_type_as_first_symbol(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
+  if symbols[0] in fusion_symbols:
+    return fusion_symbols
+  not_fusion_symbols_in_symbols = set(symbols) - fusion_symbols
+  return not_fusion_symbols_in_symbols
 
 
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
