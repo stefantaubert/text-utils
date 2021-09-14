@@ -177,3 +177,4 @@ def _apply_template_map(template_map, dest_map, orig) -> Tuple[SymbolsMap, List[
   #   logger.info("There were no new symbols in the destination symbol set.")
   dest_map = sort_map_after_map_from_symbol(dest_map)
   return dest_map, get_sorted_list_from_set(orig)
+

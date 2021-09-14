@@ -2,6 +2,9 @@ from text_utils.accent_symbols import (get_accent_symbol_id,
                                        get_accent_symbol_ids,
                                        get_accent_symbols_count, get_symbol_id)
 from text_utils.accents_dict import AccentsDict
+from text_utils.cli_core import (INFERENCE_ARROW_TYPE, WEIGHTS_ARROW_TYPE,
+                                 change_symbols_in_map, print_map,
+                                 print_symbols)
 from text_utils.gender import Gender
 from text_utils.language import (Language, get_lang_from_str,
                                  is_lang_from_str_supported)
