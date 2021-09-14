@@ -2,9 +2,10 @@ import re
 from typing import Iterable, List, Set, Tuple
 
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, DONT_CHANGE, MERGE,
-                                                  PREPEND, STRESS_PRIMARY,
+                                                  PREPEND, SCHWAS,
+                                                  STRESS_PRIMARY,
                                                   STRESS_SECONDARY, TIE_ABOVE,
-                                                  TIE_BELOW, TONES)
+                                                  TIE_BELOW, TONES, VOWELS)
 from text_utils.types import Symbol, Symbols
 from text_utils.utils import remove_symbols_at_all_places
 
@@ -49,10 +50,16 @@ def remove_stress(symbols: Symbols) -> Symbols:
 
 def parse_ipa_to_symbols(sentence: str) -> Symbols:
   all_symbols = tuple(sentence)
+  all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
   all_symbols = merge_together(all_symbols, merge_symbols=MERGE, ignore_merge_symbols=DONT_CHANGE)
   all_symbols = merge_left(all_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE)
   all_symbols = merge_right(all_symbols, merge_symbols=APPENDIX, ignore_merge_symbols=DONT_CHANGE)
   return all_symbols
+
+
+def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
+  # TODO
+  return symbols
 
 
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
