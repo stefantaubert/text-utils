@@ -5,7 +5,7 @@ from logging import WARNING, getLogger
 from typing import Dict, Optional, Set, Tuple
 
 from dragonmapper import hanzi
-from sentence2pronunciation import sentence2pronunciation_cached
+from sentence2pronunciation import clear_cache, sentence2pronunciation_cached
 from text_utils.language import Language
 from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
@@ -17,6 +17,11 @@ from text_utils.pronunciation.pronunciation_dict_cache import \
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbol, Symbols
 from text_utils.utils import symbols_to_upper
+
+
+def clear_ipa_cache():
+  clear_cache()
+
 
 DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
 ANNOTATION_SPLIT_SYMBOL = "/"
@@ -144,6 +149,7 @@ def __get_chn_ipa(word: Symbols) -> Symbols:
   assert isinstance(word, tuple)
   word_str = ''.join(word)
   chn_ipa = hanzi.to_ipa(word_str)
+  # TODO move tones to vowels/diphtongs
   ipa_symbols = parse_ipa_to_symbols(chn_ipa)
   return ipa_symbols
 
