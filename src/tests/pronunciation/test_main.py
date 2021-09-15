@@ -1,5 +1,6 @@
 
 import pytest
+from sentence2pronunciation import clear_cache
 from text_utils.language import Language
 from text_utils.pronunciation.main import (EngToIPAMode, __get_arpa_oov,
                                            __get_chn_ipa, __get_eng_ipa,
@@ -16,21 +17,29 @@ def test_eng_to_arpa():
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
+
+  clear_cache()
   assert result == ('DH', 'IH0', 'S', ' ', 'IH0', 'Z', ' ', 'AH0', ' ', 'T', 'EH1', 'S', 'T', ".",)
 
 
 def test_get_arpa_oov():
   result = __get_arpa_oov(tuple("test"))
+
+  clear_cache()
   assert result == ('T', 'EH1', 'S', 'T',)
 
 
 def test_get_eng_ipa():
   result = __get_eng_ipa(tuple("test"))
+
+  clear_cache()
   assert result == ('t', 'ɛ', 's', 't',)
 
 
 def test__get_ger_ipa():
   result = __get_ger_ipa(tuple("test"))
+
+  clear_cache()
   assert result == ('t', 'e', 's', 't',)
 
 
@@ -39,6 +48,8 @@ def test_eng_to_ipa_epitran():
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
+
+  clear_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
 
 
@@ -47,6 +58,8 @@ def test_eng_to_ipa_epitran__with_annotations__is_considered():
     eng_sentence=tuple("This /ɪz/ /ə/ə/ test."),
     consider_annotations=True,
   )
+
+  clear_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪz', ' ', 'ə', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
 
 
@@ -55,6 +68,8 @@ def test_eng_to_ipa_pronunciation_dict():
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
+
+  clear_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ʌ', ' ', 't', 'ˈɛ', 's', 't', '.',)
 
 
@@ -64,6 +79,8 @@ def test_eng_to_ipa__epitran():
     consider_annotations=False,
     mode=EngToIPAMode.EPITRAN,
   )
+
+  clear_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
 
 
@@ -73,6 +90,8 @@ def test_eng_to_ipa__librispeech():
     consider_annotations=False,
     mode=EngToIPAMode.LIBRISPEECH,
   )
+
+  clear_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ʌ', ' ', 't', 'ˈɛ', 's', 't', '.',)
 
 
@@ -81,11 +100,15 @@ def test_ger_to_ipa():
     ger_sentence=tuple("This is a test."),
     consider_annotations=False,
   )
+
+  clear_cache()
   assert result == ('t', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 't', 'e', 's', 't', '.',)
 
 
 def test_get_chn_ipa():
   result = __get_chn_ipa(tuple("堡包"))
+
+  clear_cache()
   assert result == ('p', 'ɑʊ˧˩˧', ' ', 'p', 'ɑʊ˥',)
 
 
@@ -94,6 +117,8 @@ def test_chn_to_ipa():
     chn_sentence=tuple("北 冷."),
     consider_annotations=False,
   )
+
+  clear_cache()
   assert result == ('p', 'eɪ˧˩˧', ' ', 'l', 'ɤ', 'ŋ˧˩˧', '.',)
 
 
@@ -139,6 +164,7 @@ def test_symbols_to_ipa__convert_english_graphemes():
     symbols_format=SymbolFormat.GRAPHEMES,
   )
 
+  clear_cache()
   assert result_symbols == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
   assert result_format == SymbolFormat.PHONEMES_IPA
 
@@ -152,6 +178,7 @@ def test_symbols_to_ipa__convert_ipa__returns_ipa():
     symbols_format=SymbolFormat.PHONES_IPA,
   )
 
+  clear_cache()
   assert result_symbols == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.',)
   assert result_format == SymbolFormat.PHONES_IPA
 
