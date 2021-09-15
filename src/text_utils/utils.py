@@ -7,6 +7,8 @@ from typing import Dict, List
 from typing import OrderedDict as OrderedDictType
 from typing import Set, TypeVar
 
+from pronunciation_dict_parser import PronunciationDict
+
 from text_utils.types import Symbol, Symbols
 
 T = TypeVar('T')
@@ -14,6 +16,13 @@ T = TypeVar('T')
 
 _T1 = TypeVar("_T1")
 _T2 = TypeVar("_T2")
+
+
+def pronunciation_dict_to_tuple_dict(pronunciation_dict: PronunciationDict) -> Dict[Symbols, Symbols]:
+  result = {
+    tuple(key.upper()): value for key, value in pronunciation_dict.items()
+  }
+  return result
 
 
 def parse_json(path: Path) -> Dict:
@@ -157,6 +166,11 @@ def symbols_strip(symbols: Symbols, strip: Set[Symbol]) -> Symbols:
 
 def symbols_to_lower(symbols: Symbols) -> Symbols:
   res = tuple(symbol.lower() for symbol in symbols)
+  return res
+
+
+def symbols_to_upper(symbols: Symbols) -> Symbols:
+  res = tuple(symbol.upper() for symbol in symbols)
   return res
 
 

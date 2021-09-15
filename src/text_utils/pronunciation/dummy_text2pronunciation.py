@@ -2,12 +2,13 @@ from functools import partial
 from typing import Callable, Dict, Optional, Set
 
 from sentence2pronunciation import \
-    sentence2pronunciaton as sentence2pronunciaton_orig
+    sentence2pronunciation as sentence2pronunciaton_orig
 from sentence2pronunciation.core import Pronunciation, Symbol
+from text_utils.utils import symbols_to_upper
 
 
-def lookup_dict(word: str, dictionary: Dict[Pronunciation, Pronunciation], replace_unknown_with: Callable[[Pronunciation], Pronunciation]) -> Pronunciation:
-  word_upper = word.upper()
+def lookup_dict(word: Pronunciation, dictionary: Dict[Pronunciation, Pronunciation], replace_unknown_with: Callable[[Pronunciation], Pronunciation]) -> Pronunciation:
+  word_upper = symbols_to_upper(word)
   if word_upper in dictionary:
     return dictionary[word_upper][0]
   return replace_unknown_with(word)
