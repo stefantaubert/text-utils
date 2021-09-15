@@ -58,8 +58,32 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
 
 
 def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
-  # TODO
-  return symbols
+  aux_symbols = list(symbols)
+  fused_symbols = []
+  while len(aux_symbols) != 0:
+    next_fused_symbols, processed_index = get_next_fused_symbols_and_index(aux_symbols, fusion_symbols)
+    fused_symbols.append(next_fused_symbols)
+    del aux_symbols[:processed_index + 1]
+  return tuple(fused_symbols)
+
+
+def get_next_fused_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Tuple[Symbols, int]:
+  if symbols[0] not in fusion_symbols:
+    return symbols[0], 0
+  fused_fusion_symbols, processed_index = get_next_consecutive_fusion_symbols_and_index(symbols, fusion_symbols)
+  return fused_fusion_symbols, processed_index
+
+
+def get_next_consecutive_fusion_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Tuple[Symbols, int]:
+  consecutive_fusion_symbols = symbols[0]
+  processed_index = 0
+  for symbol in symbols[1:]:
+    if symbol in fusion_symbols:
+      consecutive_fusion_symbols += symbol
+      processed_index += 1
+    else:
+      break
+  return consecutive_fusion_symbols, processed_index
 
 
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:

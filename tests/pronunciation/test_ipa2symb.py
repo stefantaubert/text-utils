@@ -2,8 +2,26 @@ import re
 import string
 
 from text_utils.pronunciation.ipa2symb import (
-    get_all_next_consecutive_merge_symbols, get_next_merged_left_or_right_symbol_and_index, get_next_merged_together_symbol_and_index,
+    get_all_next_consecutive_merge_symbols, get_next_merged_left_or_right_symbol_and_index, get_next_merged_together_symbol_and_index, merge_fusion,
     merge_left, merge_right, merge_together)
+
+# region merge_fusion
+
+def test_merge_fusion():
+  symbols = ("a", "b", "ef", "g")
+  fusion_symbols = {"a", "b"}
+  res = merge_fusion(symbols, fusion_symbols)
+
+  assert res == ("ab", "ef", "g")
+
+def test_merge_fusion_2():
+  symbols = ("b", "ef","a", "a",  "g")
+  fusion_symbols = {"a", "b"}
+  res = merge_fusion(symbols, fusion_symbols)
+
+  assert res == ("b", "ef", "aa", "g")
+
+# endregion
 
 # region merge_together
 
