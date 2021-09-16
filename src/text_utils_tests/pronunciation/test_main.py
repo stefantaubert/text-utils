@@ -113,6 +113,13 @@ def test_get_chn_ipa():
   assert result == ('p', 'ɑʊ˧˩˧', 'p', 'ɑʊ˥',)
 
 
+def test_get_chn_ipa__syllable_without_vowel():
+  result = __get_chn_ipa(tuple("儿"))
+
+  clear_cache()
+  assert result == ('ɻ',)
+
+
 def test_get_vowel_count__two():
   result = get_vowel_count(
     symbols=("a", "b", "aa",),

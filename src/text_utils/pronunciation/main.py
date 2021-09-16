@@ -177,10 +177,13 @@ def __get_chn_ipa(word: Symbols) -> Symbols:
   for syllable in syllables:
     chn_syllable_ipa, chn_tone_ipa = split_into_ipa_and_tones(syllable)
     assert syllable.endswith(chn_tone_ipa)
-    syllabel_ipa_symbols = parse_ipa_to_symbols(chn_syllable_ipa)
-    assert get_vowel_count(syllabel_ipa_symbols) == 1
+    syllable_ipa_symbols = parse_ipa_to_symbols(chn_syllable_ipa)
+    syllable_vowel_count = get_vowel_count(syllable_ipa_symbols)
+    assert chn_tone_ipa == "" or syllable_vowel_count == 1
+    if syllable_vowel_count == 0:
+      assert syllable == "ɻ"
     syllabel_ipa_symbols_with_tones = tuple(
-      symbol + chn_tone_ipa if is_vowel(symbol) else symbol for symbol in syllabel_ipa_symbols)
+      symbol + chn_tone_ipa if is_vowel(symbol) else symbol for symbol in syllable_ipa_symbols)
     result.extend(syllabel_ipa_symbols_with_tones)
   return tuple(result)
 
