@@ -12,6 +12,7 @@ from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
                                                     get_ger_epitran)
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
 from text_utils.pronunciation.ipa2symb import parse_ipa_to_symbols
+from text_utils.pronunciation.ipa_symbols import SCHWAS, TONES, VOWELS
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
@@ -144,14 +145,44 @@ def ger_to_ipa(ger_sentence: Symbols, consider_annotations: bool) -> Symbols:
   return result
 
 
+def split_into_ipa_and_tones(word: str) -> Tuple[str, str]:
+  word_ipa = ""
+  word_tones = ""
+  for character in word:
+    if character in TONES:
+      word_tones += character
+    else:
+      word_ipa += character
+  return word_ipa, word_tones
+
+
+def is_vowel(symbol: Symbol) -> bool:
+  vowels = VOWELS | SCHWAS
+  result = all(sub_symbol in vowels for sub_symbol in tuple(symbol))
+  return result
+
+
+def get_vowel_count(symbols: Symbols) -> int:
+  result = sum(1 if is_vowel(symbol) else 0 for symbol in symbols)
+  return result
+
+
 def __get_chn_ipa(word: Symbols) -> Symbols:
   # e.g. -> 北风 = peɪ˧˩˧ fɤŋ˥
   assert isinstance(word, tuple)
   word_str = ''.join(word)
-  chn_ipa = hanzi.to_ipa(word_str)
-  # TODO move tones to vowels/diphtongs
-  ipa_symbols = parse_ipa_to_symbols(chn_ipa)
-  return ipa_symbols
+  chn_ipa = hanzi.to_ipa(word_str, delimiter=" ")
+  syllables = chn_ipa.split(" ")
+  result = []
+  for syllable in syllables:
+    chn_syllable_ipa, chn_tone_ipa = split_into_ipa_and_tones(syllable)
+    assert syllable.endswith(chn_tone_ipa)
+    syllabel_ipa_symbols = parse_ipa_to_symbols(chn_syllable_ipa)
+    assert get_vowel_count(syllabel_ipa_symbols) == 1
+    syllabel_ipa_symbols_with_tones = tuple(
+      symbol + chn_tone_ipa if is_vowel(symbol) else symbol for symbol in syllabel_ipa_symbols)
+    result.extend(syllabel_ipa_symbols_with_tones)
+  return tuple(result)
 
 
 def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool) -> Symbols:
