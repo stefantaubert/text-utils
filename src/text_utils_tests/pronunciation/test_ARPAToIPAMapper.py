@@ -1,68 +1,27 @@
-from text_utils.pronunciation.ARPAToIPAMapper import (
-    get_ipa_mapping_with_stress, has_ipa_mapping, symbol_map_arpa_to_ipa,
-    symbols_map_arpa_to_ipa)
+from text_utils.pronunciation.arpa_symbols import ALL_ARPA_INCL_STRESSES
+from text_utils.pronunciation.ARPAToIPAMapper import (__ARPABET_IPA_MAP,
+                                                      symbol_map_arpa_to_ipa,
+                                                      symbols_map_arpa_to_ipa)
+
+
+def test_all_arpa_symbols_are_mapped():
+  assert __ARPABET_IPA_MAP.keys() == ALL_ARPA_INCL_STRESSES
 
 
 def test_UH():
-  inp = "UH"
-  res = get_ipa_mapping_with_stress(inp)
-  assert res == "ʊ"
+  assert __ARPABET_IPA_MAP["UH"] == "ʊ"
 
 
 def test_UH0():
-  inp = "UH0"
-  res = get_ipa_mapping_with_stress(inp)
-
-  assert res == "ʊ"
+  assert __ARPABET_IPA_MAP["UH0"] == "ʊ"
 
 
 def test_UH1():
-  inp = "UH1"
-  res = get_ipa_mapping_with_stress(inp)
-
-  assert res == "ˈʊ"
+  assert __ARPABET_IPA_MAP["UH1"] == "ˈʊ"
 
 
 def test_UH2():
-  inp = "UH2"
-  res = get_ipa_mapping_with_stress(inp)
-
-  assert res == "ˌʊ"
-
-
-def test_has_ipa_mapping__valid_symbol_no_stress__is_true():
-  result = has_ipa_mapping("UH")
-  assert result
-
-
-def test_has_ipa_mapping__valid_symbol_zero_stress__is_true():
-  result = has_ipa_mapping("UH0")
-  assert result
-
-
-def test_has_ipa_mapping__valid_symbol_primary_stress__is_true():
-  result = has_ipa_mapping("UH1")
-  assert result
-
-
-def test_has_ipa_mapping__valid_symbol_secondary_stress__is_true():
-  result = has_ipa_mapping("UH2")
-  assert result
-
-
-def test_has_ipa_mapping__valid_symbol_double_secondary_stress__is_false():
-  result = has_ipa_mapping("UH22")
-  assert not result
-
-
-def test_has_ipa_mapping__not_valid_entry():
-  result = has_ipa_mapping("ABC")
-  assert not result
-
-
-def test_has_ipa_mapping__not_valid_entry_with_stress():
-  result = has_ipa_mapping("ABC1")
-  assert not result
+  assert __ARPABET_IPA_MAP["UH2"] == "ˌʊ"
 
 
 def test_map_arpa_to_ipa_component_test():

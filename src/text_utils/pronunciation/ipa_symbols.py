@@ -6,12 +6,12 @@ STRESS_SECONDARY = "\u02CC"  # ˌ
 LONG = "\u02D0"  # ː
 HALF_LONG = "\u02D1"  # eˑ
 EXTRA_SHORT = "\u0306"  # ə̆
-NASAL = "\u0303"  # ẽ
+NASAL = "\u0303"  # ẽ ɾ̃
 RAISED = "\u031D"  # r̝
 TIE_ABOVE = "\u0361"  # ͡
 TIE_BELOW = "\u035C"  # ͜
 
-SYLLABIC = "\u0329"
+SYLLABIC = "\u0329"  # n̩
 NON_SYLLABIC = "\u032F"
 
 BREAK_SYLLABLE = "."
@@ -177,6 +177,7 @@ CONSONANTS = {
   "h",
   "ɦ",
   "w",
+  "ʍ",
   "ʋ",
   "ɹ",
   "ɻ",
