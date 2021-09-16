@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+text-utils = {editable = true, path = "."}
 autopep8 = "*"
 pylint = "*"
 pycodestyle = "*"
@@ -11,7 +12,6 @@ isort = "*"
 pipenv-setup = "*"
 rope = "*"
 pytest = "*"
-text-utils = {editable = true, path = "."}
 unittest2pytest = "*"
 pytest-xdist = "*"
 
