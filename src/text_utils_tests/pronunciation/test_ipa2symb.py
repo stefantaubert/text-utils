@@ -33,6 +33,12 @@ def test_is_n_thong__dipthong__is_true():
   assert result
 
 
+def test_is_n_thong__dipthong_with_tones__is_true():
+  result = is_n_thong("aa˦˦")
+
+  assert result
+
+
 def test_is_n_thong__double_consonant__is_false():
   result = is_n_thong("bb")
 
@@ -45,6 +51,12 @@ def test_is_n_thong__single_vowel__is_false():
   assert not result
 
 
+def test_is_n_thong__single_vowel_with_tone__is_false():
+  result = is_n_thong("a˦")
+
+  assert not result
+
+
 def test_is_n_thong__single_consonant__is_false():
   result = is_n_thong("b")
 
@@ -53,10 +65,10 @@ def test_is_n_thong__single_consonant__is_false():
 
 def test_break_n_thongs__component_test():
   result = break_n_thongs(
-    symbols=("aa", "b", "aə"),
+    symbols=("aa˦˦", "b˦", "ˈaə", "˦a", "˦aa", "a\u0361aa"),
   )
 
-  assert result == ("a", "a", "b", "a", "ə",)
+  assert result == ("a", "a˦˦", "b˦", "ˈa", "ə", "˦a", "˦", "a", "a", "a\u0361a", "a")
 
 # region merge_fusion
 

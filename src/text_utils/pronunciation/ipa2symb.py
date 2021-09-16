@@ -1,8 +1,9 @@
 import re
 from typing import Iterable, List, Set, Tuple
 
-from text_utils.pronunciation.ipa_symbols import (APPENDIX, DONT_CHANGE, MERGE,
-                                                  PREPEND, SCHWAS,
+from text_utils.pronunciation.ipa_symbols import (APPENDIX, CHARACTERS,
+                                                  CONSONANTS, DONT_CHANGE,
+                                                  MERGE, PREPEND, SCHWAS,
                                                   STRESS_PRIMARY,
                                                   STRESS_SECONDARY, TIE_ABOVE,
                                                   TIE_BELOW, TONES, VOWELS)
@@ -39,6 +40,12 @@ def break_n_thongs(symbols: Symbols) -> Symbols:
     symbol_is_n_thong = is_n_thong(symbol)
     if symbol_is_n_thong:
       sub_symbols = tuple(symbol)
+      # TODO maybe merge stress to first vowel in n-thong in chinese
+      sub_symbols = merge_together(sub_symbols, merge_symbols=MERGE,
+                                   ignore_merge_symbols=DONT_CHANGE)
+      sub_symbols = merge_left(sub_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE)
+      sub_symbols = merge_right(sub_symbols, merge_symbols=APPENDIX,
+                                ignore_merge_symbols=DONT_CHANGE)
       result.extend(sub_symbols)
     else:
       result.append(symbol)
@@ -47,14 +54,16 @@ def break_n_thongs(symbols: Symbols) -> Symbols:
 
 
 def is_n_thong(symbol: Symbol) -> bool:
-  if len(symbol) <= 1:
+  sub_symbols = tuple(symbol)
+  sub_characters = tuple(symbol for symbol in sub_symbols if symbol in CHARACTERS)
+
+  if len(sub_characters) <= 1:
     return False
 
   n_thong_symbols = VOWELS | SCHWAS
 
-  sub_symbols = tuple(symbol)
   all_sub_symbols_are_n_thong_symbol = all(
-    sub_symbol in n_thong_symbols for sub_symbol in sub_symbols)
+    sub_character in n_thong_symbols for sub_character in sub_characters)
 
   return all_sub_symbols_are_n_thong_symbol
 
