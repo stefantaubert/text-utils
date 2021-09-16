@@ -1,7 +1,62 @@
 from text_utils.utils import (delete_and_insert_in_list, is_sublist,
                               symbols_join, symbols_replace, symbols_split,
-                              symbols_strip, symbols_to_lower,
+                              symbols_strip, symbols_to_lower, split_symbols_on,
                               upper_list_if_true)
+
+
+
+def test_split_symbols_on__separates_inside_split():
+  result = split_symbols_on(
+    symbols=("aa", "a-b", "bb",),
+    split_symbols={"-"},
+  )
+
+  assert result == ("aa", "a", "b", "bb",)
+
+
+def test_split_symbols_on__ignores_standalone_split_symbols():
+  result = split_symbols_on(
+    symbols=("aa", "-", "bb",),
+    split_symbols={"-"},
+  )
+
+  assert result == ("aa", "bb",)
+
+
+def test_split_symbols_on__empty_input():
+  result = split_symbols_on(
+    symbols=(),
+    split_symbols={"-"},
+  )
+
+  assert result == ()
+
+
+def test_split_symbols_on__split_on_right():
+  result = split_symbols_on(
+    symbols=("aa", "a-", "bb",),
+    split_symbols={"-"},
+  )
+
+  assert result == ("aa", "a", "bb",)
+
+
+def test_split_symbols_on__split_on_left():
+  result = split_symbols_on(
+    symbols=("aa", "-a", "bb",),
+    split_symbols={"-"},
+  )
+
+  assert result == ("aa", "a", "bb",)
+
+
+def test_split_symbols_on__separates_escapes_char():
+  result = split_symbols_on(
+    symbols=("aa", "a?b", "bb",),
+    split_symbols={"?"},
+  )
+
+  assert result == ("aa", "a", "b", "bb",)
 
 
 def test_sentence_to_words__empty_list():

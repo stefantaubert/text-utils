@@ -130,6 +130,24 @@ def remove_symbols_at_all_places(symbols: Symbols, ignore: Set[Symbol]) -> Symbo
   return symbols
 
 
+def split_symbols_on(symbols: Symbols, split_symbols: Set[Symbol]) -> Symbols:
+  split_symbols_escaped = {re.escape(arc) for arc in split_symbols}
+  pattern = re.compile('|'.join(split_symbols_escaped))
+  result = []
+  for symbol in symbols:
+    symbols_replaced = re.split(pattern, symbol)
+    symbols_replaced = remove_empty_symbols(symbols_replaced)
+    result.extend(symbols_replaced)
+  new_symbols = tuple(result)
+  return new_symbols
+
+
+def remove_empty_symbols(symbols: Symbols) -> Symbols:
+  new_symbols = [
+      replaced_symbol for replaced_symbol in symbols if replaced_symbol != ""]
+  return new_symbols
+
+
 def symbols_split(sentence_symbols: Symbols, split_symbol: Symbol) -> List[Symbols]:
   if len(sentence_symbols) == 0:
     return []

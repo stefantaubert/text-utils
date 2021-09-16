@@ -8,7 +8,7 @@ from text_utils.cli_core import (INFERENCE_ARROW_TYPE, WEIGHTS_ARROW_TYPE,
 from text_utils.gender import Gender
 from text_utils.language import (Language, get_lang_from_str,
                                  is_lang_from_str_supported)
-from text_utils.pronunciation import (EngToIPAMode, chn_to_ipa,
+from text_utils.pronunciation import (EngToIPAMode, chn_to_ipa,break_n_thongs,
                                       clear_ipa_cache, eng_to_arpa, eng_to_ipa,
                                       ger_to_ipa, parse_ipa_to_symbols,
                                       remove_arcs, remove_stress, remove_tones,

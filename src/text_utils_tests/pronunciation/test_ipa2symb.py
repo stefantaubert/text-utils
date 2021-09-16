@@ -1,11 +1,65 @@
-import re
-import string
-
 from text_utils.pronunciation.ipa2symb import (
-    get_all_next_consecutive_merge_symbols, get_next_merged_left_or_right_symbol_and_index, get_next_merged_together_symbol_and_index, merge_fusion,
-    merge_left, merge_right, merge_together)
+    break_n_thongs, get_all_next_consecutive_merge_symbols,
+    get_next_merged_left_or_right_symbol_and_index,
+    get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
+    merge_left, merge_right, merge_together, remove_arcs)
+
+
+def test_remove_arcs__empty_input():
+  result = remove_arcs(
+    symbols=(),
+  )
+
+  assert result == ()
+
+
+def test_remove_arcs__component_tests():
+  result = remove_arcs(
+    symbols=("aa", "t͡ʃ", "t\u035Cʃ", "t", "\u0361", "ʃ", "t͡", "ʃ", "\u0361ʃ",),
+  )
+
+  assert result == ("aa", "t", "ʃ", "t", "ʃ", "t", "ʃ", "t", "ʃ", "ʃ",)
+
+
+def test_is_n_thong__tripthong__is_true():
+  result = is_n_thong("aaa")
+
+  assert result
+
+
+def test_is_n_thong__dipthong__is_true():
+  result = is_n_thong("aa")
+
+  assert result
+
+
+def test_is_n_thong__double_consonant__is_false():
+  result = is_n_thong("bb")
+
+  assert not result
+
+
+def test_is_n_thong__single_vowel__is_false():
+  result = is_n_thong("a")
+
+  assert not result
+
+
+def test_is_n_thong__single_consonant__is_false():
+  result = is_n_thong("b")
+
+  assert not result
+
+
+def test_break_n_thongs__component_test():
+  result = break_n_thongs(
+    symbols=("aa", "b", "aə"),
+  )
+
+  assert result == ("a", "a", "b", "a", "ə",)
 
 # region merge_fusion
+
 
 def test_merge_fusion():
   symbols = ("a", "b", "ef", "g")
@@ -14,8 +68,9 @@ def test_merge_fusion():
 
   assert res == ("ab", "ef", "g")
 
+
 def test_merge_fusion_2():
-  symbols = ("b", "ef","a", "a",  "g")
+  symbols = ("b", "ef", "a", "a", "g")
   fusion_symbols = {"a", "b"}
   res = merge_fusion(symbols, fusion_symbols)
 
@@ -44,43 +99,52 @@ def test_get_next_merged_together_symbol_and_index__whole_symbols_merged_togethe
   symbols = ("a", "&", "&", "b")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  res_1, res_2 = get_next_merged_together_symbol_and_index(symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
+  res_1, res_2 = get_next_merged_together_symbol_and_index(
+    symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
 
   assert res_1 == "a&&b"
   assert res_2 == 4
+
 
 def test_get_next_merged_together_symbol_and_index__not_merged_together_because_of_ignore_merge_symbol_after_merge_symbol():
   symbols = ("a", "&", " ")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  res_1, res_2 = get_next_merged_together_symbol_and_index(symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
+  res_1, res_2 = get_next_merged_together_symbol_and_index(
+    symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
 
   assert res_1 == "a"
   assert res_2 == 1
+
 
 def test_get_next_merged_together_symbol_and_index__not_merged_together_because_of_ignore_merge_symbol_for_merge_symbol():
   symbols = (" ", "&", "a")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  res_1, res_2 = get_next_merged_together_symbol_and_index(symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
+  res_1, res_2 = get_next_merged_together_symbol_and_index(
+    symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
 
   assert res_1 == " "
   assert res_2 == 1
+
 
 def test_get_next_merged_together_symbol_and_index__not_merged_together_because_no_symbol_after_merge_symbols():
   symbols = ("a", "&", "&")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  res_1, res_2 = get_next_merged_together_symbol_and_index(symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
+  res_1, res_2 = get_next_merged_together_symbol_and_index(
+    symbols, 0, merge_symbols, merge_symbols.union(ignore_merge_symbols))
 
   assert res_1 == "a"
   assert res_2 == 1
+
 
 def test_get_next_merged_together_symbol_and_index__consider_last_element():
   symbols = ("a", "&", "b")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  res_1, res_2 = get_next_merged_together_symbol_and_index(symbols, 2, merge_symbols, merge_symbols.union(ignore_merge_symbols))
+  res_1, res_2 = get_next_merged_together_symbol_and_index(
+    symbols, 2, merge_symbols, merge_symbols.union(ignore_merge_symbols))
 
   assert res_1 == "b"
   assert res_2 == 3

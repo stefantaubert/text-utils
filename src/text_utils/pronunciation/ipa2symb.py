@@ -7,7 +7,8 @@ from text_utils.pronunciation.ipa_symbols import (APPENDIX, DONT_CHANGE, MERGE,
                                                   STRESS_SECONDARY, TIE_ABOVE,
                                                   TIE_BELOW, TONES, VOWELS)
 from text_utils.types import Symbol, Symbols
-from text_utils.utils import remove_symbols_at_all_places
+from text_utils.utils import (remove_symbols_at_all_places, split_symbols_on,
+                              symbols_ignore)
 
 # _rx = '[{}]'.format(re.escape(string.punctuation))
 # https://www.internationalphoneticalphabet.org/ipa-charts/ipa-symbols-with-unicode-decimal-and-hex-codes/
@@ -32,20 +33,45 @@ from text_utils.utils import remove_symbols_at_all_places
 #   result = chr(int(hex_number, base=16))
 #   return result
 
+def break_n_thongs(symbols: Symbols) -> Symbols:
+  result = []
+  for symbol in symbols:
+    symbol_is_n_thong = is_n_thong(symbol)
+    if symbol_is_n_thong:
+      sub_symbols = tuple(symbol)
+      result.extend(sub_symbols)
+    else:
+      result.append(symbol)
+  new_symbols = tuple(result)
+  return new_symbols
+
+
+def is_n_thong(symbol: Symbol) -> bool:
+  if len(symbol) <= 1:
+    return False
+
+  n_thong_symbols = VOWELS | SCHWAS
+
+  sub_symbols = tuple(symbol)
+  all_sub_symbols_are_n_thong_symbol = all(
+    sub_symbol in n_thong_symbols for sub_symbol in sub_symbols)
+
+  return all_sub_symbols_are_n_thong_symbol
+
 
 def remove_arcs(symbols: Symbols) -> Symbols:
-  symbols = remove_symbols_at_all_places(symbols, ignore={TIE_ABOVE, TIE_BELOW})
-  return symbols
+  new_symbols = split_symbols_on(symbols, split_symbols={TIE_ABOVE, TIE_BELOW})
+  return new_symbols
 
 
 def remove_tones(symbols: Symbols) -> Symbols:
-  symbols = remove_symbols_at_all_places(symbols, ignore=TONES)
-  return symbols
+  new_symbols = remove_symbols_at_all_places(symbols, ignore=TONES)
+  return new_symbols
 
 
 def remove_stress(symbols: Symbols) -> Symbols:
-  symbols = remove_symbols_at_all_places(symbols, ignore={STRESS_PRIMARY, STRESS_SECONDARY})
-  return symbols
+  new_symbols = remove_symbols_at_all_places(symbols, ignore={STRESS_PRIMARY, STRESS_SECONDARY})
+  return new_symbols
 
 
 def parse_ipa_to_symbols(sentence: str) -> Symbols:
