@@ -30,10 +30,10 @@ ANNOTATION_SPLIT_SYMBOL = "/"
 def __get_arpa_oov(word: Symbols) -> Symbols:
   model = get_eng_g2p()
   word_str = ''.join(word)
-  result = model.predict(word_str)
+  oov_arpa = model.predict(word_str)
   logger = getLogger(__name__)
-  logger.info(f"Transliterated OOV word \"{word_str}\" to \"{''.join(result)}\".")
-  return result
+  logger.info(f"Transliterated OOV word \"{word_str}\" to \"{' '.join(oov_arpa)}\".")
+  return oov_arpa
 
 
 def lookup_dict(word: Symbols, dictionary: Dict[Symbols, Symbols]) -> Symbols:
