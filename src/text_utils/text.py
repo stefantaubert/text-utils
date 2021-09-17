@@ -1,4 +1,3 @@
-import re
 from typing import List, Optional
 
 from nltk import download
@@ -13,7 +12,7 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
 from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
 from text_utils.symbol_format import SymbolFormat
-from text_utils.types import Symbol, Symbols
+from text_utils.types import Symbols
 from text_utils.utils import split_text, symbols_split
 
 IPA_SENTENCE_SEPARATORS = [r"\?", r"\!", r"\."]
@@ -28,13 +27,13 @@ def normalize_en_grapheme_text(text: str) -> str:
   # text = text.lower()
   # TODO datetime conversion
   text = text.strip()
+  text = collapse_whitespace(text)
   text = normalize_numbers(text)
   text = expand_abbreviations(text)
   text = expand_units_of_measure(text)
   text = replace_big_letter_abbreviations(text)
   text = replace_mail_addresses(text)
   text = replace_at_symbols(text)
-  text = collapse_whitespace(text)
   return text
 
 
