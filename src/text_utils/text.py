@@ -13,36 +13,14 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
 from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
 from text_utils.symbol_format import SymbolFormat
-from text_utils.types import Symbols
+from text_utils.types import Symbol, Symbols
 from text_utils.utils import split_text, symbols_split
 
-CHN_MAPPINGS = [
-  (r"。", "."),
-  (r"？", "?"),
-  (r"！", "!"),
-  (r"，", ","),
-  (r"：", ":"),
-  (r"；", ";"),
-  (r"「", "\""),
-  (r"」", "\""),
-  (r"『", "\""),
-  (r"』", "\""),
-  (r"、", ",")
-]
-
-CHN_SUBS = [(re.compile(regex_pattern), replace_with)
-            for regex_pattern, replace_with in CHN_MAPPINGS]
 IPA_SENTENCE_SEPARATORS = [r"\?", r"\!", r"\."]
 
 
 def split_ipa_text(text: str) -> List[str]:
   return split_text(text, IPA_SENTENCE_SEPARATORS)
-
-
-def replace_chn_punctuation_with_default_punctuation(chn_sentence: str) -> str:
-  for regex, replacement in CHN_SUBS:
-    chn_sentence = re.sub(regex, replacement, chn_sentence)
-  return chn_sentence
 
 
 def normalize_en_grapheme_text(text: str) -> str:
@@ -75,7 +53,6 @@ def normalize_ipa(text: str) -> str:
 def normalize_chn_grapheme_text(text: str) -> str:
   text = text.strip()
   text = collapse_whitespace(text)
-  text = replace_chn_punctuation_with_default_punctuation(text)
   return text
 
 

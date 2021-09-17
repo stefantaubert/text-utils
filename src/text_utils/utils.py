@@ -95,6 +95,39 @@ def select_enties_from_ordereddict(select_from: OrderedDictType[_T1, _T2], keys:
   return res
 
 
+def symbols_map(symbols: Symbols, mapping: Dict[Symbol, Symbol]) -> Symbols:
+  new_symbols = symbols_map_outer(symbols, mapping)
+  new_symbols = symbols_map_inner(new_symbols, mapping)
+  return new_symbols
+
+
+def symbols_map_outer(symbols: Symbols, mapping: Dict[Symbol, Symbol]) -> Symbols:
+  result = []
+  for symbol in symbols:
+    if symbol in mapping:
+      result.append(mapping[symbol])
+    else:
+      result.append(symbol)
+  new_symbols = tuple(result)
+  return new_symbols
+
+
+def symbols_map_inner(symbols: Symbols, mapping: Dict[Symbol, Symbol]) -> Symbols:
+  result = []
+  for symbol in symbols:
+    new_symbol = text_apply_mapping(symbol, mapping)
+    result.append(new_symbol)
+  new_symbols = tuple(result)
+  return new_symbols
+
+
+def text_apply_mapping(text: str, mapping: Dict[str, str]) -> str:
+  new_text = text
+  for regex, replacement in mapping.items():
+    new_text = re.sub(re.escape(regex), replacement, new_text)
+  return new_text
+
+
 def split_text(text: str, separators: List[str]) -> List[str]:
   pattern = "|".join(separators)
   sents = re.split(f'({pattern})', text)
@@ -107,6 +140,21 @@ def split_text(text: str, separators: List[str]) -> List[str]:
   res = [x.strip() for x in res]
   res = [x for x in res if x]
   return res
+
+
+def remove_space_around_punctuation(symbols: Symbols, space: Set[Symbol], punctuation: Set[Symbol]) -> Symbols:
+  result = []
+  for i, current_symbol in enumerate(symbols):
+    previous_symbol = symbols[i - 1] if i - 1 >= 0 else None
+    next_symbol = symbols[i + 1] if i + 1 < len(symbols) else None
+    if current_symbol in space:
+      if next_symbol is not None and next_symbol in punctuation:
+        continue
+      if previous_symbol is not None and previous_symbol in punctuation:
+        continue
+    result.append(current_symbol)
+  new_symbols = tuple(result)
+  return new_symbols
 
 
 def symbols_ignore(symbols: Symbols, ignore: Set[Symbol]) -> Symbols:

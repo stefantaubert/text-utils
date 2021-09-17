@@ -4,28 +4,33 @@ from functools import partial
 from logging import WARNING, getLogger
 from typing import Dict, Optional, Set, Tuple
 
-from dragonmapper import hanzi
 from sentence2pronunciation import clear_cache, sentence2pronunciation_cached
 from text_utils.language import Language
 from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
+from text_utils.pronunciation.chinese_ipa import chn_to_ipa
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
                                                     get_ger_epitran)
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
-from text_utils.pronunciation.ipa2symb import parse_ipa_to_symbols
-from text_utils.pronunciation.ipa_symbols import SCHWAS, TONES, VOWELS
+from text_utils.pronunciation.ipa2symb import \
+    break_n_thongs as break_n_thongs_method
+from text_utils.pronunciation.ipa2symb import (parse_ipa_to_symbols,
+                                               remove_arcs, remove_stress,
+                                               remove_tones)
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbol, Symbols
+from text_utils.utils import \
+    remove_space_around_punctuation as remove_space_around_punctuation_method
 from text_utils.utils import symbols_to_upper
+
+DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
+DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL: Set[Symbol] = {".", ",", ";", "?", "!"}
+ANNOTATION_SPLIT_SYMBOL: Symbol = "/"
 
 
 def clear_ipa_cache():
   clear_cache()
-
-
-DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
-ANNOTATION_SPLIT_SYMBOL = "/"
 
 
 def __get_arpa_oov(word: Symbols) -> Symbols:
@@ -145,64 +150,6 @@ def ger_to_ipa(ger_sentence: Symbols, consider_annotations: bool) -> Symbols:
   return result
 
 
-def split_into_ipa_and_tones(word: str) -> Tuple[str, str]:
-  word_ipa = ""
-  word_tones = ""
-  for character in word:
-    if character in TONES:
-      word_tones += character
-    else:
-      word_ipa += character
-  return word_ipa, word_tones
-
-
-def is_vowel(symbol: Symbol) -> bool:
-  vowels = VOWELS | SCHWAS
-  result = all(sub_symbol in vowels for sub_symbol in tuple(symbol))
-  return result
-
-
-def get_vowel_count(symbols: Symbols) -> int:
-  result = sum(1 if is_vowel(symbol) else 0 for symbol in symbols)
-  return result
-
-
-def __get_chn_ipa(word: Symbols) -> Symbols:
-  # e.g. -> 北风 = peɪ˧˩˧ fɤŋ˥
-  assert isinstance(word, tuple)
-  word_str = ''.join(word)
-  chn_ipa = hanzi.to_ipa(word_str, delimiter=" ")
-  syllables = chn_ipa.split(" ")
-  result = []
-  for syllable in syllables:
-    chn_syllable_ipa, chn_tone_ipa = split_into_ipa_and_tones(syllable)
-    assert syllable.endswith(chn_tone_ipa)
-    syllable_ipa_symbols = parse_ipa_to_symbols(chn_syllable_ipa)
-    syllable_vowel_count = get_vowel_count(syllable_ipa_symbols)
-    assert chn_tone_ipa == "" or syllable_vowel_count == 1
-    if syllable_vowel_count == 0:
-      assert syllable == "ɻ"
-    syllabel_ipa_symbols_with_tones = tuple(
-      symbol + chn_tone_ipa if is_vowel(symbol) else symbol for symbol in syllable_ipa_symbols)
-    result.extend(syllabel_ipa_symbols_with_tones)
-  return tuple(result)
-
-
-def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool) -> Symbols:
-  #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  result = sentence2pronunciation_cached(
-    sentence=chn_sentence,
-    annotation_split_symbol=ANNOTATION_SPLIT_SYMBOL,
-    consider_annotation=consider_annotations,
-    get_pronunciation=__get_chn_ipa,
-    split_on_hyphen=True,
-    trim_symbols=DEFAULT_IGNORE_PUNCTUATION,
-    ignore_case_in_cache=True,
-  )
-
-  return result
-
-
 def log_and_return_exception(msg: str) -> Exception:
   logger = getLogger(__name__)
   logger.exception(msg)
@@ -228,9 +175,34 @@ def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Languag
     new_symbols = ger_to_ipa(symbols, consider_ipa_annotations)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.CHN:
-    new_symbols = chn_to_ipa(symbols, consider_ipa_annotations)
+    new_symbols = chn_to_ipa(symbols, consider_ipa_annotations, ANNOTATION_SPLIT_SYMBOL)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   assert False
+
+
+def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool, remove_space_around_punctuation: bool) -> Symbols:
+  new_symbols = symbols
+
+  if ignore_arcs:
+    new_symbols = remove_arcs(new_symbols)
+
+  if ignore_tones:
+    new_symbols = remove_tones(new_symbols)
+
+  if ignore_stress:
+    new_symbols = remove_stress(new_symbols)
+
+  if break_n_thongs:
+    new_symbols = break_n_thongs_method(new_symbols)
+
+  if remove_space_around_punctuation:
+    new_symbols = remove_space_around_punctuation_method(
+      symbols=symbols,
+      punctuation=DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL,
+      space={" "},
+    )
+
+  return new_symbols
 
 
 # def merge_symbols(pronunciation: Symbols, merge_at: Symbol, merge_on_symbols: Set[Symbol]) -> Symbols:

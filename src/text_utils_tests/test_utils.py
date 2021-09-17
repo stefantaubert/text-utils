@@ -1,8 +1,66 @@
 from text_utils.utils import (delete_and_insert_in_list, is_sublist,
-                              symbols_join, symbols_replace, symbols_split,
-                              symbols_strip, symbols_to_lower, split_symbols_on,
-                              upper_list_if_true)
+                              remove_space_around_punctuation,
+                              split_symbols_on, symbols_join, symbols_map_outer,
+                              symbols_replace, symbols_split, symbols_strip,
+                              symbols_to_lower, upper_list_if_true)
 
+
+def test_symbols_map():
+  result = symbols_map_outer(
+    symbols=("a", "b", "c"),
+    mapping={"a": "A", "b": "B"},
+  )
+  assert result == ("A", "B", "c")
+
+
+def test_remove_space_around_punctuation__empty_input():
+  result = remove_space_around_punctuation(
+    symbols=(),
+    space={},
+    punctuation={},
+  )
+
+  assert result == ()
+
+
+def test_remove_space_around_punctuation__before_and_after_space():
+  result = remove_space_around_punctuation(
+    symbols=("a", " ", ".", " ", "b"),
+    space={" "},
+    punctuation={"."},
+  )
+
+  assert result == ("a", ".", "b")
+
+
+def test_remove_space_around_punctuation__multiple_punctuation_is_considered():
+  result = remove_space_around_punctuation(
+    symbols=("a", ".", " ", "b", "?", " ", "!", "c"),
+    space={" "},
+    punctuation={".", "?", "!"},
+  )
+
+  assert result == ("a", ".", "b", "?", "!", "c")
+
+
+def test_remove_space_around_punctuation__multiple_space_is_considered():
+  result = remove_space_around_punctuation(
+    symbols=("a", " ", ".", "\t", "b"),
+    space={" ", "\t"},
+    punctuation={"."},
+  )
+
+  assert result == ("a", ".", "b")
+
+
+def test_remove_space_around_punctuation__removes_only_one_space():
+  result = remove_space_around_punctuation(
+    symbols=("a", " ", " ", ".", " ", " ", "b"),
+    space={" "},
+    punctuation={"."},
+  )
+
+  assert result == ("a", " ", ".", " ", "b")
 
 
 def test_split_symbols_on__separates_inside_split():
