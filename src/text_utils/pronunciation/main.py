@@ -21,8 +21,6 @@ from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbol, Symbols
-from text_utils.utils import \
-    remove_space_around_punctuation as remove_space_around_punctuation_method
 from text_utils.utils import symbols_to_upper
 
 DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
@@ -182,7 +180,7 @@ def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Languag
   assert False
 
 
-def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool, remove_space_around_punctuation: bool) -> Symbols:
+def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool) -> Symbols:
   new_symbols = symbols
 
   if ignore_arcs:
@@ -196,13 +194,6 @@ def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_s
 
   if break_n_thongs:
     new_symbols = break_n_thongs_method(new_symbols)
-
-  if remove_space_around_punctuation:
-    new_symbols = remove_space_around_punctuation_method(
-      symbols=symbols,
-      punctuation=DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL,
-      space={" "},
-    )
 
   return new_symbols
 

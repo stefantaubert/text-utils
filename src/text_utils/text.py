@@ -13,15 +13,23 @@ from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbol, Symbols
-from text_utils.utils import (remove_empty_symbols, split_text,
-                              symbols_separate, symbols_split, symbols_strip)
+from text_utils.utils import remove_empty_symbols
+from text_utils.utils import \
+    remove_space_around_punctuation as remove_space_around_punctuation_method
+from text_utils.utils import (split_text, symbols_separate, symbols_split,
+                              symbols_strip)
 
 IPA_SENTENCE_SEPARATORS = {"?", "!", "."}
-CHN_SENTENCE_SEPARATORS = {"？", "！", "。"}
+CHN_SENTENCE_SEPARATORS = {"?", "!", ".", "？", "！", "。"}
+
+DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL_GER: Set[Symbol] = {".", ",", ";", "?", "!"}
+DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL_ENG: Set[Symbol] = {".", ",", ";", "?", "!"}
+DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL_CHN: Set[Symbol] = {
+  ".", ",", ";", "?", "!", "。", "，", "；", "？", "！", "、"}
 
 
 def split_ipa_text(text: str) -> List[str]:
-  # TODO seperate not split!
+  # TODO separate not split!
   raise Exception()
   return split_text(text, IPA_SENTENCE_SEPARATORS)
 
@@ -109,6 +117,28 @@ def text_to_symbols(text: str, text_format: SymbolFormat, lang: Optional[Languag
     return tuple(text)
 
   assert False
+
+
+def change_symbols(symbols: Symbols, remove_space_around_punctuation: bool, lang: Language) -> Symbols:
+  new_symbols = symbols
+  if remove_space_around_punctuation:
+    remove_punctuation = ""
+    if lang == Language.GER:
+      remove_punctuation = DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL_GER
+    elif lang == Language.ENG:
+      remove_punctuation = DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL_ENG
+    elif lang == Language.CHN:
+      remove_punctuation = DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL_CHN
+    else:
+      assert False
+
+    new_symbols = remove_space_around_punctuation_method(
+      symbols=symbols,
+      punctuation=remove_punctuation,
+      space={" "},
+    )
+
+  return new_symbols
 
 
 def text_to_sentences(text: str, text_format: SymbolFormat, lang: Optional[Language]) -> List[str]:
