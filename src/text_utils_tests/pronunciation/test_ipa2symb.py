@@ -2,7 +2,8 @@ from text_utils.pronunciation.ipa2symb import (
     break_n_thongs, get_all_next_consecutive_merge_symbols,
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
-    merge_left, merge_right, merge_together, remove_arcs)
+    merge_left, merge_right, merge_template, merge_together, remove_arcs,
+    split_string_to_tuple)
 
 
 def test_remove_arcs__empty_input():
@@ -69,6 +70,95 @@ def test_break_n_thongs__component_test():
   )
 
   assert result == ("a", "a˦˦", "b˦", "ˈa", "ə", "˦a", "˦", "a", "a", "a\u0361a", "a")
+
+# region split_string_to_tuple
+
+
+def test_split_string_to_tuple():
+  string_of_symbols = " abc   def "  # 3 Leerzeichen in Mitte
+  split_symbol = " "
+  res = split_string_to_tuple(string_of_symbols, split_symbol)
+
+  assert res == ("abc", " ", "def")
+
+
+def test_split_string_to_tuple2():
+  string_of_symbols = "abc   def"  # 3 Leerzeichen in Mitte
+  split_symbol = " "
+  res = split_string_to_tuple(string_of_symbols, split_symbol)
+
+  assert res == ("abc", " ", "def")
+
+
+def test_split_string_to_tuple__two_split_symbols_in_middle():
+  string_of_symbols = "abc  def"  # 3 Leerzeichen in Mitte
+  split_symbol = " "
+  res = split_string_to_tuple(string_of_symbols, split_symbol)
+
+  assert res == ("abc", " def")
+
+
+def test_split_string_to_tuple__four_split_symbols_in_middle():
+  string_of_symbols = "abc    def"  # 3 Leerzeichen in Mitte
+  split_symbol = " "
+  res = split_string_to_tuple(string_of_symbols, split_symbol)
+
+  assert res == ("abc", " ", " def")
+
+# endregion
+
+# region merge_template
+
+
+def test_merge_region__should_merge_longest_in_template():
+  symbols = ("a", "b", "c", "d")
+  template = {"bc", "cd", "bcd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("a", "bcd")
+
+
+def test_merge_region__should_merge_which_comes_first():
+  symbols = ("a", "b", "c", "d")
+  template = {"bc", "cd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("a", "bc", "d")
+
+
+def test_merge_region__symbols_is_empty_string():
+  symbols = ("",)
+  template = {"bc", "cd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("",)
+
+
+def test_merge_region__symbols_is_empty_tuple():
+  symbols = ()
+  template = {"bc", "cd"}
+  res = merge_template(symbols, template)
+
+  assert res == ()
+
+
+def test_merge_region__template_is_empty_set():
+  symbols = ("a", "b", "c", "d")
+  template = {}
+  res = merge_template(symbols, template)
+
+  assert res == symbols
+
+
+def test_merge_region__template_contains_only_empty_string():
+  symbols = ("a", "b", "c", "d")
+  template = {""}
+  res = merge_template(symbols, template)
+
+  assert res == symbols
+
+
+# endregion
 
 # region merge_fusion
 
