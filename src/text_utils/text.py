@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Set
 
 from nltk import download
 from nltk.tokenize import sent_tokenize
@@ -12,14 +12,30 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
 from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
 from text_utils.symbol_format import SymbolFormat
-from text_utils.types import Symbols
-from text_utils.utils import split_text, symbols_split
+from text_utils.types import Symbol, Symbols
+from text_utils.utils import (remove_empty_symbols, split_text,
+                              symbols_separate, symbols_split, symbols_strip)
 
-IPA_SENTENCE_SEPARATORS = [r"\?", r"\!", r"\."]
+IPA_SENTENCE_SEPARATORS = {"?", "!", "."}
+CHN_SENTENCE_SEPARATORS = {"？", "！", "。"}
 
 
 def split_ipa_text(text: str) -> List[str]:
+  # TODO seperate not split!
+  raise Exception()
   return split_text(text, IPA_SENTENCE_SEPARATORS)
+
+
+def ipa_symbols_to_sentences(symbols: Symbols) -> List[Symbols]:
+  return symbols_to_sentences_core(symbols, separators=IPA_SENTENCE_SEPARATORS)
+
+
+def symbols_to_sentences_core(symbols: Symbols, separators: Set[Symbol]) -> List[Symbols]:
+  sentences = symbols_separate(symbols, separate_symbols=separators)
+  sentences = [symbols_strip(sentence, strip={" "}) for sentence in sentences]
+  sentences = [remove_empty_symbols(sentence) for sentence in sentences]
+  sentences = [sentence for sentence in sentences if len(sentence) > 0]
+  return sentences
 
 
 def normalize_en_grapheme_text(text: str) -> str:
@@ -118,21 +134,61 @@ def text_to_sentences(text: str, text_format: SymbolFormat, lang: Optional[Langu
   assert False
 
 
+def symbols_to_sentences(symbols: Symbols, symbols_format: SymbolFormat, lang: Optional[Language]) -> List[Symbols]:
+  if symbols_format.is_IPA:
+    return ipa_symbols_to_sentences(symbols)
+  if symbols_format == SymbolFormat.PHONEMES_ARPA:
+    raise ValueError("Not supported!")
+
+  assert symbols_format == SymbolFormat.GRAPHEMES
+
+  if lang is None:
+    raise ValueError("Language required!")
+
+  if lang == Language.CHN:
+    return split_chn_graphemes_symbols(symbols)
+
+  if lang == Language.ENG:
+    return split_en_graphemes_symbols(symbols)
+
+  if lang == Language.GER:
+    return split_ger_graphemes_symbols(symbols)
+
+  assert False
+
+
 def symbols_to_words(symbols: Symbols) -> List[Symbols]:
-  return symbols_split(symbols, " ")
-
-
-CHN_SENTENCE_SEPARATORS = [r"？", r"！", r"。"]
+  return symbols_split(symbols, {" "})
 
 
 def split_chn_graphemes_text(text: str) -> Symbols:
+  # TODO seperate not split!
+  raise Exception()
   return split_text(text, CHN_SENTENCE_SEPARATORS)
+
+
+def split_chn_graphemes_symbols(symbols: Symbols) -> List[Symbols]:
+  return symbols_to_sentences_core(symbols, separators=CHN_SENTENCE_SEPARATORS)
+
+
+def split_en_graphemes_symbols(symbols: Symbols) -> List[Symbols]:
+  res = split_en_graphemes_text(''.join(symbols))
+  sentence_symbols = [text_to_symbols(
+    sentence, text_format=SymbolFormat.GRAPHEMES, lang=Language.ENG) for sentence in res]
+  return sentence_symbols
 
 
 def split_en_graphemes_text(text: str) -> List[str]:
   download('punkt', quiet=True)
   res = sent_tokenize(text, language="english")
   return res
+
+
+def split_ger_graphemes_symbols(symbols: Symbols) -> List[Symbols]:
+  res = split_ger_graphemes_text(''.join(symbols))
+  sentence_symbols = [text_to_symbols(
+    sentence, text_format=SymbolFormat.GRAPHEMES, lang=Language.GER) for sentence in res]
+  return sentence_symbols
 
 
 def split_ger_graphemes_text(text: str) -> List[str]:

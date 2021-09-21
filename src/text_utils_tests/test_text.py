@@ -1,9 +1,28 @@
-import time
 from logging import getLogger
 
-import pytest
+from text_utils.language import Language
+from text_utils.symbol_format import SymbolFormat
+from text_utils.text import ipa_symbols_to_sentences, symbols_to_sentences
 
 # # region en_to_ipa
+
+
+def test_symbols_to_sentences():
+  res = symbols_to_sentences(
+    symbols=("a", ".", "b"),
+    lang=Language.ENG,
+    symbols_format=SymbolFormat.PHONEMES_IPA,
+  )
+
+  assert res == [("a", "."), ("b",)]
+
+
+def test_ipa_symbols_to_sentences__ignores_spaces_between_sentences():
+  res = ipa_symbols_to_sentences(
+    symbols=(" ", "a", ".", " ", " ", "b", " ", "c", "?"),
+  )
+
+  assert res == [("a", "."), ("b", " ", "c", "?")]
 
 
 # def test_en_to_ipa_with_phones():

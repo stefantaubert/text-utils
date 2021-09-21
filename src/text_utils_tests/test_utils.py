@@ -1,7 +1,9 @@
 from text_utils.utils import (delete_and_insert_in_list, is_sublist,
+                              remove_empty_symbols, remove_empty_symbols_list,
                               remove_space_around_punctuation,
-                              split_symbols_on, symbols_join, symbols_map_outer,
-                              symbols_replace, symbols_split, symbols_strip,
+                              split_symbols_on, symbols_join,
+                              symbols_map_outer, symbols_replace,
+                              symbols_separate, symbols_split, symbols_strip,
                               symbols_to_lower, upper_list_if_true)
 
 
@@ -120,7 +122,7 @@ def test_split_symbols_on__separates_escapes_char():
 def test_sentence_to_words__empty_list():
   sentence = []
 
-  res = symbols_split(sentence, split_symbol=" ")
+  res = symbols_split(sentence, split_symbols={" "})
 
   assert res == []
 
@@ -128,7 +130,7 @@ def test_sentence_to_words__empty_list():
 def test_sentence_to_words__only_one_space():
   sentence = (" ")
 
-  res = symbols_split(sentence, split_symbol=" ")
+  res = symbols_split(sentence, split_symbols={" "})
 
   assert res == [(), ()]
 
@@ -136,7 +138,7 @@ def test_sentence_to_words__only_one_space():
 def test_sentence_to_words__one_word():
   sentence = ("a")
 
-  res = symbols_split(sentence, split_symbol=" ")
+  res = symbols_split(sentence, split_symbols={" "})
 
   assert res == [("a",)]
 
@@ -144,9 +146,55 @@ def test_sentence_to_words__one_word():
 def test_sentence_to_words__two_words():
   sentence = ("a", " ", "b",)
 
-  res = symbols_split(sentence, split_symbol=" ")
+  res = symbols_split(sentence, split_symbols={" "})
 
   assert res == [("a",), ("b",)]
+
+
+def test_sentence_to_words__split_on_end():
+  sentence = ("a", " ")
+
+  res = symbols_split(sentence, split_symbols={" "})
+
+  assert res == [("a",), ()]
+
+
+def test_sentence_to_words__split_on_start():
+  sentence = (" ", "a")
+
+  res = symbols_split(sentence, split_symbols={" "})
+
+  assert res == [(), ("a",)]
+
+
+def test_sentence_to_words__multiple_split_symbols():
+  sentence = ("a", ".", "b", "?", "c")
+
+  res = symbols_split(sentence, split_symbols={".", "?"})
+
+  assert res == [("a",), ("b",), ("c",)]
+
+
+def test_symbols_separate__with_separate_at_end():
+  sentence = ("a", ".", " ", "b", ".")
+  res = symbols_separate(sentence, separate_symbols={"."})
+  assert res == [("a", ".",), (" ", "b", "."), ()]
+
+
+def test_remove_empty_symbols_list():
+  res = remove_empty_symbols_list(["", "a", "", "b", ""])
+  assert res == ["a", "b"]
+
+
+def test_remove_empty_symbols():
+  res = remove_empty_symbols(("", "a", "", "b", ""))
+  assert res == ("a", "b")
+
+
+def test_symbols_separate__without_separate_at_end():
+  sentence = ("a", ".", " ", "b", "c")
+  res = symbols_separate(sentence, separate_symbols={"."})
+  assert res == [("a", ".",), (" ", "b", "c")]
 
 
 def test_words_to_sentence__empty_list():
