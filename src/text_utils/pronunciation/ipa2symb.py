@@ -85,6 +85,9 @@ def remove_stress(symbols: Symbols) -> Symbols:
 
 def parse_ipa_to_symbols(sentence: str) -> Symbols:
   all_symbols = tuple(sentence)
+  return parse_ipa_symbols_to_symbols(all_symbols)
+
+def parse_ipa_symbols_to_symbols(all_symbols: Symbols) -> Symbols:
   all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
   all_symbols = merge_together(all_symbols, merge_symbols=MERGE, ignore_merge_symbols=DONT_CHANGE)
   all_symbols = merge_left(all_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE)

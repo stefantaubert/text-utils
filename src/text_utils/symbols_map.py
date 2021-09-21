@@ -34,7 +34,10 @@ class SymbolsMap(OrderedDict):
     res = []
     for symbol in symbols:
       if symbol in self.keys():
-        res.append(self[symbol])
+        mapping_symbol = self[symbol]
+        if mapping_symbol is None or mapping_symbol == "":
+          continue
+        res.append(mapping_symbol)
       else:
         res.append(symbol)
     return tuple(res)
@@ -177,4 +180,3 @@ def _apply_template_map(template_map, dest_map, orig) -> Tuple[SymbolsMap, List[
   #   logger.info("There were no new symbols in the destination symbol set.")
   dest_map = sort_map_after_map_from_symbol(dest_map)
   return dest_map, get_sorted_list_from_set(orig)
-

@@ -13,7 +13,8 @@ from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
 from text_utils.pronunciation.ipa2symb import \
     break_n_thongs as break_n_thongs_method
-from text_utils.pronunciation.ipa2symb import (parse_ipa_to_symbols,
+from text_utils.pronunciation.ipa2symb import (parse_ipa_symbols_to_symbols,
+                                               parse_ipa_to_symbols,
                                                remove_arcs, remove_stress,
                                                remove_tones)
 from text_utils.pronunciation.pronunciation_dict_cache import \
@@ -118,6 +119,7 @@ def eng_to_ipa_pronunciation_dict(eng_sentence: Symbols, consider_annotations: b
   arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations)
   result_ipa = symbols_map_arpa_to_ipa(arpa_symbols, ignore={},
                                        replace_unknown=False, replace_unknown_with=None)
+  result_ipa = parse_ipa_symbols_to_symbols(result_ipa)
 
   return result_ipa
 
