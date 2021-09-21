@@ -57,7 +57,18 @@ def test_chn_to_ipa():
   )
 
   clear_ipa_cache()
-  assert result == ('ʂ', 'ɨ˧˥', 'tʰ', 'oʊ', ' ', 'p', 'eɪ˧˩˧', ' ', 'l', 'ɤ˧˩˧', 'ŋ', '.',)
+  assert result == ('ʂ', 'ɨ˧˥', 'tʰ', 'oʊ', ' ', 'p', 'eɪ˧˩˧', ' ', 'l', 'ɤ˧˩˧', 'ŋ', '.')
+
+
+def test_chn_to_ipa__only_vowels():
+  result = chn_to_ipa(
+    chn_sentence=tuple("阿阿"),
+    consider_annotations=False,
+    annotation_split_symbol=None,
+  )
+
+  clear_ipa_cache()
+  assert result == ('a˥', 'a˥')
 
 
 def test_chn_to_ipa__with_multiple_same_words():
