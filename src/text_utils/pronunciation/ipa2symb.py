@@ -1,6 +1,7 @@
 import re
 from typing import Iterable, List, Set, Tuple
 
+import numpy as np
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, CHARACTERS,
                                                   CONSONANTS, DONT_CHANGE,
                                                   MERGE, PREPEND, SCHWAS,
@@ -120,18 +121,48 @@ def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
 
 # def get_starting_symbol
 
+# def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
+#   j = 0
+#   merged_symbols = []
+#   while j < len(symbols):
+#     new_symbol = symbols[j]
+#     k = j + 1
+#     while k < len(symbols) and new_symbol + symbols[k] in template:
+#       new_symbol += symbols[k]
+#       k += 1
+#     merged_symbols.append(new_symbol)
+#     j = k
+#   return tuple(merged_symbols)  # nach bugfix kopieren
+
 def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
   j = 0
   merged_symbols = []
   while j < len(symbols):
-    new_symbol = symbols[j]
-    k = j + 1
-    while k < len(symbols) and new_symbol + symbols[k] in template:
-      new_symbol += symbols[k]
-      k += 1
-    merged_symbols.append(new_symbol)
-    j = k
+    new_template, new_index = get_longest_template(symbols[j:], template)
+    j += new_index
+    merged_symbols.append(new_template)
   return tuple(merged_symbols)
+
+
+def get_longest_template(symbols: Symbols, template: Set[Symbol]):
+  max_length = get_longest_element_in_template(template)
+  longest_template = symbols[0]
+  longest_template_length = 1
+  max_upper_index = np.min([max_length + 1, len(symbols)])
+  for length in range(2, max_upper_index):
+    first_length_symbols = "".join(symbols[:length])
+    if first_length_symbols in template:
+      longest_template = first_length_symbols
+      longest_template_length = length
+  return longest_template, longest_template_length
+
+
+def get_longest_element_in_template(template: Set[Symbol]):
+  lengths = [len(temp) for temp in template]
+  if len(lengths) == 0:
+    return 0
+  max_length = np.max(lengths)
+  return max_length
 
 
 def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:

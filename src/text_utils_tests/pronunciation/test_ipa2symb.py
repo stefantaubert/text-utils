@@ -1,5 +1,6 @@
 from text_utils.pronunciation.ipa2symb import (
     break_n_thongs, get_all_next_consecutive_merge_symbols,
+    get_longest_element_in_template, get_longest_template,
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
     merge_left, merge_right, merge_template, merge_together, remove_arcs,
@@ -91,7 +92,7 @@ def test_split_string_to_tuple2():
 
 
 def test_split_string_to_tuple__two_split_symbols_in_middle():
-  string_of_symbols = "abc  def"  # 3 Leerzeichen in Mitte
+  string_of_symbols = "abc  def"  # 2 Leerzeichen in Mitte
   split_symbol = " "
   res = split_string_to_tuple(string_of_symbols, split_symbol)
 
@@ -99,7 +100,7 @@ def test_split_string_to_tuple__two_split_symbols_in_middle():
 
 
 def test_split_string_to_tuple__four_split_symbols_in_middle():
-  string_of_symbols = "abc    def"  # 3 Leerzeichen in Mitte
+  string_of_symbols = "abc    def"  # 4 Leerzeichen in Mitte
   split_symbol = " "
   res = split_string_to_tuple(string_of_symbols, split_symbol)
 
@@ -113,6 +114,30 @@ def test_split_string_to_tuple__four_split_symbols_in_middle():
 def test_merge_region__should_merge_longest_in_template():
   symbols = ("a", "b", "c", "d")
   template = {"bc", "cd", "bcd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("a", "bcd")
+
+
+def test_merge_region__symbols_has_element_with_len_2__should_merge_longest_in_template():
+  symbols = ("a", "bc", "d")
+  template = {"bc", "cd", "bcd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("a", "bcd")
+
+
+def test_merge_region__symbols_has_element_with_len_2__no_template_fits():
+  symbols = ("a", "bc", "d")
+  template = {"cd"}
+  res = merge_template(symbols, template)
+
+  assert res == symbols
+
+
+def test_merge_region__no_template_of_len_2():
+  symbols = ("a", "b", "c", "d")
+  template = {"bcd"}
   res = merge_template(symbols, template)
 
   assert res == ("a", "bcd")
@@ -159,6 +184,48 @@ def test_merge_region__template_contains_only_empty_string():
 
 
 # endregion
+
+# region get_longest_template
+
+def test_get_longest_template():
+  symbols = ("a", "bc", "e")
+  template = {"abc", "ab", "abcd"}
+  res_1, res_2 = get_longest_template(symbols, template)
+
+  assert res_1 == "abc"
+  assert res_2 == 2
+
+
+def test_get_longest_template__is_not_in_template():
+  symbols = ("a", "c", "e")
+  template = {"abc"}
+  res_1, res_2 = get_longest_template(symbols, template)
+
+  assert res_1 == "a"
+  assert res_2 == 1
+
+
+def test_get_longest_template__longest_template_is_longer_than_symbols():
+  symbols = ("a", "c", "e")
+  template = {"abcdefg"}
+  res_1, res_2 = get_longest_template(symbols, template)
+
+  assert res_1 == "a"
+  assert res_2 == 1
+
+# endregion
+
+# region get_longest_element_in_template
+
+
+def test_get_longest_element_in_template():
+  template = {"abc", "ab", "abcd"}
+  res = get_longest_element_in_template(template)
+
+  assert res == 4
+
+# endregion
+
 
 # region merge_fusion
 
