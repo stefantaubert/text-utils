@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, Set, Tuple
+from typing import Iterable, List, Optional, Set, Tuple
 
 import numpy as np
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, CHARACTERS,
@@ -140,24 +140,22 @@ def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ig
   max_length = get_longest_element_in_template(template)
   max_upper_index = np.min([max_length + 1, len(symbols)])
   for length in range(2, max_upper_index):
-    first_length_symbols = symbols[:length]
-    first_length_symbols_as_string = "".join(first_length_symbols)
-    first_length_symbols_without_ignore = first_length_symbols_as_string.replace(ignore, "")
-    if first_length_symbols_without_ignore in template:
-      current_longest_template = first_length_symbols
+    new_longest_template = try_update_longest_template(symbols, length, template, ignore)
+    if new_longest_template is not None:
+      current_longest_template = new_longest_template
   return current_longest_template
 
 
-def update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Symbol, longest_template: Symbol, longest_template_length: int):
-  first_length_symbols = "".join(symbols[:length])
-  first_length_symbols_without_ignore = first_length_symbols.replace(ignore, "")
+def try_update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Symbol) -> Optional[List[Symbol]]:
+  first_length_symbols = symbols[:length]
+  first_length_symbols_as_string = "".join(first_length_symbols)
+  first_length_symbols_without_ignore = first_length_symbols_as_string.replace(ignore, "")
   if first_length_symbols_without_ignore in template:
-    longest_template = first_length_symbols
-    longest_template_length = length
-  return longest_template, longest_template_length
+    return first_length_symbols
+  return None
 
 
-def remove_ignore_at_end(template: List[Symbol], ignore: Symbol):
+def remove_ignore_at_end(template: List[Symbol], ignore: Symbol) -> List[Symbol]:
   if len(template) > 1 and template[-1] == ignore:
     template = template[:-1]
   return template
