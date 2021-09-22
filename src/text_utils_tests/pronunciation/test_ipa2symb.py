@@ -1,6 +1,6 @@
 from text_utils.pronunciation.ipa2symb import (
     break_n_thongs, get_all_next_consecutive_merge_symbols,
-    get_longest_element_in_template, get_longest_template_and_its_length,
+    get_longest_template_with_ignore,
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
     merge_left, merge_right, merge_template, merge_template_with_ignore,
@@ -128,8 +128,9 @@ def test_merge_template_with_ignore__ignore_symbol_alone_in_middle():
 
   assert res == ("ab:c", "d")
 
+
 def test_merge_template_with_ignore__two_ignore_symbols_alone_in_middle():
-  symbols = ("ab", ":",":", "c", "d")
+  symbols = ("ab", ":", ":", "c", "d")
   template = {"abc"}
   ignore = ":"
   res = merge_template_with_ignore(symbols, template, ignore)
@@ -250,45 +251,58 @@ def test_merge_region__template_contains_only_empty_string():
 
 # endregion
 
-# region get_longest_template
+# region get_longest_template_with_ignore
 
 
-def test_get_longest_template():
+def test_get_longest_template_with_ignore():
   symbols = ("a", "bc", "e")
   template = {"abc", "ab", "abcd"}
-  res_1, res_2 = get_longest_template_and_its_length(symbols, template)
+  res = get_longest_template_with_ignore(symbols, template, "")
 
-  assert res_1 == "abc"
-  assert res_2 == 2
+  assert res == ("a", "bc")
 
+def test_get_longest_template_with_ignore__three_ignore_symbols_in_middle_of_template():
+  symbols = ("a", ":",":",":", "bc", "e")
+  template = {"abc", "ab"}
+  res = get_longest_template_with_ignore(symbols, template, ":")
 
-def test_get_longest_template__is_not_in_template():
+  assert res == ("a", ":",":",":", "bc")
+
+def test_get_longest_template_with_ignore__one_ignore_symbol_at_beginning():
+  symbols = (":", "bc", "e")
+  template = {"bce"}
+  res = get_longest_template_with_ignore(symbols, template, ":")
+
+  assert res == (":",)
+
+def test_get_longest_template_with_ignore__two_ignore_symbols_at_beginning():
+  symbols = (":",":", "bc", "e")
+  template = {"bce"}
+  res = get_longest_template_with_ignore(symbols, template, ":")
+
+  assert res == (":",)
+
+def test_get_longest_template_with_ignore__is_not_in_template():
   symbols = ("a", "c", "e")
   template = {"abc"}
-  res_1, res_2 = get_longest_template_and_its_length(symbols, template)
+  res = get_longest_template_with_ignore(symbols, template, "")
 
-  assert res_1 == "a"
-  assert res_2 == 1
+  assert res == ("a",)
 
 
-def test_get_longest_template__longest_template_is_longer_than_symbols():
+def test_get_longest_template_with_ignore__longest_template_is_longer_than_symbols():
   symbols = ("a", "c", "e")
   template = {"abcdefg"}
-  res_1, res_2 = get_longest_template_and_its_length(symbols, template)
+  res = get_longest_template_with_ignore(symbols, template, "")
 
-  assert res_1 == "a"
-  assert res_2 == 1
+  assert res == ("a",)
 
-# endregion
+def test_get_longest_template_with_ignore__template_is_empty():
+  symbols = ("a",)
+  template = {}
+  res = get_longest_template_with_ignore(symbols, template, "")
 
-# region get_longest_element_in_template
-
-
-def test_get_longest_element_in_template():
-  template = {"abc", "ab", "abcd"}
-  res = get_longest_element_in_template(template)
-
-  assert res == 4
+  assert res == symbols
 
 # endregion
 
