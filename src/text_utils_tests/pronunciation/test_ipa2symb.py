@@ -4,7 +4,7 @@ from text_utils.pronunciation.ipa2symb import (
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
     merge_left, merge_right, merge_template, merge_template_with_ignore,
-    merge_together, remove_arcs, split_string_to_tuple)
+    merge_together, remove_arcs, split_string_to_tuple, try_update_longest_template)
 
 
 def test_remove_arcs__empty_input():
@@ -306,6 +306,23 @@ def test_get_longest_template_with_ignore__template_is_empty():
 
 # endregion
 
+# region try_update_longest_template
+
+def test_try_update_longest_template__successful_updating():
+  symbols = ("a", "c", "e")
+  template = {"ac", "ace"}
+  res = try_update_longest_template(symbols, 2, template, ":")
+
+  assert res == ("a", "c")
+
+def test_try_update_longest_template__returns_none():
+  symbols = ("a", "c", "e")
+  template = {"ace"}
+  res = try_update_longest_template(symbols, 2, template, ":")
+
+  assert res is None
+
+# endregion
 
 # region merge_fusion
 
