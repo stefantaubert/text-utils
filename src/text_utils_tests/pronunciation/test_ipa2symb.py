@@ -128,6 +128,14 @@ def test_merge_template_with_ignore__ignore_symbol_alone_in_middle():
 
   assert res == ("ab:c", "d")
 
+def test_merge_template_with_ignore__two_ignore_symbols_alone_in_middle():
+  symbols = ("ab", ":",":", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab::c", "d")
+
 
 def test_merge_template_with_ignore__ignore_symbol_alone_at_beginning():
   symbols = (":", "ab", "c", "d")
@@ -138,6 +146,15 @@ def test_merge_template_with_ignore__ignore_symbol_alone_at_beginning():
   assert res == (":", "abc", "d")
 
 
+def test_merge_template_with_ignore__two_ignore_symbols_alone_at_beginning():
+  symbols = (":", ":", "ab", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == (":", ":", "abc", "d")
+
+
 def test_merge_template_with_ignore__ignore_symbol_alone_at_end_of_a_template():
   symbols = ("ab", "c", ":", "d")
   template = {"abc"}
@@ -145,6 +162,15 @@ def test_merge_template_with_ignore__ignore_symbol_alone_at_end_of_a_template():
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == ("abc", ":", "d")
+
+
+def test_merge_template_with_ignore__two_ignore_symbols_alone_at_end_of_a_template():
+  symbols = ("ab", "c", ":", ":", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("abc", ":", ":", "d")
 
 # endregion
 

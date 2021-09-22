@@ -137,9 +137,10 @@ def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ig
   current_longest_template = [symbols[0]]
   if current_longest_template[0] == ignore:
     return current_longest_template
-  max_length = get_longest_element_in_template(template)
-  max_upper_index = np.min([max_length + 1, len(symbols)])
-  for length in range(2, max_upper_index):
+  #max_length = get_longest_element_in_template(template)
+  smallest_none_trival_length = 2
+  #max_upper_index = np.min([max_length, len(symbols)])
+  for length in range(smallest_none_trival_length, len(symbols) + 1):
     new_longest_template = try_update_longest_template(symbols, length, template, ignore)
     if new_longest_template is not None:
       current_longest_template = new_longest_template
@@ -156,12 +157,17 @@ def try_update_longest_template(symbols: Symbols, length: int, template: Set[Sym
 
 
 def remove_ignore_at_end(template: List[Symbol], ignore: Symbol) -> List[Symbol]:
-  if len(template) > 1 and template[-1] == ignore:
+  while len(template) > 1 and template[-1] == ignore:
     template = template[:-1]
   return template
 
 
 def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
+  merged_symbols = merge_template_with_ignore(symbols, template, "")
+  return merged_symbols
+
+
+def merge_template2(symbols: Symbols, template: Set[Symbol]) -> Symbols:
   j = 0
   merged_symbols = []
   while j < len(symbols):
