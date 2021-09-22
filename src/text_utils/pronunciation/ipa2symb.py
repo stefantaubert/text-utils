@@ -134,12 +134,11 @@ def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: 
 
 
 def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> List[Symbol]:
-  current_longest_template = [symbols[0]]
+  assert len(symbols) > 0
+  current_longest_template = (symbols[0],)
   if current_longest_template[0] == ignore:
     return current_longest_template
-  #max_length = get_longest_element_in_template(template)
   smallest_none_trival_length = 2
-  #max_upper_index = np.min([max_length, len(symbols)])
   for length in range(smallest_none_trival_length, len(symbols) + 1):
     new_longest_template = try_update_longest_template(symbols, length, template, ignore)
     if new_longest_template is not None:
@@ -165,37 +164,6 @@ def remove_ignore_at_end(template: List[Symbol], ignore: Symbol) -> List[Symbol]
 def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
   merged_symbols = merge_template_with_ignore(symbols, template, "")
   return merged_symbols
-
-
-def merge_template2(symbols: Symbols, template: Set[Symbol]) -> Symbols:
-  j = 0
-  merged_symbols = []
-  while j < len(symbols):
-    new_template, new_index = get_longest_template_and_its_length(symbols[j:], template)
-    j += new_index
-    merged_symbols.append(new_template)
-  return tuple(merged_symbols)
-
-
-def get_longest_template_and_its_length(symbols: Symbols, template: Set[Symbol]) -> Tuple[Symbol, int]:
-  max_length = get_longest_element_in_template(template)
-  longest_template = symbols[0]
-  longest_template_length = 1
-  max_upper_index = np.min([max_length + 1, len(symbols)])
-  for length in range(2, max_upper_index):
-    first_length_symbols = "".join(symbols[:length])
-    if first_length_symbols in template:
-      longest_template = first_length_symbols
-      longest_template_length = length
-  return longest_template, longest_template_length
-
-
-def get_longest_element_in_template(template: Set[Symbol]) -> int:
-  lengths = [len(temp) for temp in template]
-  if len(lengths) == 0:
-    return 0
-  max_length = np.max(lengths)
-  return max_length
 
 
 def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
