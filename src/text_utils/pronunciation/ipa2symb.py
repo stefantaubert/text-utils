@@ -133,7 +133,7 @@ def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: 
   return tuple(merged_symbols)
 
 
-def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> List[Symbol]:
+def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> Symbols:
   assert len(symbols) > 0
   current_longest_template = (symbols[0],)
   if current_longest_template[0] == ignore:
@@ -146,7 +146,7 @@ def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ig
   return current_longest_template
 
 
-def try_update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Symbol) -> Optional[List[Symbol]]:
+def try_update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Symbol) -> Optional[Symbols]:
   first_length_symbols = symbols[:length]
   first_length_symbols_as_string = "".join(first_length_symbols)
   first_length_symbols_without_ignore = first_length_symbols_as_string.replace(ignore, "")
@@ -155,7 +155,7 @@ def try_update_longest_template(symbols: Symbols, length: int, template: Set[Sym
   return None
 
 
-def remove_ignore_at_end(template: List[Symbol], ignore: Symbol) -> List[Symbol]:
+def remove_ignore_at_end(template: Symbols, ignore: Symbol) -> Symbols:
   while len(template) > 1 and template[-1] == ignore:
     template = template[:-1]
   return template
