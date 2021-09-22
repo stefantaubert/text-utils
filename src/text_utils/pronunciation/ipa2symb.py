@@ -40,6 +40,7 @@ def break_n_thongs(symbols: Symbols) -> Symbols:
     symbol_is_n_thong = is_n_thong(symbol)
     if symbol_is_n_thong:
       sub_symbols = tuple(symbol)
+      # no merge fusion
       # TODO maybe merge stress to first vowel in n-thong in chinese
       sub_symbols = merge_together(sub_symbols, merge_symbols=MERGE,
                                    ignore_merge_symbols=DONT_CHANGE)

@@ -84,4 +84,8 @@ def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool, annotation_spl
   )
 
   symbols = symbols_map(symbols, CHN_PUNCTUATION_MAPPING)
+
+  symbols_rejoined = parse_ipa_to_symbols(''.join(symbols))
+  assert symbols_rejoined == symbols
+
   return symbols

@@ -2,8 +2,9 @@ from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Any, Callable, Optional
 
-from text_utils.cli_core import (INFERENCE_ARROW_TYPE, WEIGHTS_ARROW_TYPE, change_symbols_in_map,
-                                 print_map, print_symbols)
+from text_utils.cli_core import (INFERENCE_ARROW_TYPE, WEIGHTS_ARROW_TYPE,
+                                 change_symbols_in_map, print_map,
+                                 print_symbols)
 
 ARROW_TYPES = [WEIGHTS_ARROW_TYPE, INFERENCE_ARROW_TYPE]
 
@@ -23,9 +24,9 @@ def init_symbol_parser(parser: ArgumentParser) -> Callable[[str], None]:
 
 
 def init_change_parser(parser: ArgumentParser) -> Callable[[str, str, Optional[str], Optional[str], Optional[str]], None]:
-  parser.add_argument("-p", "--map_path", type=str, required=True,
+  parser.add_argument("-p", "--map_path", type=Path, required=True,
                       help="Path to .json-file containing the map")
-  parser.add_argument("-s", "--symbol_path", type=str, required=True,
+  parser.add_argument("-s", "--symbol_path", type=Path, required=True,
                       help="Path to file containing the allowed symbols")
   parser.add_argument("-a", "--arrow_type", type=str, required=False,
                       help="Sets the direction of the arrow", choices=ARROW_TYPES)

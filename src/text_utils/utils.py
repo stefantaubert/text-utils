@@ -128,8 +128,9 @@ def text_apply_mapping(text: str, mapping: Dict[str, str]) -> str:
   return new_text
 
 
-def split_text(text: str, separators: List[str]) -> List[str]:
-  pattern = "|".join(separators)
+def split_text(text: str, separators: Set[str]) -> List[str]:
+  separators_re = {re.escape(separator) for separator in separators}
+  pattern = "|".join(separators_re)
   sents = re.split(f'({pattern})', text)
   res = []
   for i, sent in enumerate(sents):
@@ -184,30 +185,50 @@ def split_symbols_on(symbols: Symbols, split_symbols: Set[Symbol]) -> Symbols:
   result = []
   for symbol in symbols:
     symbols_replaced = re.split(pattern, symbol)
-    symbols_replaced = remove_empty_symbols(symbols_replaced)
+    symbols_replaced = remove_empty_symbols_list(symbols_replaced)
     result.extend(symbols_replaced)
   new_symbols = tuple(result)
   return new_symbols
 
 
-def remove_empty_symbols(symbols: Symbols) -> Symbols:
+def remove_empty_symbols_list(symbols: List[Symbol]) -> List[Symbol]:
   new_symbols = [
       replaced_symbol for replaced_symbol in symbols if replaced_symbol != ""]
   return new_symbols
 
 
-def symbols_split(sentence_symbols: Symbols, split_symbol: Symbol) -> List[Symbols]:
+def remove_empty_symbols(symbols: Symbols) -> Symbols:
+  new_symbols = tuple(
+      replaced_symbol for replaced_symbol in symbols if replaced_symbol != "")
+  return new_symbols
+
+
+def symbols_split(sentence_symbols: Symbols, split_symbols: Set[Symbol]) -> List[Symbols]:
   if len(sentence_symbols) == 0:
     return []
   res = []
-  current_word = []
+  current = []
   for symbol in sentence_symbols:
-    if symbol == split_symbol:
-      res.append(tuple(current_word))
-      current_word = []
+    if symbol in split_symbols:
+      res.append(tuple(current))
+      current = []
     else:
-      current_word.append(symbol)
-  res.append(tuple(current_word))
+      current.append(symbol)
+  res.append(tuple(current))
+  return res
+
+
+def symbols_separate(sentence_symbols: Symbols, separate_symbols: Set[Symbol]) -> List[Symbols]:
+  if len(sentence_symbols) == 0:
+    return []
+  res = []
+  current = []
+  for symbol in sentence_symbols:
+    current.append(symbol)
+    if symbol in separate_symbols:
+      res.append(tuple(current))
+      current = []
+  res.append(tuple(current))
   return res
 
 
