@@ -97,6 +97,43 @@ def parse_ipa_symbols_to_symbols(all_symbols: Symbols) -> Symbols:
   return all_symbols
 
 
+def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
+  j = 0
+  splitted_symbols = []
+  while j < len(string_of_symbols):
+    if j not in {0, len(string_of_symbols) - 1} or string_of_symbols[j] != split_symbol:
+      new_symbol = string_of_symbols[j]
+    else:
+      j += 1
+      continue
+    k = j + 1
+    while k < len(string_of_symbols):
+      k += 1
+      if string_of_symbols[k - 1] != split_symbol:
+        new_symbol += string_of_symbols[k - 1]
+      else:
+        break
+    splitted_symbols.append(new_symbol)
+    j = k
+  return tuple(splitted_symbols)
+
+
+# def get_starting_symbol
+
+def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
+  j = 0
+  merged_symbols = []
+  while j < len(symbols):
+    new_symbol = symbols[j]
+    k = j + 1
+    while k < len(symbols) and new_symbol + symbols[k] in template:
+      new_symbol += symbols[k]
+      k += 1
+    merged_symbols.append(new_symbol)
+    j = k
+  return tuple(merged_symbols)
+
+
 def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
   aux_symbols = list(symbols)
   fused_symbols = []
