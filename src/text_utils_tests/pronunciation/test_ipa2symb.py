@@ -3,8 +3,8 @@ from text_utils.pronunciation.ipa2symb import (
     get_longest_element_in_template, get_longest_template,
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
-    merge_left, merge_right, merge_template, merge_together, remove_arcs,
-    split_string_to_tuple)
+    merge_left, merge_right, merge_template, merge_template_with_ignore,
+    merge_together, remove_arcs, split_string_to_tuple)
 
 
 def test_remove_arcs__empty_input():
@@ -108,6 +108,46 @@ def test_split_string_to_tuple__four_split_symbols_in_middle():
 
 # endregion
 
+# region merge_template_with_ignore
+
+
+def test_merge_template_with_ignore():
+  symbols = ("ab:", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab:c", "d")
+
+
+def test_merge_template_with_ignore__ignore_symbol_alone_in_middle():
+  symbols = ("ab", ":", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab:c", "d")
+
+
+def test_merge_template_with_ignore__ignore_symbol_alone_at_beginning():
+  symbols = (":", "ab", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == (":", "abc", "d")
+
+
+def test_merge_template_with_ignore__ignore_symbol_alone_at_end_of_a_template():
+  symbols = ("ab", "c", ":", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("abc", ":", "d")
+
+# endregion
+
 # region merge_template
 
 
@@ -182,10 +222,10 @@ def test_merge_region__template_contains_only_empty_string():
 
   assert res == symbols
 
-
 # endregion
 
 # region get_longest_template
+
 
 def test_get_longest_template():
   symbols = ("a", "bc", "e")
