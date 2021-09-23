@@ -4,7 +4,8 @@ from typing import Iterable, List, Optional, Set, Tuple
 import numpy as np
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, CHARACTERS,
                                                   CONSONANTS, DONT_CHANGE,
-                                                  MERGE, PREPEND, SCHWAS,
+                                                  ENG_DIPHTHONGS, MERGE,
+                                                  PREPEND, SCHWAS,
                                                   STRESS_PRIMARY,
                                                   STRESS_SECONDARY, TIE_ABOVE,
                                                   TIE_BELOW, TONES, VOWELS)
@@ -93,8 +94,9 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
 def parse_ipa_symbols_to_symbols(all_symbols: Symbols) -> Symbols:
   all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
   all_symbols = merge_together(all_symbols, merge_symbols=MERGE, ignore_merge_symbols=DONT_CHANGE)
-  all_symbols = merge_left(all_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE)
   all_symbols = merge_right(all_symbols, merge_symbols=APPENDIX, ignore_merge_symbols=DONT_CHANGE)
+  #all_symbols = merge_template_with_ignore(all_symbols, template=ENG_DIPHTHONGS, ignore=APPENDIX)
+  all_symbols = merge_left(all_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE)
   return all_symbols
 
 
