@@ -1,9 +1,10 @@
 from text_utils.pronunciation.ipa2symb import (
     break_n_thongs, get_all_next_consecutive_merge_symbols,
+    get_longest_template_with_ignore,
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
-    merge_left, merge_right, merge_template, merge_together, remove_arcs,
-    split_string_to_tuple)
+    merge_left, merge_right, merge_template, merge_template_with_ignore,
+    merge_together, remove_arcs, split_string_to_tuple, try_update_longest_template)
 
 
 def test_remove_arcs__empty_input():
@@ -91,7 +92,7 @@ def test_split_string_to_tuple2():
 
 
 def test_split_string_to_tuple__two_split_symbols_in_middle():
-  string_of_symbols = "abc  def"  # 3 Leerzeichen in Mitte
+  string_of_symbols = "abc  def"  # 2 Leerzeichen in Mitte
   split_symbol = " "
   res = split_string_to_tuple(string_of_symbols, split_symbol)
 
@@ -99,11 +100,78 @@ def test_split_string_to_tuple__two_split_symbols_in_middle():
 
 
 def test_split_string_to_tuple__four_split_symbols_in_middle():
-  string_of_symbols = "abc    def"  # 3 Leerzeichen in Mitte
+  string_of_symbols = "abc    def"  # 4 Leerzeichen in Mitte
   split_symbol = " "
   res = split_string_to_tuple(string_of_symbols, split_symbol)
 
   assert res == ("abc", " ", " def")
+
+# endregion
+
+# region merge_template_with_ignore
+
+
+def test_merge_template_with_ignore():
+  symbols = ("ab:", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab:c", "d")
+
+
+def test_merge_template_with_ignore__ignore_symbol_alone_in_middle():
+  symbols = ("ab", ":", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab:c", "d")
+
+
+def test_merge_template_with_ignore__two_ignore_symbols_alone_in_middle():
+  symbols = ("ab", ":", ":", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab::c", "d")
+
+
+def test_merge_template_with_ignore__ignore_symbol_alone_at_beginning():
+  symbols = (":", "ab", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == (":", "abc", "d")
+
+
+def test_merge_template_with_ignore__two_ignore_symbols_alone_at_beginning():
+  symbols = (":", ":", "ab", "c", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == (":", ":", "abc", "d")
+
+
+def test_merge_template_with_ignore__ignore_symbol_alone_at_end_of_a_template():
+  symbols = ("ab", "c", ":", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("abc", ":", "d")
+
+
+def test_merge_template_with_ignore__two_ignore_symbols_alone_at_end_of_a_template():
+  symbols = ("ab", "c", ":", ":", "d")
+  template = {"abc"}
+  ignore = ":"
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("abc", ":", ":", "d")
 
 # endregion
 
@@ -113,6 +181,30 @@ def test_split_string_to_tuple__four_split_symbols_in_middle():
 def test_merge_region__should_merge_longest_in_template():
   symbols = ("a", "b", "c", "d")
   template = {"bc", "cd", "bcd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("a", "bcd")
+
+
+def test_merge_region__symbols_has_element_with_len_2__should_merge_longest_in_template():
+  symbols = ("a", "bc", "d")
+  template = {"bc", "cd", "bcd"}
+  res = merge_template(symbols, template)
+
+  assert res == ("a", "bcd")
+
+
+def test_merge_region__symbols_has_element_with_len_2__no_template_fits():
+  symbols = ("a", "bc", "d")
+  template = {"cd"}
+  res = merge_template(symbols, template)
+
+  assert res == symbols
+
+
+def test_merge_region__no_template_of_len_2():
+  symbols = ("a", "b", "c", "d")
+  template = {"bcd"}
   res = merge_template(symbols, template)
 
   assert res == ("a", "bcd")
@@ -157,6 +249,78 @@ def test_merge_region__template_contains_only_empty_string():
 
   assert res == symbols
 
+# endregion
+
+# region get_longest_template_with_ignore
+
+
+def test_get_longest_template_with_ignore():
+  symbols = ("a", "bc", "e")
+  template = {"abc", "ab", "abcd"}
+  res = get_longest_template_with_ignore(symbols, template, "")
+
+  assert res == ("a", "bc")
+
+def test_get_longest_template_with_ignore__three_ignore_symbols_in_middle_of_template():
+  symbols = ("a", ":",":",":", "bc", "e")
+  template = {"abc", "ab"}
+  res = get_longest_template_with_ignore(symbols, template, ":")
+
+  assert res == ("a", ":",":",":", "bc")
+
+def test_get_longest_template_with_ignore__one_ignore_symbol_at_beginning():
+  symbols = (":", "bc", "e")
+  template = {"bce"}
+  res = get_longest_template_with_ignore(symbols, template, ":")
+
+  assert res == (":",)
+
+def test_get_longest_template_with_ignore__two_ignore_symbols_at_beginning():
+  symbols = (":",":", "bc", "e")
+  template = {"bce"}
+  res = get_longest_template_with_ignore(symbols, template, ":")
+
+  assert res == (":",)
+
+def test_get_longest_template_with_ignore__is_not_in_template():
+  symbols = ("a", "c", "e")
+  template = {"abc"}
+  res = get_longest_template_with_ignore(symbols, template, "")
+
+  assert res == ("a",)
+
+
+def test_get_longest_template_with_ignore__longest_template_is_longer_than_symbols():
+  symbols = ("a", "c", "e")
+  template = {"abcdefg"}
+  res = get_longest_template_with_ignore(symbols, template, "")
+
+  assert res == ("a",)
+
+def test_get_longest_template_with_ignore__template_is_empty():
+  symbols = ("a",)
+  template = {}
+  res = get_longest_template_with_ignore(symbols, template, "")
+
+  assert res == symbols
+
+# endregion
+
+# region try_update_longest_template
+
+def test_try_update_longest_template__successful_updating():
+  symbols = ("a", "c", "e")
+  template = {"ac", "ace"}
+  res = try_update_longest_template(symbols, 2, template, ":")
+
+  assert res == ("a", "c")
+
+def test_try_update_longest_template__returns_none():
+  symbols = ("a", "c", "e")
+  template = {"ace"}
+  res = try_update_longest_template(symbols, 2, template, ":")
+
+  assert res is None
 
 # endregion
 
