@@ -4,7 +4,10 @@ from functools import partial
 from logging import WARNING, getLogger
 from typing import Dict, Optional, Set, Tuple
 
-from sentence2pronunciation import clear_cache, sentence2pronunciation_cached
+from ordered_set import OrderedSet
+from pronunciation_dict_parser import PronunciationDict
+from sentence2pronunciation import (clear_cache, get_non_annotated_words,
+                                    sentence2pronunciation_cached)
 from text_utils.language import Language
 from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
 from text_utils.pronunciation.chinese_ipa import chn_to_ipa
@@ -29,6 +32,10 @@ ANNOTATION_SPLIT_SYMBOL: Symbol = "/"
 
 
 def clear_ipa_cache():
+  clear_cache()
+
+
+def clear_arpa_cache():
   clear_cache()
 
 
@@ -156,27 +163,47 @@ def log_and_return_exception(msg: str) -> Exception:
   return Exception(msg)
 
 
-def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, mode: Optional[EngToIPAMode], consider_ipa_annotations: Optional[bool]) -> Tuple[Symbols, SymbolFormat]:
+def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, mode: Optional[EngToIPAMode], consider_annotations: Optional[bool]) -> Tuple[Symbols, SymbolFormat]:
   if symbols_format.is_IPA:
     return symbols, symbols_format
   if symbols_format == SymbolFormat.PHONEMES_ARPA:
     raise log_and_return_exception("Not supported!")
   assert symbols_format == SymbolFormat.GRAPHEMES
 
-  if consider_ipa_annotations is None:
-    raise log_and_return_exception("Please specify 'consider_ipa_annotations'.")
+  if consider_annotations is None:
+    raise log_and_return_exception("Please specify 'consider_annotations'.")
 
   if lang == Language.ENG:
     if mode is None:
       raise log_and_return_exception("Please specify the IPA conversion mode.")
-    new_symbols = eng_to_ipa(symbols, consider_ipa_annotations, mode=mode)
+    new_symbols = eng_to_ipa(symbols, consider_annotations, mode=mode)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.GER:
-    new_symbols = ger_to_ipa(symbols, consider_ipa_annotations)
+    new_symbols = ger_to_ipa(symbols, consider_annotations)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.CHN:
-    new_symbols = chn_to_ipa(symbols, consider_ipa_annotations, ANNOTATION_SPLIT_SYMBOL)
+    new_symbols = chn_to_ipa(symbols, consider_annotations, ANNOTATION_SPLIT_SYMBOL)
     return new_symbols, SymbolFormat.PHONEMES_IPA
+  assert False
+
+
+def symbols_to_arpa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, consider_annotations: Optional[bool]) -> Tuple[Symbols, SymbolFormat]:
+  if symbols_format == SymbolFormat.PHONEMES_ARPA:
+    return symbols, symbols_format
+  if symbols_format.is_IPA:
+    raise log_and_return_exception("Not supported!")
+  assert symbols_format == SymbolFormat.GRAPHEMES
+
+  if consider_annotations is None:
+    raise log_and_return_exception("Please specify 'consider_annotations'.")
+
+  if lang in (Language.GER, Language.CHN):
+    raise log_and_return_exception("Language is not supported!")
+
+  if lang == Language.ENG:
+    new_symbols = eng_to_arpa(symbols, consider_annotations)
+    return new_symbols, SymbolFormat.PHONEMES_ARPA
+
   assert False
 
 
@@ -196,6 +223,31 @@ def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_s
     new_symbols = break_n_thongs_method(new_symbols)
 
   return new_symbols
+
+
+def symbols_to_arpa_pronunciation_dict(symbols: Symbols, symbols_format: SymbolFormat, language: Language, ignore_case: bool, split_on_hyphen: bool, consider_annotations: bool) -> PronunciationDict:
+  # consider_annotations: if true then the annotations will be figured out and not taken into the dictionary. if false the annotations including the split symbol will be considered
+  words = get_non_annotated_words(
+    sentence=symbols,
+    trim_symbols=DEFAULT_IGNORE_PUNCTUATION,
+    consider_annotation=consider_annotations,
+    annotation_split_symbol=ANNOTATION_SPLIT_SYMBOL,
+    ignore_case=ignore_case,
+    split_on_hyphen=split_on_hyphen,
+  )
+
+  result = {}
+  for word in words:
+    ipa_symbols, _ = symbols_to_arpa(
+      symbols=word,
+      symbols_format=symbols_format,
+      lang=language,
+      consider_annotations=False,
+    )
+    word_str = "".join(word)
+    assert word_str not in result
+    result[word_str] = OrderedSet([ipa_symbols])
+  return result
 
 
 # def merge_symbols(pronunciation: Symbols, merge_at: Symbol, merge_on_symbols: Set[Symbol]) -> Symbols:

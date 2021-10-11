@@ -11,6 +11,7 @@ from text_utils.adjustments import (collapse_whitespace, expand_abbreviations,
                                     replace_mail_addresses)
 from text_utils.language import Language
 from text_utils.pronunciation import parse_ipa_to_symbols
+from text_utils.pronunciation.main import EngToIPAMode, symbols_to_ipa
 from text_utils.symbol_format import SymbolFormat
 from text_utils.types import Symbol, Symbols
 from text_utils.utils import remove_empty_symbols
@@ -113,7 +114,7 @@ def text_to_symbols(text: str, text_format: SymbolFormat, lang: Optional[Languag
   if lang is None:
     raise ValueError("Language required!")
 
-  if lang in {Language.ENG, Language.GER, Language.CHN}:
+  if lang in (Language.ENG, Language.GER, Language.CHN):
     return tuple(text)
 
   assert False

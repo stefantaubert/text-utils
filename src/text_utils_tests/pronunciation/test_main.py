@@ -1,13 +1,18 @@
 
 import pytest
+from ordered_set import OrderedSet
 from text_utils.language import Language
 from text_utils.pronunciation.main import (EngToIPAMode, __get_arpa_oov,
                                            __get_eng_ipa, __get_ger_ipa,
-                                           clear_ipa_cache, eng_to_arpa,
-                                           eng_to_ipa, eng_to_ipa_epitran,
+                                           clear_arpa_cache, clear_ipa_cache,
+                                           eng_to_arpa, eng_to_ipa,
+                                           eng_to_ipa_epitran,
                                            eng_to_ipa_pronunciation_dict,
-                                           ger_to_ipa, symbols_to_ipa)
+                                           ger_to_ipa, symbols_to_arpa,
+                                           symbols_to_arpa_pronunciation_dict,
+                                           symbols_to_ipa)
 from text_utils.symbol_format import SymbolFormat
+from text_utils.types import Symbol
 
 
 def test_eng_to_arpa():
@@ -117,7 +122,7 @@ def test_symbols_to_ipa__convert_arpa__raises_exception():
   with pytest.raises(Exception):
     symbols_to_ipa(
       symbols=tuple("This is a test."),
-      consider_ipa_annotations=None,
+      consider_annotations=None,
       lang=Language.ENG,
       mode=EngToIPAMode.EPITRAN,
       symbols_format=SymbolFormat.PHONEMES_ARPA,
@@ -128,7 +133,7 @@ def test_symbols_to_ipa__eng_no_mode__raises_exception():
   with pytest.raises(Exception):
     symbols_to_ipa(
       symbols=tuple("This is a test."),
-      consider_ipa_annotations=False,
+      consider_annotations=False,
       lang=Language.ENG,
       mode=None,
       symbols_format=SymbolFormat.GRAPHEMES,
@@ -139,7 +144,7 @@ def test_symbols_to_ipa__none_consider_annotation_on_graphemes__raises_exception
   with pytest.raises(Exception):
     symbols_to_ipa(
       symbols=tuple("This is a test."),
-      consider_ipa_annotations=None,
+      consider_annotations=None,
       lang=Language.ENG,
       mode=EngToIPAMode.EPITRAN,
       symbols_format=SymbolFormat.GRAPHEMES,
@@ -149,7 +154,7 @@ def test_symbols_to_ipa__none_consider_annotation_on_graphemes__raises_exception
 def test_symbols_to_ipa__convert_english_graphemes():
   result_symbols, result_format = symbols_to_ipa(
     symbols=tuple("This is a test."),
-    consider_ipa_annotations=False,
+    consider_annotations=False,
     lang=Language.ENG,
     mode=EngToIPAMode.EPITRAN,
     symbols_format=SymbolFormat.GRAPHEMES,
@@ -163,7 +168,7 @@ def test_symbols_to_ipa__convert_english_graphemes():
 def test_symbols_to_ipa__convert_ipa__returns_ipa():
   result_symbols, result_format = symbols_to_ipa(
     symbols=('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.'),
-    consider_ipa_annotations=False,
+    consider_annotations=False,
     lang=Language.ENG,
     mode=None,
     symbols_format=SymbolFormat.PHONES_IPA,
@@ -172,6 +177,39 @@ def test_symbols_to_ipa__convert_ipa__returns_ipa():
   clear_ipa_cache()
   assert result_symbols == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.')
   assert result_format == SymbolFormat.PHONES_IPA
+
+
+def test_symbols_to_arpa():
+  result, result_format = symbols_to_arpa(
+    symbols=tuple("This is a test /AA/BB/"),
+    consider_annotations=True,
+    lang=Language.ENG,
+    symbols_format=SymbolFormat.GRAPHEMES,
+  )
+
+  clear_arpa_cache()
+  assert result == ('DH', 'IH0', 'S', ' ', 'IH0', 'Z', ' ', 'AH0',
+                    ' ', 'T', 'EH1', 'S', 'T', ' ', 'AA', 'BB')
+  assert result_format == SymbolFormat.PHONEMES_ARPA
+
+
+def test_symbols_to_pronunciation_dict():
+  result = symbols_to_arpa_pronunciation_dict(
+    symbols=tuple("This!, ?a .is-a test /bb/"),
+    language=Language.ENG,
+    symbols_format=SymbolFormat.GRAPHEMES,
+    ignore_case=True,
+    split_on_hyphen=True,
+    consider_annotations=True,
+  )
+
+  clear_arpa_cache()
+  assert len(result) == 4
+  assert result["THIS"] == OrderedSet([('DH', 'IH0', 'S')])
+  assert result["IS"] == OrderedSet([('IH0', 'Z')])
+  assert result["A"] == OrderedSet([('AH0',)])
+  assert result["TEST"] == OrderedSet([('T', 'EH1', 'S', 'T')])
+
 
 # def test_merge_symbols__no_merge_symbols():
 #   res = merge_symbols(
