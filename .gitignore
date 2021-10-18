@@ -129,6 +129,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-playground*
-*.debug.py
-debug/
+text_utils_debug/
