@@ -107,7 +107,8 @@ def text_to_symbols(text: str, text_format: SymbolFormat, lang: Optional[Languag
   if text_format.is_IPA:
     return parse_ipa_to_symbols(text)
   if text_format == SymbolFormat.PHONEMES_ARPA:
-    raise ValueError("Not supported!")
+    result = tuple(text.split(" "))
+    return result
 
   assert text_format == SymbolFormat.GRAPHEMES
 
