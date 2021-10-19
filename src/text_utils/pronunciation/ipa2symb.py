@@ -240,7 +240,7 @@ def get_all_next_consecutive_merge_symbols(symbols: Symbols, merge_symbols: Set[
   return merge_symbol_concat, index
 
 
-def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Symbols:
+def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Optional[Symbol]) -> Symbols:
   if insert_symbol is None:
     insert_symbol = ""
   j = 0
@@ -265,7 +265,7 @@ def get_next_merged_left_symbol_and_index(symbols: Symbols, j: int, merge_symbol
   return new_symbol, j
 
 
-def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Symbols:
+def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Optional[Symbol]) -> Symbols:
   if insert_symbol is None:
     insert_symbol = ""
   j = 0
