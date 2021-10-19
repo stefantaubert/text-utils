@@ -253,11 +253,12 @@ def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbol
 
 
 def get_next_merged_left_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Tuple[Symbol, int]:
+  assert isinstance(insert_symbol, str)
   new_symbol = symbols[j]
   j += 1
   if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
     while j < len(symbols) and symbols[j] in merge_symbols:
-      new_symbol = symbols[j] + new_symbol
+      new_symbol = symbols[j] + insert_symbol + new_symbol
       j += 1
   return new_symbol, j
 
@@ -275,6 +276,7 @@ def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbo
 
 
 def get_next_merged_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Tuple[Symbol, int]:
+  assert isinstance(insert_symbol, str)
   new_symbol = symbols[j]
   j += 1
   if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
