@@ -13,7 +13,9 @@ from text_utils.pronunciation import (EngToIPAMode, break_n_thongs, change_ipa,
                                       eng_to_ipa, ger_to_ipa,
                                       parse_ipa_to_symbols, remove_arcs,
                                       remove_stress, remove_tones,
-                                      symbols_map_arpa_to_ipa, symbols_to_arpa,
+                                      symbols_map_arpa_to_ipa,
+                                      symbols_remove_non_arpa_symbols,
+                                      symbols_to_arpa,
                                       symbols_to_arpa_pronunciation_dict,
                                       symbols_to_ipa)
 from text_utils.speakers_dict import SpeakersDict, SpeakersLogDict

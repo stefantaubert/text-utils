@@ -1,7 +1,8 @@
 from typing import Dict, Optional, Set
 
-from text_utils.pronunciation.arpa_symbols import (AA, AE, AH, AO, AW, AX, AXR,
-                                                   AY, CH)
+from text_utils.pronunciation.arpa_symbols import (AA, AE, AH,
+                                                   ALL_ARPA_INCL_STRESSES, AO,
+                                                   AW, AX, AXR, AY, CH)
 from text_utils.pronunciation.arpa_symbols import CONSONANTS as ARPA_CONSONANTS
 from text_utils.pronunciation.arpa_symbols import (DH, DX, EH, EL, EM, EN, ER,
                                                    EY, HH, IH, IX, IY, JH, NG,
@@ -122,3 +123,8 @@ def symbol_map_arpa_to_ipa(arpa_symbol: Symbol, ignore: Set[Symbol], replace_unk
       return None
     return replace_unknown_with
   return arpa_symbol
+
+
+def symbols_remove_non_arpa_symbols(symbols: Symbols) -> Symbols:
+  result = tuple(symbol for symbol in symbols if symbol in ALL_ARPA_INCL_STRESSES)
+  return result
