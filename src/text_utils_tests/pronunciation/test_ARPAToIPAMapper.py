@@ -1,7 +1,13 @@
 from text_utils.pronunciation.arpa_symbols import ALL_ARPA_INCL_STRESSES
-from text_utils.pronunciation.ARPAToIPAMapper import (__ARPABET_IPA_MAP,
-                                                      symbol_map_arpa_to_ipa,
-                                                      symbols_map_arpa_to_ipa)
+from text_utils.pronunciation.ARPAToIPAMapper import (
+    __ARPABET_IPA_MAP, symbol_map_arpa_to_ipa, symbols_map_arpa_to_ipa,
+    symbols_remove_non_arpa_symbols)
+
+
+def test_symbols_remove_non_arpa_symbols():
+  symbols = ('DH', 'IH0', 'S', ' ', 'IH0', 'Z', ' ', 'AH0', ' ', 'T', 'EH1', 'S', 'T', ".",)
+  result = symbols_remove_non_arpa_symbols(symbols)
+  assert result == ('DH', 'IH0', 'S', 'IH0', 'Z', 'AH0', 'T', 'EH1', 'S', 'T')
 
 
 def test_all_arpa_symbols_are_mapped():

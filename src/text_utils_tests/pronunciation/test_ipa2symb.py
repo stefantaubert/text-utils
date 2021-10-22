@@ -491,7 +491,20 @@ def test_merge_left__insert_symbol_consists_of_two_chars():
                    "'"}, ignore_merge_symbols={" "}, insert_symbol="?$")
   assert res == ("'?$a", ",", "'", " ", "b",)
 
+
+def test_merge_left__merge_symbols_are_not_merged_if_no_non_ignore_symbol_exists():
+  res = merge_left(" -- ", merge_symbols={"-"}, ignore_merge_symbols={" "})
+  assert res == (" ", "-", "-", " ")
+
 # endregion
+
+
+def test_merge_join():
+  result = merge_join(
+    symbols=tuple(" -- "),
+    join_symbols={"-"},
+  )
+  assert result == (" ", "--", " ")
 
 # region merge_right
 

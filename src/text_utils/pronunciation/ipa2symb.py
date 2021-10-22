@@ -123,6 +123,11 @@ def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
   return tuple(splitted_symbols)
 
 
+def merge_join(symbols: Symbols, join_symbols: Set[Symbol]) -> Symbols:
+  # TODO jasmin
+  return symbols
+
+
 def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> Symbols:
   j = 0
   merged_symbols = []

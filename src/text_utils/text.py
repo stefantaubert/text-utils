@@ -17,8 +17,8 @@ from text_utils.types import Symbol, Symbols
 from text_utils.utils import remove_empty_symbols
 from text_utils.utils import \
     remove_space_around_punctuation as remove_space_around_punctuation_method
-from text_utils.utils import (split_text, symbols_separate, symbols_split,
-                              symbols_strip)
+from text_utils.utils import (split_text, symbols_join, symbols_separate,
+                              symbols_split, symbols_strip)
 
 IPA_SENTENCE_SEPARATORS = {"?", "!", "."}
 CHN_SENTENCE_SEPARATORS = {"?", "!", ".", "？", "！", "。"}
@@ -107,7 +107,8 @@ def text_to_symbols(text: str, text_format: SymbolFormat, lang: Optional[Languag
   if text_format.is_IPA:
     return parse_ipa_to_symbols(text)
   if text_format == SymbolFormat.PHONEMES_ARPA:
-    raise ValueError("Not supported!")
+    result = tuple(text.split(" "))
+    return result
 
   assert text_format == SymbolFormat.GRAPHEMES
 
@@ -190,6 +191,10 @@ def symbols_to_sentences(symbols: Symbols, symbols_format: SymbolFormat, lang: O
 
 def symbols_to_words(symbols: Symbols) -> List[Symbols]:
   return symbols_split(symbols, {" "})
+
+
+def words_to_symbols(words: List[Symbols]) -> Symbols:
+  return symbols_join(words, join_symbol=" ")
 
 
 def split_chn_graphemes_text(text: str) -> Symbols:
