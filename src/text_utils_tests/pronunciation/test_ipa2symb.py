@@ -3,9 +3,9 @@ from text_utils.pronunciation.ipa2symb import (
     get_longest_template_with_ignore,
     get_next_merged_left_or_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
-    merge_left, merge_right, merge_template, merge_template_with_ignore,
-    merge_together, remove_arcs, split_string_to_tuple,
-    try_update_longest_template)
+    merge_join, merge_left, merge_right, merge_template,
+    merge_template_with_ignore, merge_together, remove_arcs,
+    split_string_to_tuple, try_update_longest_template)
 
 
 def test_remove_arcs__empty_input():
@@ -483,6 +483,14 @@ def test_merge_left__merge_symbols_are_not_merged_if_no_non_ignore_symbol_exists
   assert res == (" ", "-", "-", " ")
 
 # endregion
+
+
+def test_merge_join():
+  result = merge_join(
+    symbols=tuple(" -- "),
+    join_symbols={"-"},
+  )
+  assert result == (" ", "--", " ")
 
 # region merge_right
 
