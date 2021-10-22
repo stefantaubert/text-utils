@@ -193,7 +193,7 @@ def remove_ignore_at_end(template: Symbols, ignore: Set[Symbol]) -> Symbols:
 
 
 def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
-  merged_symbols = merge_template_with_ignore(symbols, template, "")
+  merged_symbols = merge_template_with_ignore(symbols, template, {})
   return merged_symbols
 
 
