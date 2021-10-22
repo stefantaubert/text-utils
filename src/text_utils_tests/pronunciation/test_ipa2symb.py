@@ -4,7 +4,7 @@ from text_utils.pronunciation.ipa2symb import (
     get_next_merged_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
     merge_left, merge_right, merge_template, merge_template_with_ignore,
-    merge_together, remove_arcs, split_string_to_tuple,
+    merge_together, remove_arcs, remove_ignore_at_end, split_string_to_tuple,
     try_update_longest_template)
 
 
@@ -115,16 +115,41 @@ def test_split_string_to_tuple__four_split_symbols_in_middle():
 def test_merge_template_with_ignore():
   symbols = ("ab:", "c", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == ("ab:c", "d")
+
+def test_merge_template_with_ignore__ignore_symbol_is_also_part_of_template():
+  symbols = ("aba", "c", "d")
+  template = {"abc"}
+  ignore = {"a"}
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("abac", "d")
+
+def test_merge_template_with_ignore__ignore_is_set_with_two_elements():
+  symbols = ("ab:;", "c", "d")
+  template = {"abc"}
+  ignore = {":", ";"}
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("ab:;c", "d")
+
+
+def test_merge_template_with_ignore__ignore_is_empty_set():
+  symbols = ("ab:", "c", "d")
+  template = {"abc"}
+  ignore = {}
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == symbols
 
 
 def test_merge_template_with_ignore__ignore_symbol_alone_in_middle():
   symbols = ("ab", ":", "c", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == ("ab:c", "d")
@@ -133,16 +158,25 @@ def test_merge_template_with_ignore__ignore_symbol_alone_in_middle():
 def test_merge_template_with_ignore__two_ignore_symbols_alone_in_middle():
   symbols = ("ab", ":", ":", "c", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == ("ab::c", "d")
 
 
+def test_merge_template_with_ignore__ignore_symbol_at_beginning_of_one_tuple_entry_that_should_be_merged():
+  symbols = (":ab", "c", "d")
+  template = {"abc"}
+  ignore = {":"}
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == (":abc", "d")
+
+
 def test_merge_template_with_ignore__ignore_symbol_alone_at_beginning():
   symbols = (":", "ab", "c", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == (":", "abc", "d")
@@ -151,16 +185,25 @@ def test_merge_template_with_ignore__ignore_symbol_alone_at_beginning():
 def test_merge_template_with_ignore__two_ignore_symbols_alone_at_beginning():
   symbols = (":", ":", "ab", "c", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == (":", ":", "abc", "d")
 
 
+def test_merge_template_with_ignore__ignore_symbol_at_end_of_one_tuple_entry_that_should_be_merged():
+  symbols = ("ab", "c:", "d")
+  template = {"abc"}
+  ignore = {":"}
+  res = merge_template_with_ignore(symbols, template, ignore)
+
+  assert res == ("abc:", "d")
+
+
 def test_merge_template_with_ignore__ignore_symbol_alone_at_end_of_a_template():
   symbols = ("ab", "c", ":", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == ("abc", ":", "d")
@@ -169,7 +212,7 @@ def test_merge_template_with_ignore__ignore_symbol_alone_at_end_of_a_template():
 def test_merge_template_with_ignore__two_ignore_symbols_alone_at_end_of_a_template():
   symbols = ("ab", "c", ":", ":", "d")
   template = {"abc"}
-  ignore = ":"
+  ignore = {":"}
   res = merge_template_with_ignore(symbols, template, ignore)
 
   assert res == ("abc", ":", ":", "d")
@@ -258,7 +301,8 @@ def test_merge_region__template_contains_only_empty_string():
 def test_get_longest_template_with_ignore():
   symbols = ("a", "bc", "e")
   template = {"abc", "ab", "abcd"}
-  res = get_longest_template_with_ignore(symbols, template, "")
+  ignore = {}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == ("a", "bc")
 
@@ -266,7 +310,8 @@ def test_get_longest_template_with_ignore():
 def test_get_longest_template_with_ignore__three_ignore_symbols_in_middle_of_template():
   symbols = ("a", ":", ":", ":", "bc", "e")
   template = {"abc", "ab"}
-  res = get_longest_template_with_ignore(symbols, template, ":")
+  ignore = {":"}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == ("a", ":", ":", ":", "bc")
 
@@ -274,7 +319,8 @@ def test_get_longest_template_with_ignore__three_ignore_symbols_in_middle_of_tem
 def test_get_longest_template_with_ignore__one_ignore_symbol_at_beginning():
   symbols = (":", "bc", "e")
   template = {"bce"}
-  res = get_longest_template_with_ignore(symbols, template, ":")
+  ignore = {":"}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == (":",)
 
@@ -282,7 +328,8 @@ def test_get_longest_template_with_ignore__one_ignore_symbol_at_beginning():
 def test_get_longest_template_with_ignore__two_ignore_symbols_at_beginning():
   symbols = (":", ":", "bc", "e")
   template = {"bce"}
-  res = get_longest_template_with_ignore(symbols, template, ":")
+  ignore = {":"}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == (":",)
 
@@ -290,7 +337,8 @@ def test_get_longest_template_with_ignore__two_ignore_symbols_at_beginning():
 def test_get_longest_template_with_ignore__is_not_in_template():
   symbols = ("a", "c", "e")
   template = {"abc"}
-  res = get_longest_template_with_ignore(symbols, template, "")
+  ignore = {}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == ("a",)
 
@@ -298,7 +346,8 @@ def test_get_longest_template_with_ignore__is_not_in_template():
 def test_get_longest_template_with_ignore__longest_template_is_longer_than_symbols():
   symbols = ("a", "c", "e")
   template = {"abcdefg"}
-  res = get_longest_template_with_ignore(symbols, template, "")
+  ignore = {}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == ("a",)
 
@@ -306,7 +355,8 @@ def test_get_longest_template_with_ignore__longest_template_is_longer_than_symbo
 def test_get_longest_template_with_ignore__template_is_empty():
   symbols = ("a",)
   template = {}
-  res = get_longest_template_with_ignore(symbols, template, "")
+  ignore = {}
+  res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == symbols
 
@@ -318,7 +368,32 @@ def test_get_longest_template_with_ignore__template_is_empty():
 def test_try_update_longest_template__successful_updating():
   symbols = ("a", "c", "e")
   template = {"ac", "ace"}
-  res = try_update_longest_template(symbols, 2, template, ":")
+  ignore = {":", ";"}
+  res = try_update_longest_template(symbols, 2, template, ignore)
+
+  assert res == ("a", "c")
+
+def test_try_update_longest_template__successful_updating__in_middle_of_template_is_one_ignore_symbol():
+  symbols = ("a:", "c", "e")
+  template = {"ac", "ace"}
+  ignore = {":", ";"}
+  res = try_update_longest_template(symbols, 2, template, ignore)
+
+  assert res == ("a:", "c")
+
+def test_try_update_longest_template__successful_updating__in_middle_of_template_are_two_ignore_symbol():
+  symbols = ("a:", ";c", "e")
+  template = {"ac", "ace"}
+  ignore = {":", ";"}
+  res = try_update_longest_template(symbols, 2, template, ignore)
+
+  assert res == ("a:", ";c")
+
+def test_try_update_longest_template__successful_updating__ignore_is_empty():
+  symbols = ("a", "c", "e")
+  template = {"ac", "ace"}
+  ignore = {}
+  res = try_update_longest_template(symbols, 2, template, ignore)
 
   assert res == ("a", "c")
 
@@ -326,9 +401,35 @@ def test_try_update_longest_template__successful_updating():
 def test_try_update_longest_template__returns_none():
   symbols = ("a", "c", "e")
   template = {"ace"}
-  res = try_update_longest_template(symbols, 2, template, ":")
+  ignore = {":", ";"}
+  res = try_update_longest_template(symbols, 2, template, ignore)
 
   assert res is None
+
+# endregion
+
+# region remove_ignore_at_end
+
+def test_remove_ignore_at_end__ignore_symbol_at_end_of_tuple_entry_but_not_alone_so_do_not_remove():
+  template = ("abc:",)
+  ignore = {":"}
+  res = remove_ignore_at_end(template, ignore)
+
+  assert res == template
+
+def test_remove_ignore_at_end__ignore_symbol_at_end_of_tuple__remove():
+  template = ("abc", ":")
+  ignore = {":"}
+  res = remove_ignore_at_end(template, ignore)
+
+  assert res == ("abc",)
+
+def test_remove_ignore_at_end__two_alone_ignore_symbol_at_end_of_tuple__remove_both():
+  template = ("abc", ":", ";")
+  ignore = {":", ";"}
+  res = remove_ignore_at_end(template, ignore)
+
+  assert res == ("abc",)
 
 # endregion
 
