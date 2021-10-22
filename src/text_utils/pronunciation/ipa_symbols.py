@@ -119,35 +119,38 @@ SCHWAS = {
   "ɝ",
 }
 
-ENG_DIPHTHONGS={
+ENG_ARPA_DIPHTONGS = {
   "aʊ",
   "aɪ",
+  "eɪ",  # "engraved"
+  "oʊ",  # "only"
+  "ɔɪ",  # "boy", "avoidance"
+}
+
+ENG_DIPHTHONGS = ENG_ARPA_DIPHTONGS | {
   "æʊ",
   "æɔ",
   "æɪ",
   "ʌʊ",
   "ʌɪ",
-  "ɔɪ", # "boy"
-  "oʊ",
   "oɪ",
   "ʉu",
-  "iʌ", # extra
+  "iʌ",  # extra
   "ɪər",
   "ɪə",
   "ɪɹ",
   "ɛər",
   "ɛə",
-  "eə", # extra "air"
-  "eər", # extra
-  "eʊ", # extra "boat"
+  "eə",  # extra "air"
+  "eər",  # extra
+  "eʊ",  # extra "boat"
   "ɛɹ",
-  "eɪ",
   "ʊər",
   "ʊə",
   "ʊu",
   "ʊɹ",
-  "ɝʌ", # extra
-  "ɝi", # extra
+  # "ɝʌ",  # extra
+  # "ɝi",  # extra
 }
 
 CONSONANTS = {
@@ -179,7 +182,7 @@ CONSONANTS = {
   "b͡v",
   "t͡s",
   "d͡z",
-  "t͡ʃ",
+  "t͡ʃ",  # "Chinese"
   "d͡ʒ",
   "ʈ͡ʂ",
   "ɖ͡ʐ",
@@ -229,7 +232,7 @@ CONSONANTS = {
 
 CHARACTERS = VOWELS | SCHWAS | CONSONANTS
 
-MERGE = {
+TIES = {
   TIE_ABOVE,
   TIE_BELOW,
 }
@@ -270,9 +273,9 @@ APPENDIX = {
   BREATHY_VOICE_ASPIRATED,
 }
 
-PREPEND = {
+STRESSES = {
   STRESS_PRIMARY,
   STRESS_SECONDARY,
 }
 
-DONT_CHANGE = set(string.punctuation) | set(string.whitespace)
+PUNCTUATION_AND_WHITESPACE = set(string.punctuation) | set(string.whitespace)

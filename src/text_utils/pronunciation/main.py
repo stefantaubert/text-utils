@@ -16,10 +16,14 @@ from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
 from text_utils.pronunciation.ipa2symb import \
     break_n_thongs as break_n_thongs_method
-from text_utils.pronunciation.ipa2symb import (parse_ipa_symbols_to_symbols,
+from text_utils.pronunciation.ipa2symb import (merge_template, merge_together,
+                                               parse_ipa_symbols_to_symbols,
                                                parse_ipa_to_symbols,
                                                remove_arcs, remove_stress,
                                                remove_tones)
+from text_utils.pronunciation.ipa_symbols import (ENG_ARPA_DIPHTONGS,
+                                                  PUNCTUATION_AND_WHITESPACE,
+                                                  TIES)
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
@@ -80,12 +84,22 @@ def __get_eng_ipa(word: Symbols) -> Symbols:
 
   epi_instance = get_eng_epitran()
   word_str = ''.join(word)
-  result = epi_instance.transliterate(word_str)
+  symbols_str = epi_instance.transliterate(word_str)
 
   main_logger.setLevel(old_level)
 
-  result_tuple = parse_ipa_to_symbols(result)
-  return result_tuple
+  symbols = tuple(symbols_str)
+  symbols = merge_together(
+    symbols=symbols,
+    merge_symbols=TIES,
+    ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
+  )
+
+  symbols_contain_no_arpa_diphtongs = len(ENG_ARPA_DIPHTONGS.intersection(set(symbols))) == 0
+  assert symbols_contain_no_arpa_diphtongs
+  assert parse_ipa_to_symbols(symbols_str) == symbols
+
+  return symbols
 
 
 def __get_ger_ipa(word: Symbols) -> Symbols:
@@ -124,9 +138,15 @@ def eng_to_ipa_pronunciation_dict(eng_sentence: Symbols, consider_annotations: b
   arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations)
   result_ipa = symbols_map_arpa_to_ipa(arpa_symbols, ignore={},
                                        replace_unknown=False, replace_unknown_with=None)
-  result_ipa = parse_ipa_symbols_to_symbols(result_ipa)
+  mapped_ipa_str = ''.join(result_ipa)
+  reparsed_ipa = parse_ipa_to_symbols(mapped_ipa_str)
+  if reparsed_ipa != result_ipa:
+    logger = getLogger(__name__)
+    logger.info(f"Changed parsing of \"{' '.join(result_ipa)}\" to \"{' '.join(reparsed_ipa)}\".")
+  # assert parse_ipa_to_symbols(''.join(result_ipa)) == result_ipa
+  # result_ipa = parse_ipa_symbols_to_symbols(result_ipa)
 
-  return result_ipa
+  return reparsed_ipa
 
 
 class EngToIPAMode(Enum):
