@@ -121,6 +121,11 @@ def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
   return tuple(splitted_symbols)
 
 
+def merge_join(symbols: Symbols, merge_symbols: Set[Symbol]) -> Symbols:
+  # TODO jasmin
+  return symbols
+
+
 def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> Symbols:
   j = 0
   merged_symbols = []
@@ -250,21 +255,6 @@ def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbol
   return tuple(merged_symbols)
 
 
-def get_next_merged_left_or_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], from_left: bool) -> Tuple[Symbol, int]:
-  new_symbol = symbols[j]
-  j += 1
-  if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
-    while j < len(symbols) and symbols[j] in merge_symbols:
-      if from_left:
-        new_symbol = symbols[j] + new_symbol
-      else:
-        new_symbol += symbols[j]
-      j += 1
-  return new_symbol, j
-
-# def add_symbols(symbol_1: Symbol, symbol_2: Symbol, )
-
-
 def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
   j = 0
   merged_symbols = []
@@ -274,6 +264,20 @@ def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbo
     merged_symbols.append(new_symbol)
   return tuple(merged_symbols)
 
+
+def get_next_merged_left_or_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], from_left: bool) -> Tuple[Symbol, int]:
+  new_symbol = symbols[j]
+  j += 1
+  if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
+    while j < len(symbols) and symbols[j] in merge_symbols:
+      if from_left:
+        new_symbol = symbols[j] + new_symbol
+      else:
+        new_symbol = new_symbol + symbols[j]
+      j += 1
+  return new_symbol, j
+
+# def add_symbols(symbol_1: Symbol, symbol_2: Symbol, )
 
 # def is_phonetic_transcription_in_text(text: str) -> bool:
 #   # ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
