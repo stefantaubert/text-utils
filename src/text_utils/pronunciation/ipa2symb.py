@@ -2,12 +2,14 @@ from typing import Iterable, List, Optional, Set, Tuple
 
 import numpy as np
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, CHARACTERS,
-                                                  CONSONANTS, DONT_CHANGE,
-                                                  ENG_DIPHTHONGS, MERGE,
-                                                  PREPEND, SCHWAS,
-                                                  STRESS_PRIMARY,
-                                                  STRESS_SECONDARY, TIE_ABOVE,
-                                                  TIE_BELOW, TONES, VOWELS)
+                                                  CONSONANTS,
+                                                  ENG_ARPA_DIPHTONGS,
+                                                  ENG_DIPHTHONGS,
+                                                  PUNCTUATION_AND_WHITESPACE,
+                                                  SCHWAS, STRESS_PRIMARY,
+                                                  STRESS_SECONDARY, STRESSES,
+                                                  TIE_ABOVE, TIE_BELOW, TIES,
+                                                  TONES, VOWELS)
 from text_utils.types import Symbol, Symbols
 from text_utils.utils import (remove_symbols_at_all_places, split_symbols_on,
                               symbols_ignore)
@@ -43,12 +45,12 @@ def break_n_thongs(symbols: Symbols) -> Symbols:
       sub_symbols = tuple(symbol)
       # no merge fusion
       # TODO maybe merge stress to first vowel in n-thong in chinese
-      sub_symbols = merge_together(sub_symbols, merge_symbols=MERGE,
-                                   ignore_merge_symbols=DONT_CHANGE)
-      sub_symbols = merge_left(sub_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE,
+      sub_symbols = merge_together(sub_symbols, merge_symbols=TIES,
+                                   ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE)
+      sub_symbols = merge_left(sub_symbols, merge_symbols=STRESSES, ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
                                insert_symbol=None)
       sub_symbols = merge_right(sub_symbols, merge_symbols=APPENDIX,
-                                ignore_merge_symbols=DONT_CHANGE, insert_symbol=None)
+                                ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE, insert_symbol=None)
       result.extend(sub_symbols)
     else:
       result.append(symbol)
@@ -92,13 +94,34 @@ def parse_ipa_to_symbols(sentence: str) -> Symbols:
 
 
 def parse_ipa_symbols_to_symbols(all_symbols: Symbols) -> Symbols:
-  all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
-  all_symbols = merge_together(all_symbols, merge_symbols=MERGE, ignore_merge_symbols=DONT_CHANGE)
-  all_symbols = merge_right(all_symbols, merge_symbols=APPENDIX, ignore_merge_symbols=DONT_CHANGE,
-                            insert_symbol=None)
+  #all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
+  all_symbols = merge_together(
+    symbols=all_symbols,
+    merge_symbols=TIES,
+    ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
+  )
+
+  all_symbols = merge_right(
+    symbols=all_symbols,
+    merge_symbols=APPENDIX,
+    ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
+    insert_symbol=None,
+  )
+
+  all_symbols = merge_template_with_ignore(
+    symbols=all_symbols,
+    template=ENG_ARPA_DIPHTONGS,
+    ignore=APPENDIX,
+  )
+
   #all_symbols = merge_template_with_ignore(all_symbols, template=ENG_DIPHTHONGS, ignore=APPENDIX)
-  all_symbols = merge_left(all_symbols, merge_symbols=PREPEND, ignore_merge_symbols=DONT_CHANGE,
-                           insert_symbol=None)
+  all_symbols = merge_left(
+    symbols=all_symbols,
+    merge_symbols=STRESSES,
+    ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
+    insert_symbol=None,
+  )
+
   return all_symbols
 
 
@@ -123,12 +146,8 @@ def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
   return tuple(splitted_symbols)
 
 
-def merge_join(symbols: Symbols, join_symbols: Set[Symbol]) -> Symbols:
-  # TODO jasmin
-  return symbols
-
-
 def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> Symbols:
+  """ignore at end"""
   j = 0
   merged_symbols = []
   while j < len(symbols):

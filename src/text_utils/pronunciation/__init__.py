@@ -1,6 +1,6 @@
 from text_utils.pronunciation.ARPAToIPAMapper import (
     symbols_map_arpa_to_ipa, symbols_remove_non_arpa_symbols)
-from text_utils.pronunciation.ipa2symb import (break_n_thongs, merge_join,
+from text_utils.pronunciation.ipa2symb import (break_n_thongs,
                                                parse_ipa_to_symbols,
                                                remove_arcs, remove_stress,
                                                remove_tones)

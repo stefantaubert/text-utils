@@ -39,6 +39,13 @@ def test_get_eng_ipa():
   assert result == ('t', 'ɛ', 's', 't')
 
 
+def test_get_eng_ipa__ties_are_merged():
+  result = __get_eng_ipa(tuple("Chinese"))
+
+  clear_ipa_cache()
+  assert result == ('t͡ʃ', 'a', 'j', 'n', 'i', 'z')
+
+
 def test__get_ger_ipa():
   result = __get_ger_ipa(tuple("test"))
 
