@@ -3,7 +3,8 @@ from typing import Optional, Set, Tuple
 
 from dragonmapper import hanzi
 from sentence2pronunciation.core import sentence2pronunciation_cached
-from text_utils.pronunciation.ipa2symb import parse_ipa_to_symbols
+from text_utils.pronunciation.ipa2symb import (parse_ipa_to_symbols,
+                                               reparse_ipa_symbols_to_symbols)
 from text_utils.pronunciation.ipa_symbols import SCHWAS, TONES, VOWELS
 from text_utils.types import Symbol, Symbols
 from text_utils.utils import symbols_map
@@ -85,7 +86,7 @@ def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool, annotation_spl
 
   symbols = symbols_map(symbols, CHN_PUNCTUATION_MAPPING)
 
-  symbols_rejoined = parse_ipa_to_symbols(''.join(symbols))
+  symbols_rejoined = reparse_ipa_symbols_to_symbols(symbols)
   assert symbols_rejoined == symbols
 
   return symbols
