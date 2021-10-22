@@ -38,23 +38,34 @@ from text_utils.utils import (remove_symbols_at_all_places, split_symbols_on,
 #   return result
 
 def break_n_thongs(symbols: Symbols) -> Symbols:
-  result = []
-  for symbol in symbols:
-    symbol_is_n_thong = is_n_thong(symbol)
-    if symbol_is_n_thong:
-      sub_symbols = tuple(symbol)
-      # no merge fusion
-      # TODO maybe merge stress to first vowel in n-thong in chinese
-      sub_symbols = merge_together(sub_symbols, merge_symbols=TIES,
-                                   ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE)
-      sub_symbols = merge_left(sub_symbols, merge_symbols=STRESSES, ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
-                               insert_symbol=None)
-      sub_symbols = merge_right(sub_symbols, merge_symbols=APPENDIX,
-                                ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE, insert_symbol=None)
-      result.extend(sub_symbols)
-    else:
-      result.append(symbol)
-  new_symbols = tuple(result)
+  # new_symbols = []
+  # for symbol in symbols:
+  #   symbol_is_n_thong = is_n_thong(symbol)
+  #   if symbol_is_n_thong:
+  #     sub_symbols = tuple(symbol)
+  #     # no merge fusion
+  #     # TODO maybe merge stress to first vowel in n-thong in chinese
+  #     sub_symbols = merge_together(sub_symbols, merge_symbols=TIES,
+  #                                  ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE)
+  #     sub_symbols = merge_left(sub_symbols, merge_symbols=STRESSES, ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
+  #                              insert_symbol=None)
+  #     sub_symbols = merge_right(sub_symbols, merge_symbols=APPENDIX,
+  #                               ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE, insert_symbol=None)
+  #     result.extend(sub_symbols)
+  #   else:
+  #     result.append(symbol)
+  # new_symbols = tuple(result)
+  return reparse_ipa_symbols_to_symbols(symbols)
+
+
+def add_n_thongs(symbols: Symbols) -> Symbols:
+  #all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
+  new_symbols = merge_template_with_ignore(
+    symbols=symbols,
+    template=ENG_ARPA_DIPHTONGS,
+    ignore=APPENDIX,
+  )
+
   return new_symbols
 
 
@@ -88,13 +99,17 @@ def remove_stress(symbols: Symbols) -> Symbols:
   return new_symbols
 
 
+def reparse_ipa_symbols_to_symbols(symbols: Symbols) -> Symbols:
+  symbols_str = ''.join(symbols)
+  return parse_ipa_to_symbols(symbols_str)
+
+
 def parse_ipa_to_symbols(sentence: str) -> Symbols:
   all_symbols = tuple(sentence)
   return parse_ipa_symbols_to_symbols(all_symbols)
 
 
 def parse_ipa_symbols_to_symbols(all_symbols: Symbols) -> Symbols:
-  #all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
   all_symbols = merge_together(
     symbols=all_symbols,
     merge_symbols=TIES,
@@ -108,13 +123,6 @@ def parse_ipa_symbols_to_symbols(all_symbols: Symbols) -> Symbols:
     insert_symbol=None,
   )
 
-  all_symbols = merge_template_with_ignore(
-    symbols=all_symbols,
-    template=ENG_ARPA_DIPHTONGS,
-    ignore=APPENDIX,
-  )
-
-  #all_symbols = merge_template_with_ignore(all_symbols, template=ENG_DIPHTHONGS, ignore=APPENDIX)
   all_symbols = merge_left(
     symbols=all_symbols,
     merge_symbols=STRESSES,

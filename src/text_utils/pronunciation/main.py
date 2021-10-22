@@ -14,6 +14,7 @@ from text_utils.pronunciation.chinese_ipa import chn_to_ipa
 from text_utils.pronunciation.epitran_cache import (get_eng_epitran,
                                                     get_ger_epitran)
 from text_utils.pronunciation.G2p_cache import get_eng_g2p
+from text_utils.pronunciation.ipa2symb import add_n_thongs
 from text_utils.pronunciation.ipa2symb import \
     break_n_thongs as break_n_thongs_method
 from text_utils.pronunciation.ipa2symb import (merge_template, merge_together,
@@ -84,22 +85,24 @@ def __get_eng_ipa(word: Symbols) -> Symbols:
 
   epi_instance = get_eng_epitran()
   word_str = ''.join(word)
-  symbols_str = epi_instance.transliterate(word_str)
+  word_ipa_symbols_str = epi_instance.transliterate(word_str)
 
   main_logger.setLevel(old_level)
 
-  symbols = tuple(symbols_str)
-  symbols = merge_together(
-    symbols=symbols,
-    merge_symbols=TIES,
-    ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
-  )
+  word_ipa_symbols = parse_ipa_to_symbols(word_ipa_symbols_str)
 
-  symbols_contain_no_arpa_diphtongs = len(ENG_ARPA_DIPHTONGS.intersection(set(symbols))) == 0
-  assert symbols_contain_no_arpa_diphtongs
-  assert parse_ipa_to_symbols(symbols_str) == symbols
+  # symbols = tuple(symbols_str)
+  # symbols = merge_together(
+  #   symbols=symbols,
+  #   merge_symbols=TIES,
+  #   ignore_merge_symbols=PUNCTUATION_AND_WHITESPACE,
+  # )
 
-  return symbols
+  # symbols_contain_no_arpa_diphtongs = len(ENG_ARPA_DIPHTONGS.intersection(set(symbols))) == 0
+  # assert symbols_contain_no_arpa_diphtongs
+  # assert parse_ipa_to_symbols(symbols_str) == symbols
+
+  return word_ipa_symbols
 
 
 def __get_ger_ipa(word: Symbols) -> Symbols:
@@ -110,12 +113,12 @@ def __get_ger_ipa(word: Symbols) -> Symbols:
 
   epi_instance = get_ger_epitran()
   word_str = ''.join(word)
-  result = epi_instance.transliterate(word_str)
+  word_ipa_symbols_str = epi_instance.transliterate(word_str)
 
   main_logger.setLevel(old_level)
 
-  result_tuple = parse_ipa_to_symbols(result)
-  return result_tuple
+  word_ipa_symbols = parse_ipa_to_symbols(word_ipa_symbols_str)
+  return word_ipa_symbols
 
 
 def eng_to_ipa_epitran(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
@@ -140,9 +143,10 @@ def eng_to_ipa_pronunciation_dict(eng_sentence: Symbols, consider_annotations: b
                                        replace_unknown=False, replace_unknown_with=None)
   mapped_ipa_str = ''.join(result_ipa)
   reparsed_ipa = parse_ipa_to_symbols(mapped_ipa_str)
-  if reparsed_ipa != result_ipa:
-    logger = getLogger(__name__)
-    logger.info(f"Changed parsing of \"{' '.join(result_ipa)}\" to \"{' '.join(reparsed_ipa)}\".")
+  # if reparsed_ipa != result_ipa:
+  #   logger = getLogger(__name__)
+  #   logger.info(f"Changed parsing of \"{' '.join(result_ipa)}\" to \"{' '.join(reparsed_ipa)}\".")
+
   # assert parse_ipa_to_symbols(''.join(result_ipa)) == result_ipa
   # result_ipa = parse_ipa_symbols_to_symbols(result_ipa)
 
@@ -227,7 +231,7 @@ def symbols_to_arpa(symbols: Symbols, symbols_format: SymbolFormat, lang: Langua
   assert False
 
 
-def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool) -> Symbols:
+def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool, build_n_thongs: bool) -> Symbols:
   new_symbols = symbols
 
   if ignore_arcs:
@@ -241,6 +245,9 @@ def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_s
 
   if break_n_thongs:
     new_symbols = break_n_thongs_method(new_symbols)
+
+  if build_n_thongs:
+    new_symbols = add_n_thongs(symbols)
 
   return new_symbols
 
