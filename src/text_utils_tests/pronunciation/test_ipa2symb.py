@@ -1,3 +1,4 @@
+from text_utils.pronunciation import merge_join
 from text_utils.pronunciation.ipa2symb import (
     break_n_thongs, get_all_next_consecutive_merge_symbols,
     get_longest_template_with_ignore, get_next_merged_left_symbol_and_index,
@@ -493,11 +494,11 @@ def test_merge_left__insert_symbol_consists_of_two_chars():
 
 
 def test_merge_left__merge_symbols_are_not_merged_if_no_non_ignore_symbol_exists():
-  res = merge_left(" -- ", merge_symbols={"-"}, ignore_merge_symbols={" "})
+  res = merge_left(" -- ", merge_symbols={"-"}, ignore_merge_symbols={" "}, insert_symbol=None)
   assert res == (" ", "-", "-", " ")
 
-# endregion
 
+# endregion
 
 def test_merge_join():
   result = merge_join(
