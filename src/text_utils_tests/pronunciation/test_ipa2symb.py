@@ -1,3 +1,4 @@
+import pytest
 from text_utils.pronunciation.ipa2symb import (
     break_n_thongs, get_all_next_consecutive_merge_symbols,
     get_longest_template_with_ignore, get_next_merged_left_symbol_and_index,
@@ -120,13 +121,15 @@ def test_merge_template_with_ignore():
 
   assert res == ("ab:c", "d")
 
-def test_merge_template_with_ignore__ignore_symbol_is_also_part_of_template():
-  symbols = ("aba", "c", "d")
-  template = {"abc"}
-  ignore = {"a"}
-  res = merge_template_with_ignore(symbols, template, ignore)
 
-  assert res == ("abac", "d")
+def test_merge_template_with_ignore__ignore_symbol_is_also_part_of_template__raise_assertion_error():
+  symbols = ("aba", "c", "d")
+  template = {"abc", "def"}
+  ignore = {"a", ":"}
+
+  with pytest.raises(AssertionError):
+    merge_template_with_ignore(symbols, template, ignore)
+
 
 def test_merge_template_with_ignore__ignore_is_set_with_two_elements():
   symbols = ("ab:;", "c", "d")
@@ -373,6 +376,7 @@ def test_try_update_longest_template__successful_updating():
 
   assert res == ("a", "c")
 
+
 def test_try_update_longest_template__successful_updating__in_middle_of_template_is_one_ignore_symbol():
   symbols = ("a:", "c", "e")
   template = {"ac", "ace"}
@@ -381,6 +385,7 @@ def test_try_update_longest_template__successful_updating__in_middle_of_template
 
   assert res == ("a:", "c")
 
+
 def test_try_update_longest_template__successful_updating__in_middle_of_template_are_two_ignore_symbol():
   symbols = ("a:", ";c", "e")
   template = {"ac", "ace"}
@@ -388,6 +393,7 @@ def test_try_update_longest_template__successful_updating__in_middle_of_template
   res = try_update_longest_template(symbols, 2, template, ignore)
 
   assert res == ("a:", ";c")
+
 
 def test_try_update_longest_template__successful_updating__ignore_is_empty():
   symbols = ("a", "c", "e")
@@ -410,6 +416,7 @@ def test_try_update_longest_template__returns_none():
 
 # region remove_ignore_at_end
 
+
 def test_remove_ignore_at_end__ignore_symbol_at_end_of_tuple_entry_but_not_alone_so_do_not_remove():
   template = ("abc:",)
   ignore = {":"}
@@ -417,12 +424,14 @@ def test_remove_ignore_at_end__ignore_symbol_at_end_of_tuple_entry_but_not_alone
 
   assert res == template
 
+
 def test_remove_ignore_at_end__ignore_symbol_at_end_of_tuple__remove():
   template = ("abc", ":")
   ignore = {":"}
   res = remove_ignore_at_end(template, ignore)
 
   assert res == ("abc",)
+
 
 def test_remove_ignore_at_end__two_alone_ignore_symbol_at_end_of_tuple__remove_both():
   template = ("abc", ":", ";")

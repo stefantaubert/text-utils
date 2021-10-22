@@ -147,7 +147,9 @@ def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
 
 
 def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Set[Symbol]) -> Symbols:
-  """ignore at end"""
+  for temp in template:
+    for ignore_symbol in ignore:
+      assert ignore_symbol not in temp
   j = 0
   merged_symbols = []
   while j < len(symbols):
