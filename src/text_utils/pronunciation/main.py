@@ -231,7 +231,7 @@ def symbols_to_arpa(symbols: Symbols, symbols_format: SymbolFormat, lang: Langua
   assert False
 
 
-def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool, build_n_thongs: bool) -> Symbols:
+def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_stress: bool, break_n_thongs: bool, build_n_thongs: bool, language: Optional[Language]) -> Symbols:
   new_symbols = symbols
 
   if ignore_arcs:
@@ -247,7 +247,8 @@ def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_s
     new_symbols = break_n_thongs_method(new_symbols)
 
   if build_n_thongs:
-    new_symbols = add_n_thongs(symbols)
+    assert language is not None
+    new_symbols = add_n_thongs(symbols, language)
 
   return new_symbols
 

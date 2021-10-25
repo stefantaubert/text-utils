@@ -1,4 +1,5 @@
 import pytest
+from text_utils.language import Language
 from text_utils.pronunciation.ipa2symb import (
     add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols,
     get_longest_template_with_ignore, get_next_merged_left_symbol_and_index,
@@ -28,6 +29,7 @@ def test_remove_arcs__component_tests():
 def test_add_n_thong__merges_eng_arpa_diphtong_ai():
   result = add_n_thongs(
     symbols=("b", "a", "ˈa", "ɪ\u031D", "a", "b"),
+    language=Language.ENG,
   )
 
   assert result == ("b", "a", "ˈaɪ\u031D", "a", "b")

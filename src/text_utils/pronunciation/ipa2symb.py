@@ -1,6 +1,7 @@
 from typing import Iterable, List, Optional, Set, Tuple
 
 import numpy as np
+from text_utils.language import Language
 from text_utils.pronunciation.ipa_symbols import (APPENDIX, CHARACTERS,
                                                   CONSONANTS,
                                                   ENG_ARPA_DIPHTONGS,
@@ -58,11 +59,17 @@ def break_n_thongs(symbols: Symbols) -> Symbols:
   return reparse_ipa_symbols_to_symbols(symbols)
 
 
-def add_n_thongs(symbols: Symbols) -> Symbols:
+def add_n_thongs(symbols: Symbols, language: Language) -> Symbols:
   #all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
+  if language == Language.ENG:
+    n_thongs = ENG_ARPA_DIPHTONGS
+  else:
+    # other languages are not supported
+    assert False
+
   new_symbols = merge_template_with_ignore(
     symbols=symbols,
-    template=ENG_ARPA_DIPHTONGS,
+    template=n_thongs,
     ignore=STRESSES | APPENDIX,
   )
 
@@ -70,6 +77,7 @@ def add_n_thongs(symbols: Symbols) -> Symbols:
 
 
 def is_n_thong(symbol: Symbol) -> bool:
+  """checks if the symbol only consists of vowels or schwas"""
   sub_symbols = tuple(symbol)
   sub_characters = tuple(symbol for symbol in sub_symbols if symbol in CHARACTERS)
 
@@ -85,7 +93,7 @@ def is_n_thong(symbol: Symbol) -> bool:
 
 
 def remove_arcs(symbols: Symbols) -> Symbols:
-  new_symbols = split_symbols_on(symbols, split_symbols={TIE_ABOVE, TIE_BELOW})
+  new_symbols = split_symbols_on(symbols, split_symbols=TIES)
   return new_symbols
 
 
@@ -95,7 +103,7 @@ def remove_tones(symbols: Symbols) -> Symbols:
 
 
 def remove_stress(symbols: Symbols) -> Symbols:
-  new_symbols = remove_symbols_at_all_places(symbols, ignore={STRESS_PRIMARY, STRESS_SECONDARY})
+  new_symbols = remove_symbols_at_all_places(symbols, ignore=STRESSES)
   return new_symbols
 
 
