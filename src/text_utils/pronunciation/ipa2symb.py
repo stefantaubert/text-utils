@@ -154,8 +154,10 @@ def split_string_to_tuple(string_of_symbols: str, split_symbol: Symbol):
   return tuple(splitted_symbols)
 
 
-def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> Symbols:
-  """ignore at end"""
+def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Set[Symbol]) -> Symbols:
+  for temp in template:
+    for ignore_symbol in ignore:
+      assert ignore_symbol not in temp
   j = 0
   merged_symbols = []
   while j < len(symbols):
@@ -169,10 +171,10 @@ def merge_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: 
   return tuple(merged_symbols)
 
 
-def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Symbol) -> Symbols:
+def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ignore: Set[Symbol]) -> Symbols:
   assert len(symbols) > 0
   current_longest_template = (symbols[0],)
-  if current_longest_template[0] == ignore:
+  if current_longest_template[0] in ignore:
     return current_longest_template
   smallest_none_trival_length = 2
   for length in range(smallest_none_trival_length, len(symbols) + 1):
@@ -182,23 +184,24 @@ def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ig
   return current_longest_template
 
 
-def try_update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Symbol) -> Optional[Symbols]:
+def try_update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Set[Symbol]) -> Optional[Symbols]:
   first_length_symbols = symbols[:length]
   first_length_symbols_as_string = "".join(first_length_symbols)
-  first_length_symbols_without_ignore = first_length_symbols_as_string.replace(ignore, "")
-  if first_length_symbols_without_ignore in template:
+  for ignore_symbol in ignore:
+    first_length_symbols_as_string = first_length_symbols_as_string.replace(ignore_symbol, "")
+  if first_length_symbols_as_string in template:
     return first_length_symbols
   return None
 
 
-def remove_ignore_at_end(template: Symbols, ignore: Symbol) -> Symbols:
-  while len(template) > 1 and template[-1] == ignore:
+def remove_ignore_at_end(template: Symbols, ignore: Set[Symbol]) -> Symbols:
+  while len(template) > 1 and template[-1] in ignore:
     template = template[:-1]
   return template
 
 
 def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
-  merged_symbols = merge_template_with_ignore(symbols, template, "")
+  merged_symbols = merge_template_with_ignore(symbols, template, {})
   return merged_symbols
 
 
