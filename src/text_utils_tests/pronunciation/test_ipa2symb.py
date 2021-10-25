@@ -1,7 +1,7 @@
 import pytest
 from text_utils.language import Language
 from text_utils.pronunciation.ipa2symb import (
-    add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols,
+    add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols, get_longest_possible_length,
     get_longest_template_with_ignore, get_next_merged_left_symbol_and_index,
     get_next_merged_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
@@ -372,6 +372,18 @@ def test_get_longest_template_with_ignore__template_is_empty():
   res = get_longest_template_with_ignore(symbols, template, ignore)
 
   assert res == symbols
+
+# endregion
+
+# region get_longest_possible_length
+
+def test_get_longest_possible_length():
+  symbols = ("ab", ":", ":", ";", ":", "c")
+  template = {"abc", "ab"}
+  ignore = {":", ";"}
+  res = get_longest_possible_length(symbols, template, ignore)
+
+  assert res == 7
 
 # endregion
 
