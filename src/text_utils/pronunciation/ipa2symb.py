@@ -185,11 +185,25 @@ def get_longest_template_with_ignore(symbols: Symbols, template: Set[Symbol], ig
   if current_longest_template[0] in ignore:
     return current_longest_template
   smallest_none_trival_length = 2
-  for length in range(smallest_none_trival_length, len(symbols) + 1):
+  longest_possible_length = get_longest_possible_length(symbols, template, ignore)
+  for length in range(smallest_none_trival_length, longest_possible_length + 1):
     new_longest_template = try_update_longest_template(symbols, length, template, ignore)
     if new_longest_template is not None:
       current_longest_template = new_longest_template
   return current_longest_template
+
+
+def get_longest_possible_length(symbols: Symbols, template: Set[Symbol], ignore: Set[Symbol]) -> int:
+  number_of_ignore_symbols_in_symbols = 0
+  for ignore_symbol in ignore:
+    number_of_ignore_symbols_in_symbols += symbols.count(ignore_symbol)
+  if len(template) > 0:
+    longest_template = max(template, key=len)
+    longest_template_length = len(longest_template)
+  else:
+    longest_template_length = 0
+  longest_possible_length = number_of_ignore_symbols_in_symbols + longest_template_length
+  return longest_possible_length
 
 
 def try_update_longest_template(symbols: Symbols, length: int, template: Set[Symbol], ignore: Set[Symbol]) -> Optional[Symbols]:
