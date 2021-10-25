@@ -63,7 +63,7 @@ def add_n_thongs(symbols: Symbols) -> Symbols:
   new_symbols = merge_template_with_ignore(
     symbols=symbols,
     template=ENG_ARPA_DIPHTONGS,
-    ignore=APPENDIX,
+    ignore=STRESSES | APPENDIX,
   )
 
   return new_symbols

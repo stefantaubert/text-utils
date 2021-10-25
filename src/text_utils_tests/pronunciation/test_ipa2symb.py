@@ -1,6 +1,6 @@
 import pytest
 from text_utils.pronunciation.ipa2symb import (
-    break_n_thongs, get_all_next_consecutive_merge_symbols,
+    add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols,
     get_longest_template_with_ignore, get_next_merged_left_symbol_and_index,
     get_next_merged_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
@@ -23,6 +23,14 @@ def test_remove_arcs__component_tests():
   )
 
   assert result == ("aa", "t", "ʃ", "t", "ʃ", "t", "ʃ", "t", "ʃ", "ʃ",)
+
+
+def test_add_n_thong__merges_eng_arpa_diphtong_ai():
+  result = add_n_thongs(
+    symbols=("b", "a", "ˈa", "ɪ\u031D", "a", "b"),
+  )
+
+  assert result == ("b", "a", "ˈaɪ\u031D", "a", "b")
 
 
 def test_is_n_thong__tripthong__is_true():
