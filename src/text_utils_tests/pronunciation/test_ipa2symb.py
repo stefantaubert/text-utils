@@ -36,6 +36,15 @@ def test_add_n_thong__merges_eng_arpa_diphtong_ai():
   assert result == ("b", "a", "ˈaɪ\u031D", "a", "b")
 
 
+def test_add_n_thong__merges_chn_vowels():
+  result = add_n_thongs(
+    symbols=('tʰ', 'o', 'ʊ', '!', ' ', 'p', 'e', 'ɪ˧˩˧'),
+    language=Language.CHN,
+  )
+
+  assert result == ('tʰ', 'oʊ', '!', ' ', 'peɪ˧˩˧')
+
+
 def test_is_n_thong__tripthong__is_true():
   result = is_n_thong("aaa")
 

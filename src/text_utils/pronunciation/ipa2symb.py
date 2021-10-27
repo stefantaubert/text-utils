@@ -63,15 +63,22 @@ def add_n_thongs(symbols: Symbols, language: Language) -> Symbols:
   #all_symbols = merge_fusion(all_symbols, fusion_symbols=VOWELS | SCHWAS)
   if language == Language.ENG:
     n_thongs = ENG_ARPA_DIPHTONGS
+    new_symbols = merge_template_with_ignore(
+      symbols=symbols,
+      template=n_thongs,
+      ignore=STRESSES | APPENDIX,
+    )
+  elif language == Language.CHN:
+    # diphtongs need to be merged, all ipa vowels and schwas
+    # TODO jasmin add ignore symbol functionality
+    new_symbols = merge_fusion(
+      symbols=symbols,
+      fusion_symbols=VOWELS | SCHWAS,
+      #ignore_merge_symbols=STRESSES | APPENDIX,
+    )
   else:
     # other languages are not supported
     assert False
-
-  new_symbols = merge_template_with_ignore(
-    symbols=symbols,
-    template=n_thongs,
-    ignore=STRESSES | APPENDIX,
-  )
 
   return new_symbols
 

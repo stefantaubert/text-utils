@@ -83,7 +83,6 @@ def __get_chn_ipa(word: Symbols) -> Symbols:
             syllable_ipa_symbols_with_tones[-i - 1] += tone_ipa
             break
         syllable_ipa_symbols_with_tones = tuple(syllable_ipa_symbols_with_tones)
-
     word_ipa_symbols.extend(syllable_ipa_symbols_with_tones)
   symbols = tuple(word_ipa_symbols)
   return symbols
