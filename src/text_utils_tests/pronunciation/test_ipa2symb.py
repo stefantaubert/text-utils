@@ -1,8 +1,9 @@
 import pytest
 from text_utils.language import Language
 from text_utils.pronunciation.ipa2symb import (
-    add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols, get_longest_possible_length,
-    get_longest_template_with_ignore, get_next_merged_left_symbol_and_index,
+    add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols,
+    get_longest_possible_length, get_longest_template_with_ignore,
+    get_next_merged_left_symbol_and_index,
     get_next_merged_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong, merge_fusion,
     merge_left, merge_right, merge_template, merge_template_with_ignore,
@@ -79,10 +80,10 @@ def test_is_n_thong__single_consonant__is_false():
 
 def test_break_n_thongs__component_test():
   result = break_n_thongs(
-    symbols=("aa˦˦", "b˦", "ˈaə", "˦a", "˦aa", "a\u0361aa"),
+    symbols=("aɪ˦˦", "b˦", "ˈaɪ", "˦a", "˦aɪ", "a\u0361ɪ"),
   )
 
-  assert result == ("a", "a˦˦", "b˦", "ˈa", "ə", "˦a", "˦", "a", "a", "a\u0361a", "a")
+  assert result == ("a", "ɪ˦˦", "b˦", "ˈa", "ɪ˦", "a˦", "a", "ɪ", "a\u0361ɪ")
 
 # region split_string_to_tuple
 
@@ -376,6 +377,7 @@ def test_get_longest_template_with_ignore__template_is_empty():
 # endregion
 
 # region get_longest_possible_length
+
 
 def test_get_longest_possible_length():
   symbols = ("ab", ":", ":", ";", ":", "c")

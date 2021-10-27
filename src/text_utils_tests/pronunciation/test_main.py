@@ -1,10 +1,10 @@
 
 import pytest
 from ordered_set import OrderedSet
+from sentence2pronunciation.lookup_cache import get_empty_cache
 from text_utils.language import Language
 from text_utils.pronunciation.main import (EngToIPAMode, __get_arpa_oov,
                                            __get_eng_ipa, __get_ger_ipa,
-                                           clear_arpa_cache, clear_ipa_cache,
                                            eng_to_arpa, eng_to_ipa,
                                            eng_to_ipa_epitran,
                                            eng_to_ipa_pronunciation_dict,
@@ -19,37 +19,33 @@ def test_eng_to_arpa():
   result = eng_to_arpa(
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('DH', 'IH0', 'S', ' ', 'IH0', 'Z', ' ', 'AH0', ' ', 'T', 'EH1', 'S', 'T', ".",)
 
 
 def test_get_arpa_oov():
   result = __get_arpa_oov(tuple("test"))
 
-  clear_ipa_cache()
   assert result == ('T', 'EH1', 'S', 'T')
 
 
 def test_get_eng_ipa():
   result = __get_eng_ipa(tuple("test"))
 
-  clear_ipa_cache()
   assert result == ('t', 'ɛ', 's', 't')
 
 
 def test_get_eng_ipa__ties_are_merged():
   result = __get_eng_ipa(tuple("Chinese"))
 
-  clear_ipa_cache()
   assert result == ('t͡ʃ', 'a', 'j', 'n', 'i', 'z')
 
 
 def test__get_ger_ipa():
   result = __get_ger_ipa(tuple("test"))
 
-  clear_ipa_cache()
   assert result == ('t', 'e', 's', 't')
 
 
@@ -57,9 +53,9 @@ def test_eng_to_ipa_epitran():
   result = eng_to_ipa_epitran(
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.')
 
 
@@ -67,9 +63,9 @@ def test_eng_to_ipa_epitran__with_annotations__is_considered():
   result = eng_to_ipa_epitran(
     eng_sentence=tuple("This /ɪz/ /ə/ə/ test."),
     consider_annotations=True,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪz', ' ', 'ə', 'ə', ' ', 't', 'ɛ', 's', 't', '.')
 
 
@@ -77,20 +73,20 @@ def test_eng_to_ipa_pronunciation_dict():
   result = eng_to_ipa_pronunciation_dict(
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ʌ', ' ', 't', 'ˈɛ', 's', 't', '.')
 
 
-def test_eng_to_ipa_pronunciation_dict__merges_diphtongs():
+def test_eng_to_ipa_pronunciation_dict__dont_merge_diphtongs():
   result = eng_to_ipa_pronunciation_dict(
     eng_sentence=tuple("immediately"),
     consider_annotations=False,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
-  assert result == ('ɪ', 'm', 'ˈi', 'd', 'iʌ', 't', 'l', 'i')
+  assert result == ('ɪ', 'm', 'ˈi', 'd', 'i', 'ʌ', 't', 'l', 'i')
 
 
 def test_eng_to_ipa__epitran():
@@ -98,9 +94,9 @@ def test_eng_to_ipa__epitran():
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
     mode=EngToIPAMode.EPITRAN,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.')
 
 
@@ -109,9 +105,9 @@ def test_eng_to_ipa__librispeech():
     eng_sentence=tuple("This is a test."),
     consider_annotations=False,
     mode=EngToIPAMode.LIBRISPEECH,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ʌ', ' ', 't', 'ˈɛ', 's', 't', '.')
 
 
@@ -119,9 +115,9 @@ def test_ger_to_ipa():
   result = ger_to_ipa(
     ger_sentence=tuple("This is a test."),
     consider_annotations=False,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('t', 'i', 's', ' ', 'i', 's', ' ', 'a', ' ', 't', 'e', 's', 't', '.')
 
 
@@ -133,6 +129,7 @@ def test_symbols_to_ipa__convert_arpa__raises_exception():
       lang=Language.ENG,
       mode=EngToIPAMode.EPITRAN,
       symbols_format=SymbolFormat.PHONEMES_ARPA,
+      cache=get_empty_cache(),
     )
 
 
@@ -144,6 +141,7 @@ def test_symbols_to_ipa__eng_no_mode__raises_exception():
       lang=Language.ENG,
       mode=None,
       symbols_format=SymbolFormat.GRAPHEMES,
+      cache=get_empty_cache(),
     )
 
 
@@ -155,6 +153,7 @@ def test_symbols_to_ipa__none_consider_annotation_on_graphemes__raises_exception
       lang=Language.ENG,
       mode=EngToIPAMode.EPITRAN,
       symbols_format=SymbolFormat.GRAPHEMES,
+      cache=get_empty_cache(),
     )
 
 
@@ -165,9 +164,9 @@ def test_symbols_to_ipa__convert_english_graphemes():
     lang=Language.ENG,
     mode=EngToIPAMode.EPITRAN,
     symbols_format=SymbolFormat.GRAPHEMES,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result_symbols == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.')
   assert result_format == SymbolFormat.PHONEMES_IPA
 
@@ -179,9 +178,9 @@ def test_symbols_to_ipa__convert_ipa__returns_ipa():
     lang=Language.ENG,
     mode=None,
     symbols_format=SymbolFormat.PHONES_IPA,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result_symbols == ('ð', 'ɪ', 's', ' ', 'ɪ', 'z', ' ', 'ə', ' ', 't', 'ɛ', 's', 't', '.')
   assert result_format == SymbolFormat.PHONES_IPA
 
@@ -192,9 +191,9 @@ def test_symbols_to_arpa():
     consider_annotations=True,
     lang=Language.ENG,
     symbols_format=SymbolFormat.GRAPHEMES,
+    cache=get_empty_cache(),
   )
 
-  clear_arpa_cache()
   assert result == ('DH', 'IH0', 'S', ' ', 'IH0', 'Z', ' ', 'AH0',
                     ' ', 'T', 'EH1', 'S', 'T', ' ', 'AA', 'BB')
   assert result_format == SymbolFormat.PHONEMES_ARPA
@@ -208,9 +207,9 @@ def test_symbols_to_pronunciation_dict():
     ignore_case=True,
     split_on_hyphen=True,
     consider_annotations=True,
+    cache=get_empty_cache(),
   )
 
-  clear_arpa_cache()
   assert len(result) == 4
   assert result["THIS"] == OrderedSet([('DH', 'IH0', 'S')])
   assert result["IS"] == OrderedSet([('IH0', 'Z')])

@@ -1,19 +1,17 @@
+from sentence2pronunciation.lookup_cache import get_empty_cache
 from text_utils.pronunciation.chinese_ipa import (__get_chn_ipa, chn_to_ipa,
                                                   get_vowel_count)
-from text_utils.pronunciation.main import clear_ipa_cache
 
 
 def test_get_chn_ipa():
   result = __get_chn_ipa(tuple("堡包"))
 
-  clear_ipa_cache()
-  assert result == ('p', 'ɑʊ˧˩˧', 'p', 'ɑʊ˥',)
+  assert result == ('p', 'ɑ', 'ʊ˧˩˧', 'p', 'ɑ', 'ʊ˥')
 
 
 def test_get_chn_ipa__syllable_without_vowel():
   result = __get_chn_ipa(tuple("儿"))
 
-  clear_ipa_cache()
   assert result == ('ɻ',)
 
 
@@ -54,10 +52,10 @@ def test_chn_to_ipa():
     chn_sentence=tuple("石头 北 冷。"),
     consider_annotations=False,
     annotation_split_symbol=None,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
-  assert result == ('ʂ', 'ɨ˧˥', 'tʰ', 'oʊ', ' ', 'p', 'eɪ˧˩˧', ' ', 'l', 'ɤ˧˩˧', 'ŋ', '.')
+  assert result == ('ʂ', 'ɨ˧˥', 'tʰ', 'o','ʊ', ' ', 'p', 'e','ɪ˧˩˧', ' ', 'l', 'ɤ˧˩˧', 'ŋ', '.')
 
 
 def test_chn_to_ipa__only_vowels():
@@ -65,9 +63,9 @@ def test_chn_to_ipa__only_vowels():
     chn_sentence=tuple("阿阿"),
     consider_annotations=False,
     annotation_split_symbol=None,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('a˥', 'a˥')
 
 
@@ -76,9 +74,9 @@ def test_chn_to_ipa__with_multiple_same_words():
     chn_sentence=tuple("！石 石？ 石。"),
     consider_annotations=False,
     annotation_split_symbol=None,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
   assert result == ('!', 'ʂ', 'ɨ˧˥', ' ', 'ʂ', 'ɨ˧˥', '?', ' ', 'ʂ', 'ɨ˧˥', '.')
 
 
@@ -87,10 +85,10 @@ def test_chn_to_ipa__replaces_punctuation():
     chn_sentence=tuple("石头！ 北： 冷。 ？"),
     consider_annotations=False,
     annotation_split_symbol=None,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
-  assert result == ('ʂ', 'ɨ˧˥', 'tʰ', 'oʊ', '!', ' ', 'p', 'eɪ˧˩˧',
+  assert result == ('ʂ', 'ɨ˧˥', 'tʰ', 'o', 'ʊ', '!', ' ', 'p', 'e', 'ɪ˧˩˧',
                     ':', ' ', 'l', 'ɤ˧˩˧', 'ŋ', '.', ' ', '?')
 
 
@@ -99,8 +97,8 @@ def test_chn_to_ipa__sentence():
     chn_sentence=tuple("仅 绘画 而论 齐白石 是 巍巍 昆仑 可 这位 附庸风雅 的 门外汉 连 一块 石头 都 不是"),
     consider_annotations=False,
     annotation_split_symbol=None,
+    cache=get_empty_cache(),
   )
 
-  clear_ipa_cache()
-  assert result == ('t', 'ɕ', 'i˧˩˧', 'n', ' ', 'x', 'w', 'eɪ˥˩', 'x', 'w', 'a˥˩', ' ', 'ɑ˧˥', 'ɻ', 'l', 'w', 'ə˥˩', 'n', ' ', 't', 'ɕʰ', 'i˧˥', 'p', 'aɪ˧˥', 'ʂ', 'ɨ˧˥', ' ', 'ʂ', 'ɨ˥˩', ' ', 'w', 'eɪ˥', 'w', 'eɪ˥', ' ', 'kʰ', 'w', 'ə˥', 'n', 'l', 'w', 'ə˧˥', 'n', ' ', 'kʰ', 'ɤ˧˩˧', ' ',
-                    'ʈ', 'ʂ', 'ɤ˥˩', 'w', 'eɪ˥˩', ' ', 'f', 'u˥˩', 'yʊ˥', 'ŋ', 'f', 'ɤ˥', 'ŋ', 'j', 'a˧˩˧', ' ', 't', 'ɤ', ' ', 'm', 'ə˧˥', 'n', 'w', 'aɪ˥˩', 'x', 'a˥˩', 'n', ' ', 'l', 'j', 'ɛ˧˥', 'n', ' ', 'i˥', 'kʰ', 'w', 'aɪ˥˩', ' ', 'ʂ', 'ɨ˧˥', 'tʰ', 'oʊ', ' ', 't', 'oʊ˥', ' ', 'p', 'u˥˩', 'ʂ', 'ɨ˥˩')
+  assert result == ('t', 'ɕ', 'i˧˩˧', 'n', ' ', 'x', 'w', 'e', 'ɪ˥˩', 'x', 'w', 'a˥˩', ' ', 'ɑ˧˥', 'ɻ', 'l', 'w', 'ə˥˩', 'n', ' ', 't', 'ɕʰ', 'i˧˥', 'p', 'a', 'ɪ˧˥', 'ʂ', 'ɨ˧˥', ' ', 'ʂ', 'ɨ˥˩', ' ', 'w', 'e', 'ɪ˥', 'w', 'e', 'ɪ˥', ' ', 'kʰ', 'w', 'ə˥', 'n', 'l', 'w', 'ə˧˥', 'n', ' ', 'kʰ', 'ɤ˧˩˧', ' ', 'ʈ',
+                    'ʂ', 'ɤ˥˩', 'w', 'e', 'ɪ˥˩', ' ', 'f', 'u˥˩', 'y', 'ʊ˥', 'ŋ', 'f', 'ɤ˥', 'ŋ', 'j', 'a˧˩˧', ' ', 't', 'ɤ', ' ', 'm', 'ə˧˥', 'n', 'w', 'a', 'ɪ˥˩', 'x', 'a˥˩', 'n', ' ', 'l', 'j', 'ɛ˧˥', 'n', ' ', 'i˥', 'kʰ', 'w', 'a', 'ɪ˥˩', ' ', 'ʂ', 'ɨ˧˥', 'tʰ', 'o', 'ʊ', ' ', 't', 'o', 'ʊ˥', ' ', 'p', 'u˥˩', 'ʂ', 'ɨ˥˩')

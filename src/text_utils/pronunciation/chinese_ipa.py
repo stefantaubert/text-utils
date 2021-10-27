@@ -1,8 +1,10 @@
 import string
+from copy import copy
 from typing import Optional, Set, Tuple
 
 from dragonmapper import hanzi
 from sentence2pronunciation.core import sentence2pronunciation_cached
+from sentence2pronunciation.lookup_cache import LookupCache
 from text_utils.pronunciation.ipa2symb import (parse_ipa_to_symbols,
                                                reparse_ipa_symbols_to_symbols)
 from text_utils.pronunciation.ipa_symbols import SCHWAS, TONES, VOWELS
@@ -63,17 +65,31 @@ def __get_chn_ipa(word: Symbols) -> Symbols:
     assert hanzi_syllable_ipa.endswith(tone_ipa)
     syllable_ipa_symbols = parse_ipa_to_symbols(syllable_ipa)
     syllable_vowel_count = get_vowel_count(syllable_ipa_symbols)
-    assert tone_ipa == "" or syllable_vowel_count == 1
+    assert tone_ipa == "" or syllable_vowel_count >= 1
     if syllable_vowel_count == 0:
       assert hanzi_syllable_ipa == "ɻ"
-    syllable_ipa_symbols_with_tones = tuple(
-      symbol + tone_ipa if is_vowel(symbol) else symbol for symbol in syllable_ipa_symbols)
+
+    if len(tone_ipa) == 0:
+      syllable_ipa_symbols_with_tones = syllable_ipa_symbols
+    else:
+      if syllable_vowel_count <= 1:
+        syllable_ipa_symbols_with_tones = tuple(
+            symbol + tone_ipa if is_vowel(symbol) else symbol for symbol in syllable_ipa_symbols)
+      else:
+        syllable_ipa_symbols_with_tones = [symbol for symbol in syllable_ipa_symbols]
+        for i in range(len(syllable_ipa_symbols)):
+          current_symbol = syllable_ipa_symbols[-i - 1]
+          if is_vowel(current_symbol):
+            syllable_ipa_symbols_with_tones[-i - 1] += tone_ipa
+            break
+        syllable_ipa_symbols_with_tones = tuple(syllable_ipa_symbols_with_tones)
+
     word_ipa_symbols.extend(syllable_ipa_symbols_with_tones)
   symbols = tuple(word_ipa_symbols)
   return symbols
 
 
-def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool, annotation_split_symbol: Optional[Symbol]) -> Symbols:
+def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool, annotation_split_symbol: Optional[Symbol], cache: LookupCache) -> Symbols:
   symbols = sentence2pronunciation_cached(
     sentence=chn_sentence,
     annotation_split_symbol=annotation_split_symbol,
@@ -82,6 +98,7 @@ def chn_to_ipa(chn_sentence: Symbols, consider_annotations: bool, annotation_spl
     split_on_hyphen=False,
     trim_symbols=CHN_PUNCTUATION,
     ignore_case_in_cache=True,
+    cache=cache,
   )
 
   symbols = symbols_map(symbols, CHN_PUNCTUATION_MAPPING)

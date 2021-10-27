@@ -6,8 +6,9 @@ from typing import Dict, Optional, Set, Tuple
 
 from ordered_set import OrderedSet
 from pronunciation_dict_parser import PronunciationDict
-from sentence2pronunciation import (clear_cache, get_non_annotated_words,
+from sentence2pronunciation import (get_non_annotated_words,
                                     sentence2pronunciation_cached)
+from sentence2pronunciation.lookup_cache import LookupCache
 from text_utils.language import Language
 from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
 from text_utils.pronunciation.chinese_ipa import chn_to_ipa
@@ -28,20 +29,13 @@ from text_utils.pronunciation.ipa_symbols import (ENG_ARPA_DIPHTONGS,
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict
 from text_utils.symbol_format import SymbolFormat
+from text_utils.text import symbols_to_words
 from text_utils.types import Symbol, Symbols
-from text_utils.utils import symbols_to_upper
+from text_utils.utils import symbols_split, symbols_to_upper
 
 DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
 DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL: Set[Symbol] = {".", ",", ";", "?", "!"}
 ANNOTATION_SPLIT_SYMBOL: Symbol = "/"
-
-
-def clear_ipa_cache():
-  clear_cache()
-
-
-def clear_arpa_cache():
-  clear_cache()
 
 
 def __get_arpa_oov(word: Symbols) -> Symbols:
@@ -60,7 +54,7 @@ def lookup_dict(word: Symbols, dictionary: Dict[Symbols, Symbols]) -> Symbols:
   return __get_arpa_oov(word)
 
 
-def eng_to_arpa(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
+def eng_to_arpa(eng_sentence: Symbols, consider_annotations: bool, cache: LookupCache) -> Symbols:
   pronunciations = get_eng_pronunciation_dict()
   method = partial(lookup_dict, dictionary=pronunciations)
 
@@ -72,6 +66,7 @@ def eng_to_arpa(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
     split_on_hyphen=True,
     trim_symbols=DEFAULT_IGNORE_PUNCTUATION,
     ignore_case_in_cache=True,
+    cache=cache,
   )
 
   return result
@@ -121,7 +116,7 @@ def __get_ger_ipa(word: Symbols) -> Symbols:
   return word_ipa_symbols
 
 
-def eng_to_ipa_epitran(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
+def eng_to_ipa_epitran(eng_sentence: Symbols, consider_annotations: bool, cache: LookupCache) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   result = sentence2pronunciation_cached(
     sentence=eng_sentence,
@@ -131,14 +126,15 @@ def eng_to_ipa_epitran(eng_sentence: Symbols, consider_annotations: bool) -> Sym
     split_on_hyphen=True,
     trim_symbols=DEFAULT_IGNORE_PUNCTUATION,
     ignore_case_in_cache=True,
+    cache=cache,
   )
 
   return result
 
 
-def eng_to_ipa_pronunciation_dict(eng_sentence: Symbols, consider_annotations: bool) -> Symbols:
+def eng_to_ipa_pronunciation_dict(eng_sentence: Symbols, consider_annotations: bool, cache: LookupCache) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
-  arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations)
+  arpa_symbols = eng_to_arpa(eng_sentence, consider_annotations, cache)
   result_ipa = symbols_map_arpa_to_ipa(arpa_symbols, ignore={},
                                        replace_unknown=False, replace_unknown_with=None)
   mapped_ipa_str = ''.join(result_ipa)
@@ -158,15 +154,15 @@ class EngToIPAMode(Enum):
   EPITRAN = 1
 
 
-def eng_to_ipa(eng_sentence: Symbols, consider_annotations: bool, mode: EngToIPAMode) -> Symbols:
+def eng_to_ipa(eng_sentence: Symbols, consider_annotations: bool, mode: EngToIPAMode, cache: LookupCache) -> Symbols:
   if mode == EngToIPAMode.EPITRAN:
-    return eng_to_ipa_epitran(eng_sentence, consider_annotations)
+    return eng_to_ipa_epitran(eng_sentence, consider_annotations, cache)
   if mode == EngToIPAMode.LIBRISPEECH:
-    return eng_to_ipa_pronunciation_dict(eng_sentence, consider_annotations)
+    return eng_to_ipa_pronunciation_dict(eng_sentence, consider_annotations, cache)
   assert False
 
 
-def ger_to_ipa(ger_sentence: Symbols, consider_annotations: bool) -> Symbols:
+def ger_to_ipa(ger_sentence: Symbols, consider_annotations: bool, cache: LookupCache) -> Symbols:
   #pronunciations = parse_public_dict(PublicDictType.MFA_EN_US_IPA)
   result = sentence2pronunciation_cached(
     sentence=ger_sentence,
@@ -176,6 +172,7 @@ def ger_to_ipa(ger_sentence: Symbols, consider_annotations: bool) -> Symbols:
     split_on_hyphen=True,
     trim_symbols=DEFAULT_IGNORE_PUNCTUATION,
     ignore_case_in_cache=True,
+    cache=cache,
   )
 
   return result
@@ -187,7 +184,31 @@ def log_and_return_exception(msg: str) -> Exception:
   return Exception(msg)
 
 
-def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, mode: Optional[EngToIPAMode], consider_annotations: Optional[bool]) -> Tuple[Symbols, SymbolFormat]:
+def prepare_symbols_to_ipa(symbols_format: SymbolFormat, lang: Language, mode: Optional[EngToIPAMode]) -> None:
+  if symbols_format.is_IPA:
+    return
+  if symbols_format == SymbolFormat.PHONEMES_ARPA:
+    raise log_and_return_exception("Not supported!")
+  assert symbols_format == SymbolFormat.GRAPHEMES
+
+  if lang == Language.ENG:
+    if mode is None:
+      raise log_and_return_exception("Please specify the IPA conversion mode.")
+    if mode == EngToIPAMode.EPITRAN:
+      get_eng_epitran()
+    if mode == EngToIPAMode.LIBRISPEECH:
+      get_eng_g2p()
+      get_eng_pronunciation_dict()
+  elif lang == Language.GER:
+    get_ger_epitran()
+  elif lang == Language.CHN:
+    pass
+  else:
+    assert False
+  return
+
+
+def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, mode: Optional[EngToIPAMode], consider_annotations: Optional[bool], cache: LookupCache) -> Tuple[Symbols, SymbolFormat]:
   if symbols_format.is_IPA:
     return symbols, symbols_format
   if symbols_format == SymbolFormat.PHONEMES_ARPA:
@@ -200,18 +221,18 @@ def symbols_to_ipa(symbols: Symbols, symbols_format: SymbolFormat, lang: Languag
   if lang == Language.ENG:
     if mode is None:
       raise log_and_return_exception("Please specify the IPA conversion mode.")
-    new_symbols = eng_to_ipa(symbols, consider_annotations, mode=mode)
+    new_symbols = eng_to_ipa(symbols, consider_annotations, mode=mode, cache=cache)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.GER:
-    new_symbols = ger_to_ipa(symbols, consider_annotations)
+    new_symbols = ger_to_ipa(symbols, consider_annotations, cache=cache)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   if lang == Language.CHN:
-    new_symbols = chn_to_ipa(symbols, consider_annotations, ANNOTATION_SPLIT_SYMBOL)
+    new_symbols = chn_to_ipa(symbols, consider_annotations, ANNOTATION_SPLIT_SYMBOL, cache=cache)
     return new_symbols, SymbolFormat.PHONEMES_IPA
   assert False
 
 
-def symbols_to_arpa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, consider_annotations: Optional[bool]) -> Tuple[Symbols, SymbolFormat]:
+def symbols_to_arpa(symbols: Symbols, symbols_format: SymbolFormat, lang: Language, consider_annotations: Optional[bool], cache: LookupCache) -> Tuple[Symbols, SymbolFormat]:
   if symbols_format == SymbolFormat.PHONEMES_ARPA:
     return symbols, symbols_format
   if symbols_format.is_IPA:
@@ -225,7 +246,7 @@ def symbols_to_arpa(symbols: Symbols, symbols_format: SymbolFormat, lang: Langua
     raise log_and_return_exception("Language is not supported!")
 
   if lang == Language.ENG:
-    new_symbols = eng_to_arpa(symbols, consider_annotations)
+    new_symbols = eng_to_arpa(symbols, consider_annotations, cache=cache)
     return new_symbols, SymbolFormat.PHONEMES_ARPA
 
   assert False
@@ -253,7 +274,7 @@ def change_ipa(symbols: Symbols, ignore_tones: bool, ignore_arcs: bool, ignore_s
   return new_symbols
 
 
-def symbols_to_arpa_pronunciation_dict(symbols: Symbols, symbols_format: SymbolFormat, language: Language, ignore_case: bool, split_on_hyphen: bool, consider_annotations: bool) -> PronunciationDict:
+def symbols_to_arpa_pronunciation_dict(symbols: Symbols, symbols_format: SymbolFormat, language: Language, ignore_case: bool, split_on_hyphen: bool, consider_annotations: bool, cache: LookupCache) -> PronunciationDict:
   # consider_annotations: if true then the annotations will be figured out and not taken into the dictionary. if false the annotations including the split symbol will be considered
   words = get_non_annotated_words(
     sentence=symbols,
@@ -271,6 +292,7 @@ def symbols_to_arpa_pronunciation_dict(symbols: Symbols, symbols_format: SymbolF
       symbols_format=symbols_format,
       lang=language,
       consider_annotations=False,
+      cache=cache,
     )
     word_str = "".join(word)
     assert word_str not in result
