@@ -8,7 +8,7 @@ from text_utils.utils import pronunciation_dict_to_tuple_dict
 CACHE: Dict[Symbols, Symbols] = None
 
 
-def get_eng_pronunciation_dict() -> PronunciationDict:
+def get_eng_pronunciation_dict_arpa() -> PronunciationDict:
   # pylint: disable=global-statement
   global CACHE
   if CACHE is None:

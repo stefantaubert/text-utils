@@ -2,13 +2,14 @@ import string
 from enum import Enum
 from functools import partial
 from logging import WARNING, getLogger
-from typing import Dict, Optional, Set, Tuple
+from typing import Callable, Dict, Optional, Set, Tuple
 
 from ordered_set import OrderedSet
 from pronunciation_dict_parser import PronunciationDict
 from sentence2pronunciation import (get_non_annotated_words,
                                     sentence2pronunciation_cached)
 from sentence2pronunciation.lookup_cache import LookupCache
+from sentence2pronunciation.types import Pronunciation
 from text_utils.language import Language
 from text_utils.pronunciation.ARPAToIPAMapper import symbols_map_arpa_to_ipa
 from text_utils.pronunciation.chinese_ipa import chn_to_ipa
@@ -27,7 +28,7 @@ from text_utils.pronunciation.ipa_symbols import (ENG_ARPA_DIPHTONGS,
                                                   PUNCTUATION_AND_WHITESPACE,
                                                   TIES)
 from text_utils.pronunciation.pronunciation_dict_cache import \
-    get_eng_pronunciation_dict
+    get_eng_pronunciation_dict_arpa
 from text_utils.symbol_format import SymbolFormat
 from text_utils.text import symbols_to_words
 from text_utils.types import Symbol, Symbols
@@ -54,9 +55,14 @@ def lookup_dict(word: Symbols, dictionary: Dict[Symbols, Symbols]) -> Symbols:
   return __get_arpa_oov(word)
 
 
-def eng_to_arpa(eng_sentence: Symbols, consider_annotations: bool, cache: LookupCache) -> Symbols:
-  pronunciations = get_eng_pronunciation_dict()
+def get_eng_to_arpa_lookup_method() -> Callable[[Pronunciation], Pronunciation]:
+  pronunciations = get_eng_pronunciation_dict_arpa()
   method = partial(lookup_dict, dictionary=pronunciations)
+  return method
+
+
+def eng_to_arpa(eng_sentence: Symbols, consider_annotations: bool, cache: LookupCache) -> Symbols:
+  method = get_eng_to_arpa_lookup_method()
 
   result = sentence2pronunciation_cached(
     sentence=eng_sentence,
@@ -198,7 +204,7 @@ def prepare_symbols_to_ipa(symbols_format: SymbolFormat, lang: Language, mode: O
       get_eng_epitran()
     if mode == EngToIPAMode.LIBRISPEECH:
       get_eng_g2p()
-      get_eng_pronunciation_dict()
+      get_eng_pronunciation_dict_arpa()
   elif lang == Language.GER:
     get_ger_epitran()
   elif lang == Language.CHN:
