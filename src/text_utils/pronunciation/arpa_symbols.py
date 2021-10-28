@@ -3,42 +3,42 @@ AE = "AE"
 AH = "AH"
 AO = "AO"
 AW = "AW"
-AX = "AX"
-AXR = "AXR"
+AX = "AX" # not in MFA
+AXR = "AXR" # not in MFA
 AY = "AY"
 EH = "EH"
 ER = "ER"
 EY = "EY"
 IH = "IH"
-IX = "IX"
+IX = "IX" # not in MFA
 IY = "IY"
 OW = "OW"
 OY = "OY"
 UH = "UH"
 UW = "UW"
-UX = "UX"
+UX = "UX" # not in MFA
 
 B = "B"
 CH = "CH"
 D = "D"
 DH = "DH"
-DX = "DX"
-EL = "EL"
-EM = "EM"
-EN = "EN"
+DX = "DX" # not in MFA
+EL = "EL" # not in MFA
+EM = "EM" # not in MFA
+EN = "EN" # not in MFA
 F = "F"
 G = "G"
 HH = "HH"
-H = "H"
+H = "H" # not in MFA
 JH = "JH"
 K = "K"
 L = "L"
 M = "M"
 N = "N"
 NG = "NG"
-NX = "NX"
+NX = "NX" # not in MFA
 P = "P"
-Q = "Q"
+Q = "Q" # not in MFA
 R = "R"
 S = "S"
 SH = "SH"
@@ -46,7 +46,7 @@ T = "T"
 TH = "TH"
 V = "V"
 W = "W"
-WH = "WH"
+WH = "WH" # not in MFA
 Y = "Y"
 Z = "Z"
 ZH = "ZH"
@@ -58,7 +58,7 @@ VOWELS = {
   AH,
   AO,
   AW,
-  AX,
+  AX, 
   AXR,
   AY,
   EH,
