@@ -233,6 +233,7 @@ def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
   merged_symbols = merge_template_with_ignore(symbols, template, {})
   return merged_symbols
 
+
 def merge_fusion_with_ignore(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Symbols:
   aux_symbols = list(symbols)
   fused_symbols = []
@@ -244,7 +245,7 @@ def merge_fusion_with_ignore(symbols: Symbols, fusion_symbols: Set[Symbol], igno
   return tuple(fused_symbols)
 
 
-def get_next_fused_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Tuple[Symbols, int]:
+def get_next_fused_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Tuple[Symbol, int]:
   first_symbol_without_ignore_symbols = strip_off_ignore(symbols[0], ignore)
   if first_symbol_without_ignore_symbols not in fusion_symbols:
     return symbols[0], 0
@@ -253,7 +254,8 @@ def get_next_fused_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbo
   return fused_fusion_symbols, processed_index
 
 
-def get_next_consecutive_fusion_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Tuple[Symbols, int]:
+def get_next_consecutive_fusion_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Tuple[Symbol, int]:
+  assert strip_off_ignore(symbols[0], ignore) in fusion_symbols
   consecutive_fusion_symbols = symbols[0]
   processed_index = 0
   for symbol in symbols[1:]:

@@ -3,12 +3,14 @@ from text_utils.language import Language
 from text_utils.pronunciation.ipa2symb import (
     add_n_thongs, break_n_thongs, get_all_next_consecutive_merge_symbols,
     get_longest_possible_length, get_longest_template_with_ignore,
-    get_next_merged_left_symbol_and_index,
+    get_next_consecutive_fusion_symbols_and_index,
+    get_next_fused_symbols_and_index, get_next_merged_left_symbol_and_index,
     get_next_merged_right_symbol_and_index,
     get_next_merged_together_symbol_and_index, is_n_thong,
     merge_fusion_with_ignore, merge_left, merge_right, merge_template,
     merge_template_with_ignore, merge_together, remove_arcs,
-    remove_ignore_at_end, split_string_to_tuple, try_update_longest_template)
+    remove_ignore_at_end, split_string_to_tuple, strip_off_ignore,
+    try_update_longest_template)
 
 
 def test_remove_arcs__empty_input():
@@ -530,6 +532,96 @@ def test_merge_fusion_with_ignore__ignore_symbol_on_left_side_of_first_and_right
   assert res == (":ab:",)
 
 # endregion
+
+# region get_next_fused_symbols_and_index
+
+
+def test_get_next_fused_symbols_and_index__first_symbol_is_not_fusion_symbol():
+  symbols = ("c", "b:")
+  fusion_symbols = {"a", "b"}
+  ignore = {":"}
+  res = get_next_fused_symbols_and_index(symbols, fusion_symbols, ignore)
+
+  assert res == ("c", 0)
+
+
+def test_get_next_fused_symbols_and_index__first_symbol_is_ignore_symbol():
+  symbols = (":", "b:")
+  fusion_symbols = {"a", "b"}
+  ignore = {":"}
+  res = get_next_fused_symbols_and_index(symbols, fusion_symbols, ignore)
+
+  assert res == (":", 0)
+
+# endregion
+
+# region get_next_consecutive_fusion_symbols_and_index
+
+
+def test_get_next_consecutive_fusion_symbols_and_index__empty_ignore_set():
+  symbols = ("a", "b", "ef")
+  fusion_symbols = {"a", "b"}
+  res = get_next_consecutive_fusion_symbols_and_index(symbols, fusion_symbols, {})
+
+  assert res == ("ab", 1)
+
+
+def test_get_next_consecutive_fusion_symbols_and_index__empty_ignore_set_2():
+  symbols = ("b", "ef")
+  fusion_symbols = {"a", "b"}
+  res = get_next_consecutive_fusion_symbols_and_index(symbols, fusion_symbols, {})
+
+  assert res == ("b", 0)
+
+
+def test_get_next_consecutive_fusion_symbols_and_index__single_ignore_symbol_in_between_fusion_symbols__do_not_merge():
+  symbols = ("a", ":", "b")
+  fusion_symbols = {"a", "b"}
+  ignore = {":"}
+  res = get_next_consecutive_fusion_symbols_and_index(symbols, fusion_symbols, ignore)
+
+  assert res == ("a", 0)
+
+
+def test_get_next_consecutive_fusion_symbols_and_index__ignore_symbol_on_left_side_of_second_fusion_symbol__merge():
+  symbols = ("a", ":b", "c")
+  fusion_symbols = {"a", "b"}
+  ignore = {":"}
+  res = get_next_consecutive_fusion_symbols_and_index(symbols, fusion_symbols, ignore)
+
+  assert res == ("a:b", 1)
+
+
+def test_get_next_consecutive_fusion_symbols_and_index__ignore_symbol_on_left_side_of_first_and_right_side_of_second_fusion_symbol__merge():
+  symbols = (":a", "b:", ":")
+  fusion_symbols = {"a", "b"}
+  ignore = {":"}
+  res = get_next_consecutive_fusion_symbols_and_index(symbols, fusion_symbols, ignore)
+
+  assert res == (":ab:", 1)
+
+# endregion
+
+
+# region strip_off_ignore
+
+def test_strip_off_ignore():
+  symbol = ":a;b:"
+  ignore = {":", ";"}
+  res = strip_off_ignore(symbol, ignore)
+
+  assert res == "ab"
+
+
+def test_strip_off_ignore__ignore_is_empty():
+  symbol = ":a;b:"
+  ignore = {}
+  res = strip_off_ignore(symbol, ignore)
+
+  assert res == symbol
+
+# endregion
+
 
 # region merge_together
 
