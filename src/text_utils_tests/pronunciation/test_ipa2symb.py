@@ -481,55 +481,11 @@ def test_remove_ignore_at_end__two_alone_ignore_symbol_at_end_of_tuple__remove_b
 
 
 def test_merge_fusion_with_ignore__empty_ignore_set():
-  symbols = ("a", "b", "ef", "g")
-  fusion_symbols = {"a", "b"}
-  res = merge_fusion_with_ignore(symbols, fusion_symbols, {})
-
-  assert res == ("ab", "ef", "g")
-
-
-def test_merge_fusion_with_ignore__empty_ignore_set_2():
   symbols = ("b", "ef", "a", "a", "g")
   fusion_symbols = {"a", "b"}
   res = merge_fusion_with_ignore(symbols, fusion_symbols, {})
 
   assert res == ("b", "ef", "aa", "g")
-
-
-def test_merge_fusion_with_ignore__single_ignore_symbols_at_beginning_and_end__do_not_merge_them():
-  symbols = (":", "a", "b", ";")
-  fusion_symbols = {"a", "b"}
-  ignore = {":", ";"}
-  res = merge_fusion_with_ignore(symbols, fusion_symbols, ignore)
-
-  assert res == (":", "ab", ";")
-
-
-def test_merge_fusion_with_ignore__single_ignore_symbol_in_between_fusion_symbols__do_not_merge():
-  symbols = ("a", ":", "b")
-  fusion_symbols = {"a", "b"}
-  ignore = {":"}
-  res = merge_fusion_with_ignore(symbols, fusion_symbols, ignore)
-
-  assert res == symbols
-
-
-def test_merge_fusion_with_ignore__ignore_symbol_on_left_side_of_second_fusion_symbol__merge():
-  symbols = ("a", ":b")
-  fusion_symbols = {"a", "b"}
-  ignore = {":"}
-  res = merge_fusion_with_ignore(symbols, fusion_symbols, ignore)
-
-  assert res == ("a:b",)
-
-
-def test_merge_fusion_with_ignore__ignore_symbol_on_left_side_of_first_and_right_side_of_second_fusion_symbol__merge():
-  symbols = (":a", "b:")
-  fusion_symbols = {"a", "b"}
-  ignore = {":"}
-  res = merge_fusion_with_ignore(symbols, fusion_symbols, ignore)
-
-  assert res == (":ab:",)
 
 # endregion
 
