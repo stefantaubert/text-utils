@@ -70,7 +70,6 @@ def add_n_thongs(symbols: Symbols, language: Language) -> Symbols:
     )
   elif language == Language.CHN:
     # diphtongs need to be merged, all ipa vowels and schwas
-    # TODO jasmin add ignore symbol functionality
     new_symbols = merge_fusion_with_ignore(
       symbols=symbols,
       fusion_symbols=VOWELS | SCHWAS,
