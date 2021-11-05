@@ -1,4 +1,5 @@
 import re
+from logging import getLogger
 from typing import Match
 
 import inflect
@@ -88,5 +89,11 @@ def normalize_numbers(text: str) -> str:
   text = re.sub(_dollars_re, _expand_dollars, text)
   text = re.sub(_decimal_number_re, _expand_decimal_point, text)
   text = re.sub(_ordinal_re, _expand_ordinal, text)
-  text = re.sub(_number_re, _expand_number, text)
+  try:
+    text = re.sub(_number_re, _expand_number, text)
+  except:
+    logger = getLogger(__name__)
+    logger.warn(f"Failed normalization for: {text}")
+    text = re.sub(_number_re, "", text)
+    logger.info(f"Therefore converted it to: {text}")
   return text
