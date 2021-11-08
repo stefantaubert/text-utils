@@ -4,6 +4,8 @@ from typing import Match
 
 import inflect
 
+UNDECILLION = 10**36
+
 __inflect = inflect.engine()
 __comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
 __decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
@@ -59,7 +61,7 @@ def number_to_words_safe():
 
 def __expand_number(m: Match) -> str:
   num = int(m.group(0))
-  if num >= 10**36:
+  if num >= UNDECILLION:
     return ""
   if num <= 1000 or 2000 <= num < 2010 or num >= 3000:
     return __inflect.number_to_words(num, andword='')

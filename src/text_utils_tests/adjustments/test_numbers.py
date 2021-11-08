@@ -98,7 +98,12 @@ def test_expand_number__number_is_between_1000_and_3000_and_not_one_of_other_cas
   assert res == "nineteen eighty-four"
 
 
-def test_expand_number__number_too_big_for_number_to_words__return_empty_string():
+def test_expand_number__number_is_undecillion__return_empty_string():
   m = re.match(__number_re, str(10**36))
+  res = __expand_number(m)
+  assert res == ""
+
+def test_expand_number__number_greater_than_undecillion__return_empty_string():
+  m = re.match(__number_re, str(10**36+5))
   res = __expand_number(m)
   assert res == ""
