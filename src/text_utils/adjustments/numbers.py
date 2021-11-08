@@ -4,31 +4,31 @@ from typing import Match
 
 import inflect
 
-_inflect = inflect.engine()
-_comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
-_decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
-_pounds_re = re.compile(r'£([0-9\,]*[0-9]+)')
-_dollars_re = re.compile(r'\$([0-9\.\,]*[0-9]+)')
-_ordinal_re = re.compile(r'[0-9]+(st|nd|rd|th)')
-_number_re = re.compile(r'[0-9]+')
+__inflect = inflect.engine()
+__comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
+__decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
+__pounds_re = re.compile(r'£([0-9\,]*[0-9]+)')
+__dollars_re = re.compile(r'\$([0-9\.\,]*[0-9]+)')
+__ordinal_re = re.compile(r'[0-9]+(st|nd|rd|th)')
+__number_re = re.compile(r'[0-9]+')
 
-_e_re = re.compile(r'\be([0-9]+)')
-_e_minus_re = re.compile(r'\be-([0-9]+)')
-_factor_e_re = re.compile(r'([0-9]+)e([0-9]+)')
-_factor_e_minus_re = re.compile(r'([0-9]+)e-([0-9]+)')
+__e_re = re.compile(r'\be([0-9]+)')
+__e_minus_re = re.compile(r'\be-([0-9]+)')
+__factor_e_re = re.compile(r'([0-9]+)e([0-9]+)')
+__factor_e_minus_re = re.compile(r'([0-9]+)e-([0-9]+)')
 
-_minus_re = re.compile(r'(\s|^)-([0-9]+)')
+__minus_re = re.compile(r'(\s|^)-([0-9]+)')
 
 
-def _remove_commas(m: Match) -> str:
+def __remove_commas(m: Match) -> str:
   return m.group(1).replace(',', '')
 
 
-def _expand_decimal_point(m: Match) -> str:
+def __expand_decimal_point(m: Match) -> str:
   return m.group(1).replace('.', ' point ')
 
 
-def _expand_dollars(m: Match) -> str:
+def __expand_dollars(m: Match) -> str:
   match = m.group(1)
   parts = match.split('.')
   if len(parts) > 2:
@@ -50,50 +50,58 @@ def _expand_dollars(m: Match) -> str:
 
 
 def _expand_ordinal(m: Match) -> str:
-  return _inflect.number_to_words(m.group(0))
+  return __inflect.number_to_words(m.group(0))
 
 
-def _expand_number(m: Match) -> str:
+def number_to_words_safe():
+  return __inflect.number_to_words
+
+
+def __expand_number(m: Match) -> str:
   num = int(m.group(0))
-  if num > 1000 and num < 3000:
+  if 1000 < num < 3000:
     if num == 2000:
       return 'two thousand'
-    elif num > 2000 and num < 2010:
-      return 'two thousand ' + _inflect.number_to_words(num % 100)
-    elif num % 100 == 0:
-      return _inflect.number_to_words(num // 100) + ' hundred'
-    else:
-      return _inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
-  else:
-    return _inflect.number_to_words(num, andword='')
+    if 2000 < num < 2010:
+      return 'two thousand ' + __inflect.number_to_words(num % 100)
+    if num % 100 == 0:
+      return __inflect.number_to_words(num // 100) + ' hundred'
+    return __inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
+  return __inflect.number_to_words(num, andword='')
+
+# print(__inflect.number_to_words(2000, andword=''))
+# print(__inflect.number_to_words(2009, andword=''))
+# bug
+# # NumOutOfRangeError
+# print(__inflect.number_to_words(210545465456454656546646565465454578134598813548846254540, andword=''))
 
 
-def replace_e_to_the_power_of(text: str) -> str:
-  text = re.sub(_e_minus_re, r'ten to the power of minus \1', text)
-  text = re.sub(_e_re, r'ten to the power of \1', text)
-  text = re.sub(_factor_e_minus_re, r'\1 times ten to the power of minus \2', text)
-  text = re.sub(_factor_e_re, r'\1 times ten to the power of \2', text)
+def __replace_e_to_the_power_of(text: str) -> str:
+  text = re.sub(__e_minus_re, r'ten to the power of minus \1', text)
+  text = re.sub(__e_re, r'ten to the power of \1', text)
+  text = re.sub(__factor_e_minus_re, r'\1 times ten to the power of minus \2', text)
+  text = re.sub(__factor_e_re, r'\1 times ten to the power of \2', text)
   return text
 
 
-def replace_minus(text: str) -> str:
-  text = re.sub(_minus_re, r'\1minus \2', text)
+def __replace_minus(text: str) -> str:
+  text = re.sub(__minus_re, r'\1minus \2', text)
   return text
 
 
 def normalize_numbers(text: str) -> str:
-  text = replace_e_to_the_power_of(text)
-  text = replace_minus(text)
-  text = re.sub(_comma_number_re, _remove_commas, text)
-  text = re.sub(_pounds_re, r'\1 pounds', text)
-  text = re.sub(_dollars_re, _expand_dollars, text)
-  text = re.sub(_decimal_number_re, _expand_decimal_point, text)
-  text = re.sub(_ordinal_re, _expand_ordinal, text)
+  text = __replace_e_to_the_power_of(text)
+  text = __replace_minus(text)
+  text = re.sub(__comma_number_re, __remove_commas, text)
+  text = re.sub(__pounds_re, r'\1 pounds', text)
+  text = re.sub(__dollars_re, __expand_dollars, text)
+  text = re.sub(__decimal_number_re, __expand_decimal_point, text)
+  text = re.sub(__ordinal_re, _expand_ordinal, text)
   try:
-    text = re.sub(_number_re, _expand_number, text)
+    text = re.sub(__number_re, __expand_number, text)
   except:
     logger = getLogger(__name__)
     logger.warn(f"Failed normalization for: {text}")
-    text = re.sub(_number_re, "", text)
+    text = re.sub(__number_re, "", text)
     logger.info(f"Therefore converted it to: {text}")
   return text
