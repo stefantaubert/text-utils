@@ -1,5 +1,8 @@
-from text_utils.adjustments.numbers import (__replace_e_to_the_power_of,
-                                            __replace_minus, normalize_numbers)
+import re
+
+from text_utils.adjustments.numbers import (__expand_number,
+                                            __replace_e_to_the_power_of,
+                                            __replace_minus, normalize_numbers, __number_re)
 
 
 def test_replace_e_to_the_power_of__e_minus():
@@ -46,6 +49,42 @@ def test_normalize_numbers():
   res = normalize_numbers("$5654 -54 5e-21 test $300,000.40")
   assert res == "five thousand, six hundred fifty-four dollars minus fifty-four five times ten to the power of minus twenty-one test three hundred thousand dollars, forty cents"
 
+def test_expand_number__number_is_smaller_than_1000():
+  m = re.match(__number_re, "999")
+  res = __expand_number(m)
+  assert res == "nine hundred ninety-nine"
 
-def test_expand_number():
-  pass
+def test_expand_number__number_is_greater_than_3000():
+  m = re.match(__number_re, "3001")
+  res = __expand_number(m)
+  assert res == "three thousand one"
+
+def test_expand_number__number_is_2000():
+  m = re.match(__number_re, "2000")
+  res = __expand_number(m)
+  assert res == "two thousand"
+
+def test_expand_number__number_is_between_2000_and_2010():
+  m = re.match(__number_re, "2008")
+  res = __expand_number(m)
+  assert res == "two thousand eight"
+
+def test_expand_number__number_is_between_1000_and_3000_and_divisible_by_100():
+  m = re.match(__number_re, "1400")
+  res = __expand_number(m)
+  assert res == "fourteen hundred"
+
+def test_expand_number__number_is_between_1000_and_3000_and_divisible_by_100__2():
+  m = re.match(__number_re, "2300")
+  res = __expand_number(m)
+  assert res == "twenty-three hundred"
+
+def test_expand_number__number_is_between_1000_and_3000_and_not_one_of_other_cases():
+  m = re.match(__number_re, "1004")
+  res = __expand_number(m)
+  assert res == "ten oh four"
+
+def test_expand_number__number_is_between_1000_and_3000_and_not_one_of_other_cases__2():
+  m = re.match(__number_re, "1984")
+  res = __expand_number(m)
+  assert res == "nineteen eighty-four"

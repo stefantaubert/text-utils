@@ -59,15 +59,11 @@ def number_to_words_safe():
 
 def __expand_number(m: Match) -> str:
   num = int(m.group(0))
-  if 1000 < num < 3000:
-    if num == 2000:
-      return 'two thousand'
-    if 2000 < num < 2010:
-      return 'two thousand ' + __inflect.number_to_words(num % 100)
-    if num % 100 == 0:
-      return __inflect.number_to_words(num // 100) + ' hundred'
-    return __inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
-  return __inflect.number_to_words(num, andword='')
+  if num <= 1000 or 1999 < num < 2010 or num >= 3000:
+    return __inflect.number_to_words(num, andword='')
+  if num % 100 == 0:
+    return __inflect.number_to_words(num // 100) + ' hundred'
+  return __inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
 
 # print(__inflect.number_to_words(2000, andword=''))
 # print(__inflect.number_to_words(2009, andword=''))
