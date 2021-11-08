@@ -1,6 +1,5 @@
-from text_utils.adjustments.numbers import (normalize_numbers,
-                                            __replace_e_to_the_power_of,
-                                            __replace_minus)
+from text_utils.adjustments.numbers import (__replace_e_to_the_power_of,
+                                            __replace_minus, normalize_numbers)
 
 
 def test_replace_e_to_the_power_of__e_minus():
@@ -47,5 +46,6 @@ def test_normalize_numbers():
   res = normalize_numbers("$5654 -54 5e-21 test $300,000.40")
   assert res == "five thousand, six hundred fifty-four dollars minus fifty-four five times ten to the power of minus twenty-one test three hundred thousand dollars, forty cents"
 
+
 def test_expand_number():
-  
+  pass
