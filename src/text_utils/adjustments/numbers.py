@@ -58,6 +58,10 @@ def __expand_ordinal(m: Match) -> str:
 def __expand_number(m: Match) -> str:
   num = int(m.group(0))
   if num >= UNDECILLION:
+    # Inflect does not support this until now.
+    logger = getLogger(__name__)
+    logger.warning(
+      f"Failed normalizing number: \"{m.string}\". Therefore replaced it with nothing.")
     return ""
   if num <= 1000 or 2000 <= num < 2010 or num >= 3000:
     return __inflect.number_to_words(num, andword='')
@@ -87,11 +91,5 @@ def normalize_numbers(text: str) -> str:
   text = re.sub(__dollars_re, __expand_dollars, text)
   text = re.sub(__decimal_number_re, __expand_decimal_point, text)
   text = re.sub(__ordinal_re, __expand_ordinal, text)
-  try:
-    text = re.sub(__number_re, __expand_number, text)
-  except:
-    logger = getLogger(__name__)
-    logger.warn(f"Failed normalization for: {text}")
-    text = re.sub(__number_re, "", text)
-    logger.info(f"Therefore converted it to: {text}")
+  text = re.sub(__number_re, __expand_number, text)
   return text
