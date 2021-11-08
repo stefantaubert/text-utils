@@ -49,12 +49,8 @@ def __expand_dollars(m: Match) -> str:
     return 'zero dollars'
 
 
-def _expand_ordinal(m: Match) -> str:
+def __expand_ordinal(m: Match) -> str:
   return __inflect.number_to_words(m.group(0))
-
-
-def number_to_words_safe():
-  return __inflect.number_to_words
 
 
 def __expand_number(m: Match) -> str:
@@ -96,7 +92,7 @@ def normalize_numbers(text: str) -> str:
   text = re.sub(__pounds_re, r'\1 pounds', text)
   text = re.sub(__dollars_re, __expand_dollars, text)
   text = re.sub(__decimal_number_re, __expand_decimal_point, text)
-  text = re.sub(__ordinal_re, _expand_ordinal, text)
+  text = re.sub(__ordinal_re, __expand_ordinal, text)
   try:
     text = re.sub(__number_re, __expand_number, text)
   except:
