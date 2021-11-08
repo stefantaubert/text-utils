@@ -70,11 +70,10 @@ def add_n_thongs(symbols: Symbols, language: Language) -> Symbols:
     )
   elif language == Language.CHN:
     # diphtongs need to be merged, all ipa vowels and schwas
-    # TODO jasmin add ignore symbol functionality
-    new_symbols = merge_fusion(
+    new_symbols = merge_fusion_with_ignore(
       symbols=symbols,
       fusion_symbols=VOWELS | SCHWAS,
-      #ignore_merge_symbols=STRESSES | APPENDIX,
+      ignore=STRESSES | APPENDIX,
     )
   else:
     # other languages are not supported
@@ -234,35 +233,44 @@ def merge_template(symbols: Symbols, template: Set[Symbol]) -> Symbols:
   return merged_symbols
 
 
-def merge_fusion(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Symbols:
+def merge_fusion_with_ignore(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Symbols:
   aux_symbols = list(symbols)
   fused_symbols = []
   while len(aux_symbols) != 0:
     next_fused_symbols, processed_index = get_next_fused_symbols_and_index(
-      aux_symbols, fusion_symbols)
+      aux_symbols, fusion_symbols, ignore)
     fused_symbols.append(next_fused_symbols)
     del aux_symbols[:processed_index + 1]
   return tuple(fused_symbols)
 
 
-def get_next_fused_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Tuple[Symbols, int]:
-  if symbols[0] not in fusion_symbols:
+def get_next_fused_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Tuple[Symbol, int]:
+  first_symbol_without_ignore_symbols = strip_off_ignore(symbols[0], ignore)
+  if first_symbol_without_ignore_symbols not in fusion_symbols:
     return symbols[0], 0
   fused_fusion_symbols, processed_index = get_next_consecutive_fusion_symbols_and_index(
-    symbols, fusion_symbols)
+    symbols, fusion_symbols, ignore)
   return fused_fusion_symbols, processed_index
 
 
-def get_next_consecutive_fusion_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol]) -> Tuple[Symbols, int]:
+def get_next_consecutive_fusion_symbols_and_index(symbols: Symbols, fusion_symbols: Set[Symbol], ignore: Set[Symbol]) -> Tuple[Symbol, int]:
+  assert strip_off_ignore(symbols[0], ignore) in fusion_symbols
   consecutive_fusion_symbols = symbols[0]
   processed_index = 0
   for symbol in symbols[1:]:
-    if symbol in fusion_symbols:
+    symbol_without_ignore = strip_off_ignore(symbol, ignore)
+    if symbol_without_ignore in fusion_symbols:
       consecutive_fusion_symbols += symbol
       processed_index += 1
     else:
       break
   return consecutive_fusion_symbols, processed_index
+
+
+def strip_off_ignore(symbol: Symbol, ignore: Set[Symbol]) -> Symbol:
+  for ignore_symbol in ignore:
+    symbol = symbol.replace(ignore_symbol, "")
+  return symbol
 
 
 def merge_together(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
