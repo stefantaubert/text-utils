@@ -4,6 +4,8 @@ from typing import Match
 
 import inflect
 
+UNDECILLION = 10**36
+
 __inflect = inflect.engine()
 __comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
 __decimal_number_re = re.compile(r'([0-9]+\.[0-9]+)')
@@ -55,21 +57,13 @@ def __expand_ordinal(m: Match) -> str:
 
 def __expand_number(m: Match) -> str:
   num = int(m.group(0))
-  if 1000 < num < 3000:
-    if num == 2000:
-      return 'two thousand'
-    if 2000 < num < 2010:
-      return 'two thousand ' + __inflect.number_to_words(num % 100)
-    if num % 100 == 0:
-      return __inflect.number_to_words(num // 100) + ' hundred'
-    return __inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
-  return __inflect.number_to_words(num, andword='')
-
-# print(__inflect.number_to_words(2000, andword=''))
-# print(__inflect.number_to_words(2009, andword=''))
-# bug
-# # NumOutOfRangeError
-# print(__inflect.number_to_words(210545465456454656546646565465454578134598813548846254540, andword=''))
+  if num >= UNDECILLION:
+    return ""
+  if num <= 1000 or 2000 <= num < 2010 or num >= 3000:
+    return __inflect.number_to_words(num, andword='')
+  if num % 100 == 0:
+    return __inflect.number_to_words(num // 100) + ' hundred'
+  return __inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
 
 
 def __replace_e_to_the_power_of(text: str) -> str:
