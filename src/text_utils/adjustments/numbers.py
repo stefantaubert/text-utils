@@ -65,12 +65,6 @@ def __expand_number(m: Match) -> str:
     return __inflect.number_to_words(num // 100) + ' hundred'
   return __inflect.number_to_words(num, andword='', zero='oh', group=2).replace(', ', ' ')
 
-# print(__inflect.number_to_words(2000, andword=''))
-# print(__inflect.number_to_words(2009, andword=''))
-# bug
-# # NumOutOfRangeError
-# print(__inflect.number_to_words(210545465456454656546646565465454578134598813548846254540, andword=''))
-
 
 def __replace_e_to_the_power_of(text: str) -> str:
   text = re.sub(__e_minus_re, r'ten to the power of minus \1', text)
