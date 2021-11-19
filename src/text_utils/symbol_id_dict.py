@@ -100,6 +100,13 @@ class SymbolIdDict():
     symbols = tuple(self.get_symbol(s_id) for s_id in symbol_ids)
     return symbols
 
+  def add_symbol(self, symbol: str) -> None:
+    assert symbol not in self._ids_to_symbols
+    new_id = len(self._ids_to_symbols)
+    assert new_id not in self._symbols_to_ids
+    self._ids_to_symbols[symbol] = new_id
+    self._symbols_to_ids[new_id] = symbol
+
   # def serialized_symbol_ids_to_text(self, serialized_symbol_ids: str):
   #   symbol_ids = SymbolIdDict.deserialize_symbol_ids(serialized_symbol_ids)
   #   return self.get_text(symbol_ids)
