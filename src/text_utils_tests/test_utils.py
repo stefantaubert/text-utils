@@ -1,7 +1,7 @@
 from text_utils.utils import (delete_and_insert_in_list, is_sublist,
                               remove_empty_symbols, remove_empty_symbols_list,
                               remove_space_around_punctuation,
-                              split_symbols_on, symbols_join,
+                              split_symbols_on, 
                               symbols_map_outer, symbols_replace,
                               symbols_separate, symbols_split, symbols_strip,
                               symbols_to_lower, upper_list_if_true)
@@ -196,29 +196,6 @@ def test_symbols_separate__without_separate_at_end():
   res = symbols_separate(sentence, separate_symbols={"."})
   assert res == [("a", ".",), (" ", "b", "c")]
 
-
-def test_words_to_sentence__empty_list():
-  words = []
-
-  res = symbols_join(words, join_symbol=" ")
-
-  assert res == ()
-
-
-def test_words_to_sentence__one_word():
-  words = [("a",)]
-
-  res = symbols_join(words, join_symbol=" ")
-
-  assert res == ("a",)
-
-
-def test_words_to_sentence__two_words():
-  words = [("a",), ("b",)]
-
-  res = symbols_join(words, join_symbol=" ")
-
-  assert res == ("a", " ", "b")
 
 
 def test_strip_word__empty_word():

@@ -33,6 +33,10 @@ class SymbolFormat(IntEnum):
   def is_IPA(self):
     return self in (self.PHONEMES_IPA, self.PHONES_IPA)
 
+  @property
+  def is_ARPA(self):
+    return self in (self.PHONEMES_ARPA)
+
 
 format_dict = {str(x): x for x in list(SymbolFormat)}
 

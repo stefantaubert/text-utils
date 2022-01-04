@@ -19,6 +19,7 @@ from text_utils.pronunciation import (EngToIPAMode, break_n_thongs, change_ipa,
                                       symbols_to_arpa_pronunciation_dict,
                                       symbols_to_ipa)
 from text_utils.speakers_dict import SpeakersDict, SpeakersLogDict
+from text_utils.string_format import String, StringFormat
 from text_utils.symbol_format import SymbolFormat, get_format_from_str
 from text_utils.symbol_id_dict import SymbolIdDict
 from text_utils.symbols_dict import SymbolsDict
