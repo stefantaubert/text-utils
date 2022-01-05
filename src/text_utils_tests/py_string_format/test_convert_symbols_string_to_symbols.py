@@ -2,13 +2,13 @@ from text_utils.string_format import convert_symbols_string_to_symbols
 
 
 def test_component():
-  result = convert_symbols_string_to_symbols("   a   b c  d ef g    h i  ")
+  result = convert_symbols_string_to_symbols("  a  b c  d ef g    h i  ")
   assert result == (" ", "a", " ", "b", "c", " ", "d", "ef", "g", " ", " ", "h", "i", " ")
 
 
 def test_text_empty__returns_empty():
   result = convert_symbols_string_to_symbols("")
-  assert result == ("",)
+  assert result == tuple()
 
 
 def test_text_one_char__returns_char_as_symbol():
@@ -46,36 +46,11 @@ def test_text_space_before_symbol__returns_space_and_symbol():
   assert result == (" ", "a")
 
 
-def test_four_spaces__return_two_spaces():
-  result = convert_symbols_string_to_symbols("    ")
-  assert result == (" ", " ")
-
-
-def test_three_spaces__return_one_space():
-  result = convert_symbols_string_to_symbols("   ")
-  assert result == (" ", )
-
-
-def test_three_spaces_and_a_symbol__return_one_space_and_symbol():
-  result = convert_symbols_string_to_symbols("   a")
-  assert result == (" ", "a")
-
-
-def test_three_spaces_and_a_symbol_and_three_spaces__return_space_and_symbol_and_space():
-  result = convert_symbols_string_to_symbols("   a   ")
+def test_text_space_before_and_after_symbol__returns_space_and_symbol_and_space():
+  result = convert_symbols_string_to_symbols("  a  ")
   assert result == (" ", "a", " ")
 
 
-def test_space_and_symbol_return_symbol():
-  result = convert_symbols_string_to_symbols(" a")
-  assert result == ("a",)
-
-
-def test_symbol_and_space_return_symbol():
-  result = convert_symbols_string_to_symbols("a ")
-  assert result == ("a",)
-
-
-def test_space_and_symbol_and_space_return_symbol():
-  result = convert_symbols_string_to_symbols(" a ")
-  assert result == ("a",)
+def test_four_spaces__return_two_spaces():
+  result = convert_symbols_string_to_symbols("    ")
+  assert result == (" ", " ")

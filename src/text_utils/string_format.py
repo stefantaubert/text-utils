@@ -46,10 +46,8 @@ def convert_symbols_to_string(symbols: Symbols, string_format: StringFormat) -> 
 
 def can_convert_symbols_string_to_symbols(symbols_string: String) -> bool:
   words = symbols_string.split("  ")
-  words_symbols = [tuple(word.split(" ")) for word in words]
-  all_symbols = (symbol for word_symbols in words_symbols for symbol in word_symbols)
-  for symbol in all_symbols:
-    if "" in symbol:
+  for word in words:
+    if word.startswith(" ") or word.endswith(" "):
       return False
   return True
 
