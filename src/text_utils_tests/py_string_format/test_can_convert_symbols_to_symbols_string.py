@@ -31,3 +31,11 @@ def test_one_doublespace__returns_false():
 
 def test_symbol_with_space__returns_false():
   assert not can_convert_symbols_to_symbols_string(("a ",))
+
+
+def test_one_empty_symbol__returns_false():
+  assert not can_convert_symbols_to_symbols_string(("",))
+
+
+def test_symbol_and_empty_symbol__returns_false():
+  assert not can_convert_symbols_to_symbols_string(("a", ""))

@@ -3,7 +3,7 @@ import os
 import re
 from collections import OrderedDict
 from pathlib import Path
-from typing import Dict, List
+from typing import Collection, Dict, Iterable, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, TypeVar
 
@@ -158,6 +158,15 @@ def remove_space_around_punctuation(symbols: Symbols, space: Set[Symbol], punctu
   return new_symbols
 
 
+def symbols_endswith(symbols: Symbols, endswith: Set[Symbol]) -> bool:
+  # TODO refactor
+  if len(symbols) == 0:
+    return False
+  last_symbol = symbols[-1]
+  result = last_symbol in endswith
+  return result
+
+
 def symbols_ignore(symbols: Symbols, ignore: Set[Symbol]) -> Symbols:
   res = tuple(symbol for symbol in symbols if symbol not in ignore)
   return res
@@ -261,12 +270,12 @@ def symbols_to_upper(symbols: Symbols) -> Symbols:
   return res
 
 
-def symbols_join(list_of_symbols: List[Symbols], join_symbol: Symbol) -> Symbols:
+def symbols_join(list_of_symbols: Collection[Symbols], join_symbol: Optional[Symbol]) -> Symbols:
   res = []
   for i, word in enumerate(list_of_symbols):
     res.extend(word)
     is_last_word = i == len(list_of_symbols) - 1
-    if not is_last_word:
+    if not is_last_word and join_symbol is not None:
       res.append(join_symbol)
   return tuple(res)
 

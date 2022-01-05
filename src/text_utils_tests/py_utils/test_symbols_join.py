@@ -47,3 +47,19 @@ def test_two_empty_join_with_empty__returns_both_empty_separated_by_empty():
   res = symbols_join(words, join_symbol="")
 
   assert res == ("", "", "")
+
+
+def test_two_symbols__join_with_none__returns_two_symbols():
+  words = [("a",), ("b",)]
+
+  res = symbols_join(words, join_symbol=None)
+
+  assert res == ("a", "b")
+
+
+def test_two_words__join_with_none__returns_two_words():
+  words = [("a", "b"), ("c", "d")]
+
+  res = symbols_join(words, join_symbol=None)
+
+  assert res == ("a", "b", "c", "d")

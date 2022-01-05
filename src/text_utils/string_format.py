@@ -12,10 +12,10 @@ class StringFormat(IntEnum):
   TEXT = 0
   SYMBOLS = 1
 
-  def convert_string_to_symbols(self, text: String) -> Symbols:
-    return convert_string_to_symbols(text, self)
+  def convert_string_to_symbols(self, string: String) -> Symbols:
+    return convert_string_to_symbols(string, self)
 
-  def convert_to_symbols_to_string(self, symbols: Symbols) -> String:
+  def convert_symbols_to_string(self, symbols: Symbols) -> String:
     return convert_symbols_to_string(symbols, self)
 
   def __str__(self) -> str:
@@ -62,10 +62,13 @@ def convert_symbols_string_to_symbols(symbols_string: SymbolsString) -> Symbols:
 
 
 def can_convert_symbols_to_symbols_string(symbols: Symbols) -> bool:
+  if "" in symbols:
+    return False
   words = symbols_split(symbols, split_symbols=" ")
   symbols = (symbol for word in words for symbol in word)
   for symbol in symbols:
-    if symbol != " " and " " in symbol:
+    symbol_is_no_space_but_contains_space = symbol != " " and " " in symbol
+    if symbol_is_no_space_but_contains_space:
       return False
   return True
 
