@@ -720,7 +720,8 @@ def test_merge_left__insert_symbol_consists_of_two_chars():
 
 
 def test_merge_left__merge_symbols_are_not_merged_if_no_non_ignore_symbol_exists():
-  res = merge_left(" -- ", merge_symbols={"-"}, ignore_merge_symbols={" "}, insert_symbol=None)
+  res = merge_left(tuple(" -- ",), merge_symbols={"-"},
+                   ignore_merge_symbols={" "}, insert_symbol=None)
   assert res == (" ", "-", "-", " ")
 
 
@@ -761,35 +762,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = ("a", "&", "bc")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == "&?a"
-  assert res_2 == 2
-
-
-def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero__first_symbol_is_not_merge_or_ignore_merge_symbol_but_second_is_merge_symbol__insert_symbols_is_empty():
-  symbols = ("a", "&", "bc")
-  merge_symbols = {"&"}
-  ignore_merge_symbols = {" "}
-  insert_symbol = ""
-  res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
-
-  assert res_1 == "&a"
-  assert res_2 == 2
-
-
-def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero__first_symbol_is_not_merge_or_ignore_merge_symbol_but_second_is_merge_symbol__insert_symbols_consists_of_two_chars():
-  symbols = ("a", "&", "bc")
-  merge_symbols = {"&"}
-  ignore_merge_symbols = {" "}
-  insert_symbol = "?$"
-  res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
-
-  assert res_1 == "&?$a"
+  assert res_1 == ("&", "a")
   assert res_2 == 2
 
 
@@ -797,11 +773,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = ("abc", "&", "bc")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == "&?abc"
+  assert res_1 == ("&", "abc")
   assert res_2 == 2
 
 
@@ -809,11 +784,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = ("a", "&", "&")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == "&?&?a"
+  assert res_1 == ("&", "&", "a")
   assert res_2 == 3
 
 
@@ -821,11 +795,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = ("a", " ", "&")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == "a"
+  assert res_1 == ("a",)
   assert res_2 == 1
 
 
@@ -833,11 +806,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = (" ", "&", "bc")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == " "
+  assert res_1 == (" ",)
   assert res_2 == 1
 
 
@@ -845,11 +817,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = ("&", "a", "bc")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == "&"
+  assert res_1 == ("&",)
   assert res_2 == 1
 
 
@@ -857,11 +828,10 @@ def test_get_next_merged_left_symbol_and_index__from_left_is_true__index_is_zero
   symbols = ("&", "&", "bc")
   merge_symbols = {"&"}
   ignore_merge_symbols = {" "}
-  insert_symbol = "?"
   res_1, res_2 = get_next_merged_left_symbol_and_index(
-    symbols, 0, merge_symbols, ignore_merge_symbols, insert_symbol)
+    symbols, 0, merge_symbols, ignore_merge_symbols)
 
-  assert res_1 == "&"
+  assert res_1 == ("&",)
   assert res_2 == 1
 
 
@@ -966,6 +936,17 @@ def test_get_next_merged_right_symbol_and_index__from_left_is_false__index_is_ze
 
 # endregion
 
+
+# region symbol_joiner
+
+# def test_symbol_joiner():
+#   symbols = ("\"", "b")
+#   join_symbol = "?"
+#   res = symbol_joiner(symbols, join_symbol)
+
+#   assert next(res) == "\"?b"
+
+# endregion
 
 # def test_unprocessable_ipa():
 #   text = "ɡɹât͡ʃi"
