@@ -316,9 +316,9 @@ def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbol
   if insert_symbol is None:
     insert_symbol = ""
   merged_symbols = merge_left_core(symbols, merge_symbols, ignore_merge_symbols)
-  merged_symbols_with_insert_symbols = tuple(
-    [insert_symbol.join(single_merged_symbols) for single_merged_symbols in merged_symbols])
-  return merged_symbols_with_insert_symbols
+  merged_symbols_with_insert_symbols = (
+    insert_symbol.join(single_merged_symbols) for single_merged_symbols in merged_symbols)
+  return tuple(merged_symbols_with_insert_symbols)
 
 
 def merge_left_core(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Tuple[Symbols]:
@@ -346,24 +346,53 @@ def get_next_merged_left_symbol_and_index(symbols: Symbols, j: int, merge_symbol
 def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Optional[Symbol]) -> Symbols:
   if insert_symbol is None:
     insert_symbol = ""
+  merged_symbols = merge_right_core(symbols, merge_symbols, ignore_merge_symbols)
+  merged_symbols_with_insert_symbols = (
+    insert_symbol.join(single_merged_symbols) for single_merged_symbols in merged_symbols)
+  return tuple(merged_symbols_with_insert_symbols)
+
+
+def merge_right_core(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Tuple[Symbols]:
   j = 0
   merged_symbols = []
   while j < len(symbols):
     new_symbol, j = get_next_merged_right_symbol_and_index(
-      symbols, j, merge_symbols, ignore_merge_symbols, insert_symbol)
+      symbols, j, merge_symbols, ignore_merge_symbols)
     merged_symbols.append(new_symbol)
   return tuple(merged_symbols)
 
 
-def get_next_merged_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Tuple[Symbol, int]:
-  assert isinstance(insert_symbol, str)
-  new_symbol = symbols[j]
+def get_next_merged_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Tuple[Symbol, int]:
+  new_symbol = [symbols[j]]
   j += 1
-  if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
+  if new_symbol[0] not in ignore_merge_symbols and new_symbol[0] not in merge_symbols:
     while j < len(symbols) and symbols[j] in merge_symbols:
-      new_symbol += insert_symbol + symbols[j]
+      new_symbol.append(symbols[j])
       j += 1
-  return new_symbol, j
+  return tuple(new_symbol), j
+
+
+# def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Optional[Symbol]) -> Symbols:
+#   if insert_symbol is None:
+#     insert_symbol = ""
+#   j = 0
+#   merged_symbols = []
+#   while j < len(symbols):
+#     new_symbol, j = get_next_merged_right_symbol_and_index(
+#       symbols, j, merge_symbols, ignore_merge_symbols, insert_symbol)
+#     merged_symbols.append(new_symbol)
+#   return tuple(merged_symbols)
+
+
+# def get_next_merged_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Tuple[Symbol, int]:
+#   assert isinstance(insert_symbol, str)
+#   new_symbol = symbols[j]
+#   j += 1
+#   if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
+#     while j < len(symbols) and symbols[j] in merge_symbols:
+#       new_symbol += insert_symbol + symbols[j]
+#       j += 1
+#   return new_symbol, j
 
 # def is_phonetic_transcription_in_text(text: str) -> bool:
 #   # ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
