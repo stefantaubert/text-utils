@@ -321,7 +321,7 @@ def merge_left(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbol
   return merged_symbols_with_insert_symbols
 
 
-def merge_left_core(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Symbols:
+def merge_left_core(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol]) -> Tuple[Symbols]:
   j = 0
   reversed_symbols = symbols[::-1]
   reversed_merged_symbols = []
