@@ -371,29 +371,6 @@ def get_next_merged_right_symbol_and_index(symbols: Symbols, j: int, merge_symbo
       j += 1
   return tuple(new_symbol), j
 
-
-# def merge_right(symbols: Symbols, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Optional[Symbol]) -> Symbols:
-#   if insert_symbol is None:
-#     insert_symbol = ""
-#   j = 0
-#   merged_symbols = []
-#   while j < len(symbols):
-#     new_symbol, j = get_next_merged_right_symbol_and_index(
-#       symbols, j, merge_symbols, ignore_merge_symbols, insert_symbol)
-#     merged_symbols.append(new_symbol)
-#   return tuple(merged_symbols)
-
-
-# def get_next_merged_right_symbol_and_index(symbols: Symbols, j: int, merge_symbols: Set[Symbol], ignore_merge_symbols: Set[Symbol], insert_symbol: Symbol) -> Tuple[Symbol, int]:
-#   assert isinstance(insert_symbol, str)
-#   new_symbol = symbols[j]
-#   j += 1
-#   if new_symbol not in ignore_merge_symbols and new_symbol not in merge_symbols:
-#     while j < len(symbols) and symbols[j] in merge_symbols:
-#       new_symbol += insert_symbol + symbols[j]
-#       j += 1
-#   return new_symbol, j
-
 # def is_phonetic_transcription_in_text(text: str) -> bool:
 #   # ph_trans_in_text = PH_TRANS_NO_WHITESPACE.match(text)
 #   ph_trans_in_text = PH_TRANS.search(text)
