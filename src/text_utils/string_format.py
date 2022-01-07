@@ -28,6 +28,13 @@ class StringFormat(IntEnum):
     assert False
 
 
+def get_other_format(string_format: StringFormat) -> StringFormat:
+  if string_format == StringFormat.SYMBOLS:
+    return StringFormat.TEXT
+  if string_format == StringFormat.TEXT:
+    return StringFormat.SYMBOLS
+  assert False
+
 def convert_string_to_symbols(string: String, string_format: StringFormat) -> Symbols:
   if string_format == StringFormat.SYMBOLS:
     return convert_symbols_string_to_symbols(string)
