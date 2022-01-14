@@ -18,15 +18,23 @@ class StringFormat(IntEnum):
   def convert_symbols_to_string(self, symbols: Symbols) -> String:
     return convert_symbols_to_string(symbols, self)
 
-  def __str__(self) -> str:
+  # def __str__(self) -> str:
+  #   if self == self.TEXT:
+  #     return "TEXT"
+
+  #   if self == self.SYMBOLS:
+  #     return "SYMBOLS"
+
+  #   assert False
+    
+  def __repr__(self) -> str:
     if self == self.TEXT:
-      return "TEXT"
+      return "Text"
 
     if self == self.SYMBOLS:
-      return "SYMBOLS"
+      return "Symbols"
 
     assert False
-
 
 def get_other_format(string_format: StringFormat) -> StringFormat:
   if string_format == StringFormat.SYMBOLS:
