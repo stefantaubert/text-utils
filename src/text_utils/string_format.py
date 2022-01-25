@@ -1,7 +1,9 @@
 from enum import IntEnum
+from typing import Generator
 
 from text_utils.types import Symbols
-from text_utils.utils import symbols_ignore, symbols_join, symbols_split
+from text_utils.utils import (symbols_ignore, symbols_join, symbols_split,
+                              symbols_split_iterable)
 
 String = str
 TextString = String
@@ -118,3 +120,9 @@ def convert_text_string_to_symbols(text_string: TextString) -> Symbols:
 def convert_symbols_to_text_string(symbols: Symbols) -> TextString:
   result = TEXT_SYMBOL_SEP.join(symbols)
   return result
+
+
+def get_words(symbols: Symbols) -> Generator[Symbols, None, None]:
+  words = symbols_split_iterable(symbols, TUPLE_WORD_SEP)
+  words_without_empty = (word for word in words if len(word) > 0)
+  return words_without_empty
