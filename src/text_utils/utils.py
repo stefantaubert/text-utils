@@ -3,9 +3,9 @@ import os
 import re
 from collections import OrderedDict
 from pathlib import Path
-from typing import Collection, Dict, Iterable, List, Optional
+from typing import Collection, Dict, Generator, Iterable, List, Optional
 from typing import OrderedDict as OrderedDictType
-from typing import Set, TypeVar, Generator
+from typing import Set, TypeVar
 
 from pronunciation_dict_parser import PronunciationDict
 
@@ -215,6 +215,7 @@ def remove_empty_symbols(symbols: Symbols) -> Symbols:
 def symbols_split(sentence_symbols: Symbols, split_symbols: Set[Symbol]) -> List[Symbols]:
   return list(symbols_split_iterable(sentence_symbols, split_symbols))
 
+
 def symbols_split_iterable(sentence_symbols: Symbols, split_symbols: Set[Symbol]) -> Generator[Symbols, None, None]:
   if len(sentence_symbols) == 0:
     return
@@ -225,7 +226,7 @@ def symbols_split_iterable(sentence_symbols: Symbols, split_symbols: Set[Symbol]
       current = []
     else:
       current.append(symbol)
-  #if len(current) > 0:
+  # if len(current) > 0:
   yield tuple(current)
 
 
