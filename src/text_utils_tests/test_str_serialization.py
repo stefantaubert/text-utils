@@ -20,3 +20,10 @@ def test_str_serialization_seven_spaces():
   res = list(str_deserialization(text, " "))
 
   assert res == ["St", " ", " ", " ", "7s"]
+
+
+def test_str_serialization_two_spaces_at_end():
+  text = "St 1s  "
+  res = list(str_deserialization(text, " "))
+
+  assert res == ["St", "1s", " "]
