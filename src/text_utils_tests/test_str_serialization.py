@@ -1,4 +1,5 @@
-from text_utils.str_serialization import str_deserialization, str_serialization
+from text_utils.str_serialization import (can_serialize, str_deserialization,
+                                          str_serialization)
 
 # region str_deserialization
 
@@ -119,6 +120,20 @@ def test_str_deserialization_two_spaces_at_beginning():
   assert res == [" ", "a"]
 
 
+def test_str_deserialization_four_spaces_at_end():
+  text = "a    "
+  res = list(str_deserialization(text, " "))
+
+  assert res == ["a", " ", " "]
+
+
+def test_str_deserialization_four_spaces_at_beginning():
+  text = "    a"
+  res = list(str_deserialization(text, " "))
+
+  assert res == [" ", " ", "a"]
+
+
 def test_str_deserialization_only_one_space():
   text = " "
   res = list(str_deserialization(text, " "))
@@ -145,5 +160,116 @@ def test_str_deserialization_empty_text():
   res = list(str_deserialization(text, " "))
 
   assert res == []
+
+# endregion
+
+# region can_deserialize
+
+# spaces in middle
+
+
+def test_can_deserialize__one_space_in_between():
+  text = "a b"
+  res = can_serialize(text, " ")
+
+  assert res
+
+
+def test_can_deserialize__two_spaces_in_between():
+  text = "a  b"
+  res = can_serialize(text, " ")
+
+  assert not res
+
+
+def test_can_deserialize__three_spaces_in_between():
+  text = "a   b"
+  res = can_serialize(text, " ")
+
+  assert res
+
+
+def test_can_deserialize__four_spaces_in_between():
+  text = "a    b"
+  res = can_serialize(text, " ")
+
+  assert not res
+
+
+def test_can_deserialize__five_spaces_in_between():
+  text = "a     b"
+  res = can_serialize(text, " ")
+
+  assert res
+
+# spaces at beginning
+
+
+def test_can_deserialize__one_space_at_beginning():
+  text = " a"
+  res = can_serialize(text, " ")
+
+  assert not res
+
+
+def test_can_deserialize__two_spaces_at_beginning():
+  text = "  a"
+  res = can_serialize(text, " ")
+
+  assert res
+
+
+def test_can_deserialize__three_spaces_at_beginning():
+  text = "   a"
+  res = can_serialize(text, " ")
+
+  assert not res
+
+def test_can_deserialize__four_spaces_at_beginning():
+  text = "    a"
+  res = can_serialize(text, " ")
+
+  assert res
+
+def test_can_deserialize__five_spaces_at_beginning():
+  text = "     a"
+  res = can_serialize(text, " ")
+
+  assert not res
+
+# spaces at end
+
+
+def test_can_deserialize__one_space_at_end():
+  text = "a "
+  res = can_serialize(text, " ")
+
+  assert not res
+
+
+def test_can_deserialize__two_spaces_at_end():
+  text = "a  "
+  res = can_serialize(text, " ")
+
+  assert res
+
+
+def test_can_deserialize__three_spaces_at_end():
+  text = "a   "
+  res = can_serialize(text, " ")
+
+  assert not res
+
+def test_can_deserialize__four_spaces_at_end():
+  text = "a    "
+  res = can_serialize(text, " ")
+
+  assert res
+
+def test_can_deserialize__five_spaces_at_end():
+  text = "a     "
+  res = can_serialize(text, " ")
+
+  assert not res
 
 # endregion
