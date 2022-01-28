@@ -14,9 +14,17 @@ def str_serialization(symbols: Iterable[str], split_symbol: Symbol) -> str:
 
 
 def can_deserialize(text: str, split_symbol: Symbol) -> bool:
-  last_char_was_split_symbol = True
+  no_of_subsequent_split_symbols = 1
   for char in text:
-    pass
+    if char == split_symbol:
+      no_of_subsequent_split_symbols += 1
+    else:
+      if no_of_subsequent_split_symbols % 2 == 0:
+        return False
+      no_of_subsequent_split_symbols = 0
+  if no_of_subsequent_split_symbols % 2 == 0:
+    return True
+  return False
 
 
 def str_deserialization(text: str, split_symbol: Symbol) -> Generator[Symbol, None, None]:
