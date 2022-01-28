@@ -35,5 +35,6 @@ from text_utils.types import (Accent, AccentId, AccentIds, Accents, Speaker,
                               SymbolId, SymbolIds, Symbols)
 from text_utils.utils import (deserialize_list, get_ngrams, serialize_list,
                               symbols_endswith, symbols_ignore, symbols_join,
-                              symbols_replace, symbols_split, symbols_strip,
+                              symbols_replace, symbols_split,
+                              symbols_split_iterable, symbols_strip,
                               symbols_to_lower, symbols_to_upper)
