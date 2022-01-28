@@ -119,11 +119,25 @@ def test_str_deserialization_two_spaces_at_beginning():
   assert res == [" ", "a"]
 
 
-def test_str_deserialization_only_spaces():
+def test_str_deserialization_only_one_space():
+  text = " "
+  res = list(str_deserialization(text, " "))
+
+  assert res == [" "]
+
+
+def test_str_deserialization_only_three_spaces():
   text = "   "
   res = list(str_deserialization(text, " "))
 
   assert res == [" ", " "]
+
+
+def test_str_deserialization_only_five_spaces():
+  text = "     "
+  res = list(str_deserialization(text, " "))
+
+  assert res == [" ", " ", " "]
 
 
 def test_str_deserialization_empty_text():

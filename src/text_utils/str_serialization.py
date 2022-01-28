@@ -30,7 +30,7 @@ def str_deserialization(text: str, split_symbol: Symbol) -> Generator[Symbol, No
         if yield_subsequent_split_symbol is None:
           yield char
           yield_subsequent_split_symbol = False
-        if yield_subsequent_split_symbol:
+        elif yield_subsequent_split_symbol:
           yield char
           yield_subsequent_split_symbol = False
         else:
