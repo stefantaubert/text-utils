@@ -60,6 +60,8 @@ def get_other_format(string_format: StringFormat) -> StringFormat:
 
 
 def convert_string_to_symbols(string: String, string_format: StringFormat) -> Symbols:
+  assert isinstance(string, str)
+  assert isinstance(string_format, StringFormat)
   if string_format == StringFormat.SYMBOLS:
     return convert_symbols_string_to_symbols(string)
   if string_format == StringFormat.TEXT:
@@ -68,6 +70,8 @@ def convert_string_to_symbols(string: String, string_format: StringFormat) -> Sy
 
 
 def convert_symbols_to_string(symbols: Symbols, string_format: StringFormat) -> String:
+  assert isinstance(symbols, tuple)
+  assert isinstance(string_format, StringFormat)
   if string_format == StringFormat.SYMBOLS:
     return convert_symbols_to_symbols_string(symbols)
   if string_format == StringFormat.TEXT:
