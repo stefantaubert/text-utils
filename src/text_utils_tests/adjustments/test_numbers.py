@@ -49,6 +49,20 @@ def test_normalize_numbers():
   res = normalize_numbers("$5654 -54 5e-21 test $300,000.40")
   assert res == "five thousand, six hundred fifty-four dollars minus fifty-four five times ten to the power of minus twenty-one test three hundred thousand dollars, forty cents"
 
+def test_normalize_numbers__number_contains_comma():
+  text = "123,456"
+  res = normalize_numbers(text)
+  assert res == "one hundred twenty-three thousand, four hundred fifty-six"
+
+def test_normalize_numbers__number_six_digits_without_comma():
+  text = "123456"
+  res = normalize_numbers(text)
+  assert res == "one hundred twenty-three thousand, four hundred fifty-six"
+
+def xtest_normalize_numbers__fraction():
+  text = "1/2"
+  res = normalize_numbers(text)
+  assert res == "one half"
 
 def test_expand_number__number_is_smaller_than_1000():
   m = re.match(__number_re, "999")
@@ -96,6 +110,8 @@ def test_expand_number__number_is_between_1000_and_3000_and_not_one_of_other_cas
   m = re.match(__number_re, "1987")
   res = __expand_number(m)
   assert res == "nineteen eighty-seven"
+
+
 
 
 def test_expand_number__number_is_undecillion__return_empty_string():

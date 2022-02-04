@@ -18,13 +18,16 @@ def serialize_symbols(symbols: Iterable[Symbol], split_symbol: Symbol) -> str:
 
 def can_deserialize_symbols(text: str, split_symbol: Symbol) -> bool:
   no_of_subsequent_split_symbols = 1
+  last_char_was_non_split_symbol = False
   for char in text:
     if char == split_symbol:
       no_of_subsequent_split_symbols += 1
+      last_char_was_non_split_symbol = False
     else:
-      if no_of_subsequent_split_symbols % 2 == 0:
+      if no_of_subsequent_split_symbols % 2 == 0 and not last_char_was_non_split_symbol:
         return False
       no_of_subsequent_split_symbols = 0
+      last_char_was_non_split_symbol = True
   if no_of_subsequent_split_symbols % 2 == 0:
     return True
   return False

@@ -1,4 +1,5 @@
-from text_utils.str_serialization import (can_deserialize_symbols, can_serialize_symbols,
+from text_utils.str_serialization import (can_deserialize_symbols,
+                                          can_serialize_symbols,
                                           deserialize_symbols,
                                           serialize_symbols)
 
@@ -277,6 +278,19 @@ def test_can_deserialize__five_spaces_at_end():
 
   assert not res
 
+def test_can_deserialize_symbols__symbol_consists_of_more_than_one_char():
+  text = "a bcd"
+  res = can_deserialize_symbols(text, " ")
+
+  assert res == True
+
+
+def test_can_deserialize_symbols__bugfix():
+  text = "P R IH1 N IH0 NG , IH0 N   DH AH0   OW1 N L IY0   S EH1 N S   W IH0 DH   HH W IH1 CH   W IY1   AA1 R   AE1 T   P ER0 Z EH1 N T   K AH0 N S ER1 N D , D IH1 F ER0 Z   F ER0 M   M OW1 S   IH0 F   N AA1 T   F ER0 M   AO1 L   DH AH0   AA1 R T S   AE1 N D   K R AE1 F S   R EH2 P R AH0 Z EH1 N AH0 D   IH0 N   DH AH0   EH2 K S AH0 B IH1 SH AH0 N"
+  res = can_deserialize_symbols(text, " ")
+
+  assert res == True
+
 # endregion
 
 # region can_serialize
@@ -296,3 +310,6 @@ def test_can_serialize__expect_false():
   assert res == False
 
 # endregion
+
+
+
