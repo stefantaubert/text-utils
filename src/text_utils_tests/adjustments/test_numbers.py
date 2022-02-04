@@ -59,11 +59,6 @@ def test_normalize_numbers__number_six_digits_without_comma():
   res = normalize_numbers(text)
   assert res == "one hundred twenty-three thousand, four hundred fifty-six"
 
-def xtest_normalize_numbers__fraction():
-  text = "1/2"
-  res = normalize_numbers(text)
-  assert res == "one half"
-
 def test_expand_number__number_is_smaller_than_1000():
   m = re.match(__number_re, "999")
   res = __expand_number(m)
