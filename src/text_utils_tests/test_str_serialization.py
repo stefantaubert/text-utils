@@ -278,3 +278,21 @@ def test_can_deserialize__five_spaces_at_end():
   assert not res
 
 # endregion
+
+# region can_serialize
+
+
+def test_can_serialize():
+  symbols = ("a", " ")
+  res = can_serialize(symbols, " ")
+
+  assert res == True
+
+
+def test_can_serialize__expect_false():
+  symbols = ("a ",)
+  res = can_serialize(symbols, " ")
+
+  assert res == False
+
+# endregion

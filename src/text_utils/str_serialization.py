@@ -4,7 +4,10 @@ from text_utils.types import Symbol
 
 
 def can_serialize(symbols: Iterable[str], split_symbol: Symbol) -> bool:
-  pass
+  for symbol in symbols:
+    if split_symbol in symbol and symbol != split_symbol:
+      return False
+  return True
 
 
 def str_serialization(symbols: Iterable[str], split_symbol: Symbol) -> str:
