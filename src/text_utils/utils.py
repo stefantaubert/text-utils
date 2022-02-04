@@ -3,7 +3,7 @@ import os
 import re
 from collections import OrderedDict
 from pathlib import Path
-from typing import Collection, Dict, Iterable, List, Optional
+from typing import Collection, Dict, Generator, Iterable, List, Optional
 from typing import OrderedDict as OrderedDictType
 from typing import Set, TypeVar
 
@@ -213,18 +213,21 @@ def remove_empty_symbols(symbols: Symbols) -> Symbols:
 
 
 def symbols_split(sentence_symbols: Symbols, split_symbols: Set[Symbol]) -> List[Symbols]:
+  return list(symbols_split_iterable(sentence_symbols, split_symbols))
+
+
+def symbols_split_iterable(sentence_symbols: Symbols, split_symbols: Set[Symbol]) -> Generator[Symbols, None, None]:
   if len(sentence_symbols) == 0:
-    return []
-  res = []
+    return
   current = []
   for symbol in sentence_symbols:
     if symbol in split_symbols:
-      res.append(tuple(current))
+      yield tuple(current)
       current = []
     else:
       current.append(symbol)
-  res.append(tuple(current))
-  return res
+  # if len(current) > 0:
+  yield tuple(current)
 
 
 def symbols_separate(sentence_symbols: Symbols, separate_symbols: Set[Symbol]) -> List[Symbols]:
