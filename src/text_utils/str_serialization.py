@@ -3,20 +3,20 @@ from typing import Generator, Iterable
 from text_utils.types import Symbol
 
 
-def can_serialize(symbols: Iterable[str], split_symbol: Symbol) -> bool:
+def can_serialize_symbols(symbols: Iterable[Symbol], split_symbol: Symbol) -> bool:
   for symbol in symbols:
     if split_symbol in symbol and symbol != split_symbol:
       return False
   return True
 
 
-def str_serialization(symbols: Iterable[str], split_symbol: Symbol) -> str:
+def serialize_symbols(symbols: Iterable[Symbol], split_symbol: Symbol) -> str:
   assert len(split_symbol) == 1
   text = split_symbol.join(symbols)
   return text
 
 
-def can_deserialize(text: str, split_symbol: Symbol) -> bool:
+def can_deserialize_symbols(text: str, split_symbol: Symbol) -> bool:
   no_of_subsequent_split_symbols = 1
   for char in text:
     if char == split_symbol:
@@ -30,7 +30,7 @@ def can_deserialize(text: str, split_symbol: Symbol) -> bool:
   return False
 
 
-def str_deserialization(text: str, split_symbol: Symbol) -> Generator[Symbol, None, None]:
+def deserialize_symbols(text: str, split_symbol: Symbol) -> Generator[Symbol, None, None]:
   #assert can_deserialize(text, split_symbol)
   assert len(split_symbol) == 1
   symbol = ""

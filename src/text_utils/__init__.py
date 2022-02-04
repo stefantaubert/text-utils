@@ -21,6 +21,8 @@ from text_utils.pronunciation import (EngToIPAMode, break_n_thongs, change_ipa,
 from text_utils.speakers_dict import SpeakersDict, SpeakersLogDict
 from text_utils.string_format import (String, StringFormat, SymbolsString,
                                       TextString, get_words)
+from text_utils.string_format2 import (String2, StringFormat2, SymbolsString2,
+                                       TextString2)
 from text_utils.symbol_format import SymbolFormat, get_format_from_str
 from text_utils.symbol_id_dict import SymbolIdDict
 from text_utils.symbols_dict import SymbolsDict
