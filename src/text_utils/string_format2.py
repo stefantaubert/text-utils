@@ -58,7 +58,7 @@ def convert_string_to_symbols(string: String2, string_format: StringFormat2) -> 
   assert isinstance(string, str)
   assert isinstance(string_format, StringFormat2)
   if string_format == StringFormat2.SPACED:
-    return deserialize_symbols(string, SPACED_SEP)
+    return tuple(deserialize_symbols(string, SPACED_SEP))
   if string_format == StringFormat2.DEFAULT:
     return convert_text_string_to_symbols(string)
   assert False
