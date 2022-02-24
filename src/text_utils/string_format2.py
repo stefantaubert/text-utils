@@ -15,6 +15,7 @@ SPACED_SEP = " "
 
 class StringFormat2(IntEnum):
   DEFAULT = 0
+  # rename to separated
   SPACED = 1
 
   def convert_string_to_symbols(self, string: String2) -> Symbols:
