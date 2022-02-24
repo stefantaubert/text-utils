@@ -19,6 +19,7 @@ from text_utils.utils import \
 from text_utils.utils import (split_text, symbols_join, symbols_separate,
                               symbols_split, symbols_strip)
 
+ARPA_SENTENCE_SEPARATORS = {"?", "!", "."}
 IPA_SENTENCE_SEPARATORS = {"?", "!", "."}
 CHN_SENTENCE_SEPARATORS = {"?", "!", ".", "？", "！", "。"}
 
@@ -32,6 +33,10 @@ def split_ipa_text(text: str) -> List[str]:
   # TODO separate not split!
   raise Exception()
   return split_text(text, IPA_SENTENCE_SEPARATORS)
+
+
+def arpa_symbols_to_sentences(symbols: Symbols) -> List[Symbols]:
+  return symbols_to_sentences_core(symbols, separators=ARPA_SENTENCE_SEPARATORS)
 
 
 def ipa_symbols_to_sentences(symbols: Symbols) -> List[Symbols]:
@@ -168,8 +173,8 @@ def text_to_sentences(text: str, text_format: SymbolFormat, lang: Optional[Langu
 def symbols_to_sentences(symbols: Symbols, symbols_format: SymbolFormat, lang: Optional[Language]) -> List[Symbols]:
   if symbols_format.is_IPA:
     return ipa_symbols_to_sentences(symbols)
-  if symbols_format == SymbolFormat.PHONEMES_ARPA:
-    raise ValueError("Not supported!")
+  if symbols_format.is_ARPA:
+    return arpa_symbols_to_sentences(symbols)
 
   assert symbols_format == SymbolFormat.GRAPHEMES
 

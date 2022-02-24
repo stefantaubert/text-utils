@@ -35,7 +35,7 @@ class SymbolFormat(IntEnum):
 
   @property
   def is_ARPA(self):
-    return self in (self.PHONEMES_ARPA)
+    return self == self.PHONEMES_ARPA
 
 
 format_dict = {str(x): x for x in list(SymbolFormat)}
