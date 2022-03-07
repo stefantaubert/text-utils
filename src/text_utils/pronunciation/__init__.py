@@ -10,4 +10,6 @@ from text_utils.pronunciation.main import (EngToIPAMode, change_ipa,
                                            symbols_to_arpa,
                                            symbols_to_arpa_pronunciation_dict,
                                            symbols_to_ipa)
-from text_utils.pronunciation.stress_detection import split_stress_arpa, split_stress_ipa
+from text_utils.pronunciation.stress_detection import (StressType,
+                                                       split_stress_arpa,
+                                                       split_stress_ipa)
