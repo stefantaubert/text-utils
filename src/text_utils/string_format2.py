@@ -10,7 +10,7 @@ String2 = str
 TextString2 = String2
 SymbolsString2 = String2
 
-SPACED_SEP = " "
+DEFAULT_SPACED_SEP = " "
 
 
 class StringFormat2(IntEnum):
@@ -18,30 +18,30 @@ class StringFormat2(IntEnum):
   # rename to separated
   SPACED = 1
 
-  def convert_string_to_symbols(self, string: String2) -> Symbols:
-    return convert_string_to_symbols(string, self)
+  def convert_string_to_symbols(self, string: String2, sep: str = DEFAULT_SPACED_SEP) -> Symbols:
+    return convert_string_to_symbols(string, self, sep)
 
-  def convert_symbols_to_string(self, symbols: Symbols) -> String2:
-    return convert_symbols_to_string(symbols, self)
+  def convert_symbols_to_string(self, symbols: Symbols, sep: str = DEFAULT_SPACED_SEP) -> String2:
+    return convert_symbols_to_string(symbols, self, sep)
 
-  def can_convert_string_to_symbols(self, string: String2) -> bool:
-    return can_convert_string_to_symbols(string, self)
+  def can_convert_string_to_symbols(self, string: String2, sep: str = DEFAULT_SPACED_SEP) -> bool:
+    return can_convert_string_to_symbols(string, self, sep)
 
-  def can_convert_symbols_to_string(self, symbols: Symbols) -> bool:
-    return can_convert_symbols_to_string(symbols, self)
+  def can_convert_symbols_to_string(self, symbols: Symbols, sep: str = DEFAULT_SPACED_SEP) -> bool:
+    return can_convert_symbols_to_string(symbols, self, sep)
 
 
-def can_convert_string_to_symbols(string: String2, string_format: StringFormat2) -> bool:
+def can_convert_string_to_symbols(string: String2, string_format: StringFormat2, sep: str) -> bool:
   if string_format == StringFormat2.SPACED:
-    return can_deserialize_symbols(string, SPACED_SEP)
+    return can_deserialize_symbols(string, sep)
   if string_format == StringFormat2.DEFAULT:
     return True
   assert False
 
 
-def can_convert_symbols_to_string(symbols: Symbols, string_format: StringFormat2) -> bool:
+def can_convert_symbols_to_string(symbols: Symbols, string_format: StringFormat2, sep: str) -> bool:
   if string_format == StringFormat2.SPACED:
-    return can_serialize_symbols(symbols, SPACED_SEP)
+    return can_serialize_symbols(symbols, sep)
   if string_format == StringFormat2.DEFAULT:
     return True
   assert False
@@ -55,21 +55,21 @@ def get_other_format(string_format: StringFormat2) -> StringFormat2:
   assert False
 
 
-def convert_string_to_symbols(string: String2, string_format: StringFormat2) -> Symbols:
+def convert_string_to_symbols(string: String2, string_format: StringFormat2, sep: str) -> Symbols:
   assert isinstance(string, str)
   assert isinstance(string_format, StringFormat2)
   if string_format == StringFormat2.SPACED:
-    return tuple(deserialize_symbols(string, SPACED_SEP))
+    return tuple(deserialize_symbols(string, sep))
   if string_format == StringFormat2.DEFAULT:
     return convert_text_string_to_symbols(string)
   assert False
 
 
-def convert_symbols_to_string(symbols: Symbols, string_format: StringFormat2) -> String2:
+def convert_symbols_to_string(symbols: Symbols, string_format: StringFormat2, sep: str) -> String2:
   assert isinstance(symbols, tuple)
   assert isinstance(string_format, StringFormat2)
   if string_format == StringFormat2.SPACED:
-    return serialize_symbols(symbols, SPACED_SEP)
+    return serialize_symbols(symbols, sep)
   if string_format == StringFormat2.DEFAULT:
     return convert_symbols_to_text_string(symbols)
   assert False
