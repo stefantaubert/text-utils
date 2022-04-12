@@ -30,9 +30,8 @@ from text_utils.pronunciation.ipa_symbols import (ENG_ARPA_DIPHTONGS,
 from text_utils.pronunciation.pronunciation_dict_cache import \
     get_eng_pronunciation_dict_arpa
 from text_utils.symbol_format import SymbolFormat
-from text_utils.text import symbols_to_words
 from text_utils.types import Symbol, Symbols
-from text_utils.utils import symbols_split, symbols_to_upper
+from text_utils.utils import symbols_to_upper
 
 DEFAULT_IGNORE_PUNCTUATION: Set[Symbol] = set(string.punctuation)
 DEFAULT_PUNCTUATION_FOR_SPACE_REMOVAL: Set[Symbol] = {".", ",", ";", "?", "!"}
