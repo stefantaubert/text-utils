@@ -141,6 +141,7 @@ ENG_DIPHTHONGS = ENG_ARPA_DIPHTONGS | {
   "ɪə",
   "ɪɹ",
   "ɛər",
+  "ɛɪ",  # extra
   "ɛə",
   "eə",  # extra "air"
   "eər",  # extra

@@ -746,6 +746,12 @@ def test_merge_left_core__merge_symbols_are_not_merged_if_no_non_ignore_symbol_e
                         ignore_merge_symbols={" "})
   assert res == ((" ",), ("-",), ("-",), (" ",))
 
+
+def test_merge_left_core__only_merge_symbols__were_not_merged():
+  res = merge_left_core((",", "!"), merge_symbols={
+      ",", "!"}, ignore_merge_symbols={})
+  assert res == ((",",), ("!",))
+
 # endregion
 
 # region get_next_merged_left_symbol_and_index
@@ -899,13 +905,19 @@ def test_merge_right__insert_symbol_consists_of_two_chars():
 def test_merge_right_core():
   res = merge_right_core(tuple("'a, ,'b!"), merge_symbols={
       "'", "!", ","}, ignore_merge_symbols={" "})
-  assert res == (("'",), ("a",","), (" ",), (",",), ("'",), ("b","!"))
+  assert res == (("'",), ("a", ","), (" ",), (",",), ("'",), ("b", "!"))
 
 
 def test_merge_right_core_abc():
   res = merge_right_core((",", "abc", ","), merge_symbols={
       ","}, ignore_merge_symbols={" "})
-  assert res == ((",",), ("abc",","))
+  assert res == ((",",), ("abc", ","))
+
+
+def test_merge_right_core__only_merge_symbols__were_not_merged():
+  res = merge_right_core((",", "!"), merge_symbols={
+      ",", "!"}, ignore_merge_symbols={})
+  assert res == ((",",), ("!",))
 
 # endregion
 
