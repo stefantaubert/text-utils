@@ -23,6 +23,9 @@ CHN_PUNCTUATION_MAPPING = {
   "『": "\"",
   "』": "\"",
   "、": ",",
+  "（": "(",
+  "）": ")",
+  '·': "-",
 }
 
 CHN_PUNCTUATION: Set[Symbol] = set(CHN_PUNCTUATION_MAPPING.keys()) | set(string.punctuation)
